@@ -1,0 +1,17 @@
+{
+    "name": "merkle_generate",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "test": "node index.js",
+      "debug": "node inspect index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "merkletreejs": "^0.3.11",
+      "starknet": "6.4.0"
+    }
+  }
+  

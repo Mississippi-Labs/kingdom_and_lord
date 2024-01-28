@@ -1,0 +1,43 @@
+[package]
+cairo-version = "2.4.0"
+name = "kingdom_lord"
+version = "0.5.0"
+
+[cairo]
+sierra-replace-ids = true
+
+[dependencies]
+dojo = { git = "https://github.com/dojoengine/dojo", version = "0.5.1" }
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.8.0" }
+# alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "01a7690dc25d19a086f525b8ce66aa505c8e7527"}
+
+[[target.dojo]]
+build-external-contracts = ["openzeppelin::presets::erc20::ERC20"]
+
+[tool.dojo]
+initializer_class_hash = "0xbeef"
+
+[tool.dojo.env]
+rpc_url = "http://localhost:5050/"
+# Default account for katana with seed = 0
+account_address = "0x6162896d1d7ab204c7ccac6dd5f8e9e7c25ecd5ae4fcb4ad32e57786bb46e03"
+private_key = "0x1800000000300000180000000000030000000000003006001800006600"
+
+[profile.mssp.tool.dojo.env]
+rpc_url = "https://katana1.0xmssp.xyz/"
+# Default account for katana with seed = 0
+account_address = "0x6162896d1d7ab204c7ccac6dd5f8e9e7c25ecd5ae4fcb4ad32e57786bb46e03"
+private_key = "0x1800000000300000180000000000030000000000003006001800006600"
+
+
+[tool.dojo.world]
+name = "Dojo starter"
+description = "The official Dojo Starter guide, the quickest and most streamlined way to get your Dojo Autonomous World up and running. This guide will assist you with the initial setup, from cloning the repository to deploying your world."
+cover_uri = "file://assets/cover.png"
+icon_uri = "file://assets/icon.png"
+website = "https://github.com/dojoengine/dojo-starter"
+
+[tool.dojo.world.socials]
+x = "https://x.com/ohayo_dojo"
+discord = "https://discord.gg/FB2wR6uF"
+github = "https://github.com/dojoengine/dojo-starter"

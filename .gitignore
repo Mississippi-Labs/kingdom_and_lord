@@ -1,0 +1,6 @@
+target
+local
+.venv
+node_modules
+.pdm-python
+__pycache__

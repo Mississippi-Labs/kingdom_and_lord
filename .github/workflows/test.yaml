@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+env:
+  DEPLOY_RPC_URL: https://katana1.0xmssp.xyz
+  TARGET_NAME: mssp
+
+jobs:
+  sozo-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: curl -L https://install.dojoengine.org | bash
+      - run: /home/runner/.config/.dojo/bin/dojoup
+      - run: echo $PATH
+      - run: cp /home/runner/.config/.dojo/bin/sozo /usr/local/bin/sozo
+      - run: sozo build
+      - run: sozo test
+      - run: sozo --profile ${{ env.TARGET_NAME }} migrate
+      - run: ls target
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manifest.json
+          path: target/${{ env.TARGET_NAME }}/manifest.json
+      - run: bash scripts/default_auth.sh
