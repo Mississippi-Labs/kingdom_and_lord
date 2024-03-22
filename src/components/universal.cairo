@@ -18,7 +18,10 @@ mod universal_component {
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
     use super::BuildingAreaInfo;
-    use kingdom_lord::constants::{CITY_HALL_START_INDEX, WAREHOUSE_START_INDEX, BARN_START_INDEX};
+    use kingdom_lord::constants::{
+        CITY_HALL_START_INDEX, WAREHOUSE_START_INDEX, BARN_START_INDEX, OUTER_CITY_BUILDING_AMOUNT,
+        INNER_CITY_BUILDING_AMOUNT
+    };
     use kingdom_lord::models::building::BuildingUpgradeInfo;
     use kingdom_lord::models::building_kind::BuildingKind;
     use kingdom_lord::components::city_hall::{CityHall};
@@ -89,7 +92,12 @@ mod universal_component {
             }
         }
 
-        fn level_up(self: @ComponentState<TContractState>, building_id: u64, building_kind: BuildingKind, value: (u64, u64)) {
+        fn level_up(
+            self: @ComponentState<TContractState>,
+            building_id: u64,
+            building_kind: BuildingKind,
+            value: (u64, u64)
+        ) {
             let world = self.get_contract().world();
             let player = get_caller_address();
             match building_kind {
@@ -137,8 +145,70 @@ mod universal_component {
             }
         }
 
-        fn get_total_food_consume_rate(self: @ComponentState<TContractState>, player: ContractAddress){
-
+        fn get_total_population(
+            self: @ComponentState<TContractState>, player: ContractAddress
+        ) -> u64 {
+            let mut consume_rate: u64 = 0;
+            let mut index: u64 = 0;
+            let max_count = OUTER_CITY_BUILDING_AMOUNT + INNER_CITY_BUILDING_AMOUNT;
+            loop {
+                if index == max_count {
+                    break;
+                }
+                let info: BuildingAreaInfo = get!(
+                    self.get_contract().world(), (player, index), (BuildingAreaInfo)
+                );
+                let building_kind: BuildingKind = info.building_kind.into();
+                match building_kind {
+                    BuildingKind::None => {},
+                    BuildingKind::WoodBuilding => {
+                        let city_building = get!(
+                            self.get_contract().world(), (player, index), (CityBuilding)
+                        );
+                        consume_rate += city_building.population;
+                    },
+                    BuildingKind::BrickBuilding => {
+                        let city_building = get!(
+                            self.get_contract().world(), (player, index), (CityBuilding)
+                        );
+                        consume_rate += city_building.population;
+                    },
+                    BuildingKind::SteelBuilding => {
+                        let city_building = get!(
+                            self.get_contract().world(), (player, index), (CityBuilding)
+                        );
+                        consume_rate += city_building.population;
+                    },
+                    BuildingKind::FoodBuilding => {
+                        let city_building = get!(
+                            self.get_contract().world(), (player, index), (CityBuilding)
+                        );
+                        consume_rate += city_building.population;
+                    },
+                    BuildingKind::CityHall => {
+                        let city_hall = get!(
+                            self.get_contract().world(), (player, index), (CityHall)
+                        );
+                        consume_rate += city_hall.population;
+                    },
+                    BuildingKind::Warehouse => {
+                        let warehouse = get!(
+                            self.get_contract().world(), (player, index), (Warehouse)
+                        );
+                        consume_rate += warehouse.population;
+                    },
+                    BuildingKind::Barn => {
+                        let barn = get!(self.get_contract().world(), (player, index), (Barn));
+                        consume_rate += barn.population;
+                    },
+                    BuildingKind::Barrack => {
+                        let barrack = get!(self.get_contract().world(), (player, index), (Barrack));
+                        consume_rate += barrack.population;
+                    },
+                }
+                index += 1;
+            };
+            consume_rate
         }
     }
 }

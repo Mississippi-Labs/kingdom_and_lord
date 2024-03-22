@@ -17,7 +17,7 @@ struct UnderUpgrading {
     end_time: u64,
     is_finished: bool,
     value: u64,
-    food_consume_rate:u64, 
+    population:u64, 
 }
 
 
@@ -31,7 +31,7 @@ fn new_under_upgrading( player: ContractAddress, upgrade_id:u64) -> UnderUpgradi
         end_time: 0_u64,
         is_finished: true,
         value: 0_u64,
-        food_consume_rate: 0_u64,
+        population: 0_u64,
     }
 }
 
@@ -44,7 +44,7 @@ struct CityHall {
     building_id: u64,
     level: Level,
     bonus: u64,
-    food_consume_rate:u64, 
+    population:u64, 
 }
 
 
@@ -52,9 +52,9 @@ impl CityHallLevelTrait of LevelUpTrait<CityHall, (u64, u64)>{
 
     fn level_up(ref self: CityHall, value: (u64, u64)){
         self.level.level_up(());
-        let (bonus, food_consume_rate) = value;
+        let (bonus, population) = value;
         self.bonus = bonus;
-        self.food_consume_rate = food_consume_rate;
+        self.population = population;
     }
 }
 
@@ -130,7 +130,7 @@ mod city_hall_component {
             next_level: Level,
             required_time: u64,
             value: u64,
-            food_consume_rate: u64
+            population: u64
         ) -> Result<UnderUpgrading, Error> {
             let world = self.get_contract().world();
             let current_time = get_current_time();
@@ -152,7 +152,7 @@ mod city_hall_component {
                     upgrading.end_time = current_time + required_time;
                     upgrading.target_level = next_level;
                     upgrading.value = value;
-                    upgrading.food_consume_rate = food_consume_rate;
+                    upgrading.population = population;
                     set!(world, (upgrading));
                     res = Result::Ok(upgrading);
                     break;

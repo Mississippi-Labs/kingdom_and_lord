@@ -128,7 +128,7 @@ mod kingdom_lord_controller {
                         steel: 0_u64.into(),
                         bricks: 0_u64.into(),
                         max_storage: INITIAL_MAX_STORAGE,
-                        food_consume_rate: 0_u64.into()
+                        population: 0_u64.into()
                     },
                     BuildingAreaInfo {
                         player,
@@ -141,7 +141,7 @@ mod kingdom_lord_controller {
                         level: 0_u64.into(),
                         food: 0_u64.into(),
                         max_storage: INITIAL_MAX_STORAGE,
-                        food_consume_rate: 0_u64.into()
+                        population: 0_u64.into()
                     },
                     BuildingAreaInfo {
                         player,
@@ -239,7 +239,7 @@ mod kingdom_lord_controller {
                 index += 1
             };
             let city_hall = CityHall {
-                player, building_id: CITY_HALL_START_INDEX, level: 1_u64.into(), bonus: 0_u64, food_consume_rate: 0_u64
+                player, building_id: CITY_HALL_START_INDEX, level: 1_u64.into(), bonus: 0_u64, population: 0_u64
             };
             set!(world, (city_hall));
             set!(
@@ -255,7 +255,7 @@ mod kingdom_lord_controller {
             set!(
                 world,
                 (Barrack {
-                    player, building_id: BARRACK_START_INDEX, level: 0_u64.into(), bonus: 100_u64, food_consume_rate: 0_u64
+                    player, building_id: BARRACK_START_INDEX, level: 0_u64.into(), bonus: 100_u64, population: 0_u64
                 })
             );
             set!(
@@ -286,8 +286,8 @@ mod kingdom_lord_controller {
             Result::Ok(())
         }
 
-        fn get_food_consume_rate(self: @ContractState, player: ContractAddress) -> u64{
-            0
+        fn get_total_population(self: @ContractState, player: ContractAddress) -> u64{
+            self.universal.get_total_population(player)
         }
 
         fn get_resource(
@@ -337,7 +337,7 @@ mod kingdom_lord_controller {
             req_brick: u64,
             req_steel: u64,
             req_food: u64,
-            food_consume_rate: u64,
+            population: u64,
             required_time: u64,
             value: u64,
             proof: Array<felt252>
@@ -350,7 +350,7 @@ mod kingdom_lord_controller {
                 req_brick.into(),
                 req_steel.into(),
                 req_food.into(),
-                food_consume_rate.into(),
+                population.into(),
                 required_time.into(),
                 value.into()
             ];
@@ -385,7 +385,7 @@ mod kingdom_lord_controller {
 
             let res = self
                 .city_hall
-                .start_upgrade(building_id, next_level.into(), required_time, value, food_consume_rate);
+                .start_upgrade(building_id, next_level.into(), required_time, value, population);
             match res {
                 Result::Ok(under_upgrading) => {
                     self.mine();
@@ -418,7 +418,7 @@ mod kingdom_lord_controller {
                     let world = self.world_dispatcher.read();
                     let building_id: u64 = under_upgrade.building_id;
                     let building_kind = self.universal.building_kind(building_id);
-                    self.universal.level_up(building_id, building_kind, (under_upgrade.value, under_upgrade.food_consume_rate));
+                    self.universal.level_up(building_id, building_kind, (under_upgrade.value, under_upgrade.population));
                     self.mine();
                     self
                         .emit(

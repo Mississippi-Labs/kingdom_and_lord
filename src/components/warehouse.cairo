@@ -15,7 +15,7 @@ struct Warehouse {
     bricks: Resource<Brick>,
     steel: Resource<Steel>,
     max_storage: u64,
-    food_consume_rate: u64,
+    population: u64,
 }
 
 #[generate_trait]
@@ -55,9 +55,9 @@ impl WarehouseExtensionImpl of WarehouseExtension{
 impl WarehouseLeveTrait of LevelUpTrait<Warehouse, (u64, u64)>{
     fn level_up(ref self: Warehouse, value: (u64, u64)){
         self.level.level_up(());
-        let (max_storage, food_consume_rate) = value;
+        let (max_storage, population) = value;
         self.max_storage = max_storage;
-        self.food_consume_rate = food_consume_rate;
+        self.population = population;
     }
 }
 

@@ -14,7 +14,7 @@ struct Barrack{
     building_id: u64,
     level: Level,
     bonus: u64,
-    food_consume_rate:u64
+    population:u64
 }
 
 #[derive(Model, Copy, Drop, Serde)]
@@ -52,7 +52,7 @@ struct SoldierInfo{
     req_brick: u64,
     req_steel: u64,
     req_food: u64,
-    food_consume_rate: u64,
+    population: u64,
     required_time: u64,
 }
 
@@ -119,7 +119,7 @@ fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
                 req_brick: 100,
                 req_steel: 150,
                 req_food: 30,
-                food_consume_rate: 1,
+                population: 1,
                 required_time: 1600
             }
         },
@@ -133,7 +133,7 @@ fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
                 req_brick: 130,
                 req_steel: 160,
                 req_food: 70,
-                food_consume_rate: 1,
+                population: 1,
                 required_time: 1760
             }
         },
@@ -147,7 +147,7 @@ fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
                 req_brick: 160,
                 req_steel: 210,
                 req_food: 80,
-                food_consume_rate: 1,
+                population: 1,
                 required_time: 1920
             }
         },
@@ -161,7 +161,7 @@ fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
                 req_brick: 160,
                 req_steel: 20,
                 req_food: 40,
-                food_consume_rate: 2,
+                population: 2,
                 required_time: 1360
             }
         },
@@ -175,7 +175,7 @@ fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
                 req_brick: 440,
                 req_steel: 320,
                 req_food: 100,
-                food_consume_rate: 3,
+                population: 3,
                 required_time: 2640
             }
         },
@@ -189,7 +189,7 @@ fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
                 req_brick: 640,
                 req_steel: 800,
                 req_food: 180,
-                food_consume_rate: 4,
+                population: 4,
                 required_time: 3520
             }
         }
@@ -201,8 +201,8 @@ fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
 impl BarrackLevelTrait of LevelUpTrait<Barrack, (u64, u64)>{
     fn level_up(ref self: Barrack, value: (u64, u64)){
         self.level.level_up(());
-        let (bonus, food_consume_rate) = value;
-        self.food_consume_rate = food_consume_rate;
+        let (bonus, population) = value;
+        self.population = population;
         self.bonus = bonus;
     }
 }

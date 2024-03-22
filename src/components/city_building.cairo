@@ -15,7 +15,7 @@ struct CityBuilding {
     building_kind: u64,
     level: Level,
     growth_rate: u64,
-    food_consume_rate: u64,
+    population: u64,
 }
 
 fn new_city_building(
@@ -27,7 +27,7 @@ fn new_city_building(
         building_kind: building_kind.into(),
         level,
         growth_rate, 
-        food_consume_rate: 0,
+        population: 0,
     }
 }
 impl CityBuildingGetLevelImpl of LevelTrait<CityBuilding> {
@@ -45,9 +45,9 @@ impl CityBuildingGrowthRate<T> of Growth<CityBuilding, T> {
 impl CityBuildingLevelImpl of LevelUpTrait<CityBuilding, (u64, u64)> {
     fn level_up(ref self: CityBuilding, value:(u64, u64)) {
         self.level.level_up(());
-        let (growth_rate, food_consume_rate) = value;
+        let (growth_rate, population) = value;
         self.growth_rate = growth_rate;
-        self.food_consume_rate = food_consume_rate;
+        self.population = population;
     }
 }
 

@@ -29,7 +29,7 @@ trait IKingdomLord<TState>{
     fn get_under_training(self: @TState, player: ContractAddress) -> Array<UnderTraining>;
     fn get_complete_training(self: @TState, player: ContractAddress) -> Array<UnderTraining>;
     fn get_troops(self: @TState, player: ContractAddress) -> Troops;
-    fn get_food_consume_rate(self: @TState, player: ContractAddress) -> u64;
+    fn get_total_population(self: @TState, player: ContractAddress) -> u64;
 
     // write function
     fn spawn(ref self: TState) -> Result<(), Error>;
@@ -42,7 +42,7 @@ trait IKingdomLord<TState>{
             req_brick: u64,
             req_steel: u64,
             req_food: u64,
-            food_consume_rate: u64,
+            population: u64,
             required_time: u64,
             value: u64,
             proof: Array<felt252>
