@@ -4,6 +4,7 @@ use super::city_building::{CityBuilding, CityBuildingLevelImpl};
 use kingdom_lord::models::level::Level;
 use kingdom_lord::models::building::{BuildingUpgradeResource};
 use kingdom_lord::models::level::{LevelTrait, LevelUpTrait};
+use kingdom_lord::helpers::contract_address::FmtContractAddr;
 
 #[derive(Model, Drop, Copy, Serde)]
 struct UnderUpgrading {
@@ -12,10 +13,12 @@ struct UnderUpgrading {
     #[key]
     upgrade_id: u64,
     building_id: u64,
+    building_kind: u64,
     target_level: Level,
     start_time: u64,
     end_time: u64,
     is_finished: bool,
+    is_new_building: bool,
     value: u64,
     population:u64, 
 }
@@ -26,21 +29,22 @@ fn new_under_upgrading( player: ContractAddress, upgrade_id:u64) -> UnderUpgradi
         address: player,
         upgrade_id,
         building_id: 0_u64,
+        building_kind: 0_u64,
         target_level: 0_u64.into(),
         start_time: 0_u64,
         end_time: 0_u64,
         is_finished: true,
+        is_new_building: false,
         value: 0_u64,
         population: 0_u64,
     }
 }
 
 
-#[derive(Model, Drop, Copy, Serde)]
+#[derive(Model, Drop, Copy, Serde, Debug)]
 struct CityHall {
     #[key]
     player: ContractAddress,
-    #[key]
     building_id: u64,
     level: Level,
     bonus: u64,
@@ -75,7 +79,7 @@ mod city_hall_component {
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use kingdom_lord::constants::{UNDER_UPGRADING_COUNT, CITY_HALL_START_INDEX};
+    use kingdom_lord::constants::{UNDER_UPGRADING_COUNT};
     use super::{UnderUpgrading, Level, CityBuilding, CityBuildingLevelImpl, CityHall};
     use kingdom_lord::interface::Error;
 
@@ -127,15 +131,17 @@ mod city_hall_component {
         fn start_upgrade(
             ref self: ComponentState<TContractState>,
             building_id: u64,
+            building_kind: u64,
             next_level: Level,
             required_time: u64,
             value: u64,
-            population: u64
+            population: u64,
+            is_new_building: bool
         ) -> Result<UnderUpgrading, Error> {
             let world = self.get_contract().world();
             let current_time = get_current_time();
             let player = get_caller_address();
-            let city_hall = get!(world, (player, CITY_HALL_START_INDEX), (CityHall));
+            let city_hall = get!(world, (player), (CityHall));
             let required_time = required_time - city_hall.bonus * required_time / 10000;
             let mut index = 0;
             let mut res: Result<UnderUpgrading, Error> = Result::Err(Error::UnknownedError('start upgrading failed'));
@@ -147,10 +153,12 @@ mod city_hall_component {
                 let mut upgrading: UnderUpgrading = get!(world, (player, index), (UnderUpgrading));
                 if upgrading.is_finished {
                     upgrading.building_id = building_id;
+                    upgrading.building_kind = building_kind;
                     upgrading.is_finished = false;
                     upgrading.start_time = current_time;
                     upgrading.end_time = current_time + required_time;
                     upgrading.target_level = next_level;
+                    upgrading.is_new_building = is_new_building;
                     upgrading.value = value;
                     upgrading.population = population;
                     set!(world, (upgrading));

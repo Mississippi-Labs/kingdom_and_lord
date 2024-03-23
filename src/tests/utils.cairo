@@ -1,5 +1,6 @@
 #[cfg(test)]
-use dojo::test_utils::{spawn_test_world, deploy_contract};
+use dojo::test_utils::{spawn_test_world,
+ deploy_contract};
 use kingdom_lord::components::barn::barn;
 use starknet::ContractAddress;
 use kingdom_lord::components::outer_city::outer_city;
@@ -20,6 +21,7 @@ use kingdom_lord::components::outer_city::OuterCityTraitDispatcher;
 use starknet::contract_address_const;
 use openzeppelin::presets::erc20::ERC20;
 use openzeppelin::token::erc20::interface::IERC20Dispatcher;
+use starknet::testing::{set_caller_address, set_contract_address};
 trait SerializedAppend<T> {
     fn append_serde(ref self: Array<felt252>, value: T);
 }
@@ -78,10 +80,10 @@ fn city_hall_level2_proof() -> Array<felt252> {
         0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
     ]
 }
-fn city_hall_level3_proof() -> Array<felt252> {
+fn city_hall_level1_proof() -> Array<felt252> {
     array![
-        0x7992d75be0dceda3f95c46f87060d97d2a9831d171cff7c2cd8e85fc3b15b4,
-        0x261c187877e5bb8dab0505f0461fdd4f3020fc9aaee3a350bedf511a139be6a,
+        0x56e9e5ce79486d11d4079f6521d5de93bc3e474dc2cd647063fe45c22054ac8,
+        0x575978c19ae8821f17dcb09f2865515b661bb72486a758da18853b0208c5081,
         0x751fea1cdd1b21696ae357f83c2b96fbd0a7891b053cdc652807c88320c942c,
         0x352510f1269cea2ac10dab006a027dee2dcc6fc82676fbb5b862269d99528ee,
         0x660a74333a6082be847d98d1779c25ab498eaf93ea998125db323a1bc0c8cc7,
@@ -148,7 +150,8 @@ fn setup_world() -> TestContext {
 
     let admin_dispatcher = IKingdomLordAdminDispatcher { contract_address: admin_contract_address };
     let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_contract_address };
-
+    set_caller_address(PLAYER());
+    set_contract_address(PLAYER());
     admin_dispatcher
         .set_config(
             erc20_contract_address,

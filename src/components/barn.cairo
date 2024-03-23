@@ -11,7 +11,6 @@ struct Barn{
     #[key]
     building_id: u64,
     level: Level,
-    food: Resource<Food>,
     max_storage: u64,
     population: u64
 }
@@ -68,7 +67,6 @@ mod barn_component{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
     use super::{Barn, Food, Resource, BarnStorageExtension, BarnStorage};
-    use kingdom_lord::constants::BARN_START_INDEX;
 
     #[storage]
     struct Storage {}

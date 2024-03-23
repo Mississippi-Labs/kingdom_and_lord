@@ -19,8 +19,7 @@ mod universal_component {
     };
     use super::BuildingAreaInfo;
     use kingdom_lord::constants::{
-        CITY_HALL_START_INDEX, WAREHOUSE_START_INDEX, BARN_START_INDEX, OUTER_CITY_BUILDING_AMOUNT,
-        INNER_CITY_BUILDING_AMOUNT
+        OUTER_CITY_BUILDING_AMOUNT, INNER_CITY_BUILDING_AMOUNT
     };
     use kingdom_lord::models::building::BuildingUpgradeInfo;
     use kingdom_lord::models::building_kind::BuildingKind;
@@ -29,6 +28,7 @@ mod universal_component {
     use kingdom_lord::components::warehouse::{Warehouse};
     use kingdom_lord::components::barn::{Barn};
     use kingdom_lord::components::barrack::{Barrack, BarrackLevelTrait, BarrackGetLevel};
+    use kingdom_lord::helpers::contract_address::FmtContractAddr;
     use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl};
 
     #[storage]
@@ -56,7 +56,9 @@ mod universal_component {
             let world = self.get_contract().world();
             let player = get_caller_address();
             match building_kind {
-                BuildingKind::None => panic!("None building could be found"),
+                BuildingKind::None => {
+                    return next_level == 1_u64.into();
+                },
                 BuildingKind::WoodBuilding => {
                     let city_building = get!(world, (player, building_id), (CityBuilding));
                     return city_building.is_next_level_valid(next_level);
@@ -74,19 +76,19 @@ mod universal_component {
                     return city_building.is_next_level_valid(next_level);
                 },
                 BuildingKind::CityHall => {
-                    let city_hall = get!(world, (player, building_id), (CityHall));
+                    let city_hall = get!(world, (player), (CityHall));
                     return city_hall.is_next_level_valid(next_level);
                 },
                 BuildingKind::Warehouse => {
-                    let warehouse = get!(world, (player, building_id), (Warehouse));
+                    let warehouse = get!(world, (player), (Warehouse));
                     return warehouse.is_next_level_valid(next_level);
                 },
                 BuildingKind::Barn => {
-                    let barn = get!(world, (player, building_id), (Barn));
+                    let barn = get!(world, (player), (Barn));
                     return barn.is_next_level_valid(next_level);
                 },
                 BuildingKind::Barrack => {
-                    let barrack = get!(world, (player, building_id), (Barrack));
+                    let barrack = get!(world, (player), (Barrack));
                     return barrack.is_next_level_valid(next_level);
                 },
             }
@@ -145,6 +147,85 @@ mod universal_component {
             }
         }
 
+        fn new_building(
+            self: @ComponentState<TContractState>,
+            building_id: u64,
+            building_kind: BuildingKind,
+        ){
+            let world = self.get_contract().world();
+            let player = get_caller_address();
+            match building_kind{
+                BuildingKind::None => panic!("None building could be found"),
+                BuildingKind::WoodBuilding => panic!("WoodBuilding not allow new"),
+                BuildingKind::BrickBuilding => panic!("BrickBuilding not allow new"),
+                BuildingKind::SteelBuilding => panic!("SteelBuilding not allow new"),
+                BuildingKind::FoodBuilding => panic!("FoodBuilding not allow new"),
+                BuildingKind::CityHall => {
+                    let city_hall = CityHall{
+                        player: player,
+                        building_id: building_id,
+                        level: 1_u64.into(),
+                        bonus: 100,
+                        population: 2,
+                    };
+                    let building_area_info = BuildingAreaInfo{
+                        player: player,
+                        building_id: building_id,
+                        building_kind: BuildingKind::CityHall.into(),
+                    };
+                    set!(world, (city_hall));
+                    set!(world, (building_area_info));
+                },
+                BuildingKind::Warehouse => {
+                    let warehouse = Warehouse{
+                        player,
+                        building_id,
+                        level: 1_u64.into(),
+                        max_storage: 1200,
+                        population: 1,
+                    };
+                    let building_area_info = BuildingAreaInfo{
+                        player: player,
+                        building_id: building_id,
+                        building_kind: BuildingKind::Warehouse.into(),
+                    };
+                    set!(world, (warehouse));
+                    set!(world, (building_area_info));
+                },
+                BuildingKind::Barn => {
+                    let barn = Barn{
+                        player,
+                        building_id,
+                        level: 1_u64.into(),
+                        max_storage: 1200,
+                        population: 1,
+                    };
+                    let building_area_info = BuildingAreaInfo{
+                        player: player,
+                        building_id: building_id,
+                        building_kind: BuildingKind::Barn.into(),
+                    };
+                    set!(world, (barn));
+                    set!(world, (building_area_info));
+                },
+                BuildingKind::Barrack => {
+                    let barrack = Barrack{
+                        player,
+                        building_id,
+                        level: 1_u64.into(),
+                        bonus: 100,
+                        population: 4,
+                    };
+                    let building_area_info = BuildingAreaInfo{
+                        player: player,
+                        building_id: building_id,
+                        building_kind: BuildingKind::Barrack.into(),
+                    };
+                    set!(world, (barrack));
+                    set!(world, (building_area_info));
+                },
+            }
+        }
         fn get_total_population(
             self: @ComponentState<TContractState>, player: ContractAddress
         ) -> u64 {

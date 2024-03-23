@@ -11,7 +11,7 @@ mod tests {
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{setup_world, city_hall_level2_proof, assert_resource};
+    use kingdom_lord::tests::utils::{setup_world, city_hall_level1_proof,city_hall_level2_proof, assert_resource};
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
     };
@@ -29,7 +29,7 @@ mod tests {
 
         let err = context
             .kingdom_lord
-            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof())
+            .start_upgrade(18,5,  1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         set_block_number(1000);
@@ -49,15 +49,40 @@ mod tests {
 
         let err = context
             .kingdom_lord
-            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof())
+            .start_upgrade(18,5,  1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         set_block_number(1000);
 
         let err = context
             .kingdom_lord
-            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof())
+            .start_upgrade(18, 5,  1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
             .unwrap();
-        assert_resource(context, caller, 910, 950, 925, 975);
+        assert_resource(context, caller, 930, 960, 940, 980);
     }
+
+    // #[test]
+    // #[available_gas(300000000000)]
+    // fn test_upgrade_warehouse() {
+    //     // deploy world with models
+    //     let context = setup_world();
+
+    //     context.kingdom_lord.spawn();
+    //     let caller = get_caller_address();
+
+    //     assert_resource(context, caller, 0, 0, 0, 0);
+
+    //     let err = context
+    //         .kingdom_lord
+    //         .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof())
+    //         .unwrap_err();
+    //     assert(err == Error::ResourceNotEnough, 'not enough resource');
+    //     set_block_number(1000);
+
+    //     let err = context
+    //         .kingdom_lord
+    //         .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof())
+    //         .unwrap();
+    //     assert_resource(context, caller, 910, 950, 925, 975);
+    // }
 }

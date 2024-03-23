@@ -82,7 +82,6 @@ mod warehouse_component{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
     use super::{Warehouse,  Brick, Wood, Steel, Resource, WarehouseStorageExtensionImpl, WarehouseStorage};
-    use kingdom_lord::constants::WAREHOUSE_START_INDEX;
 
     #[storage]
     struct Storage {}

@@ -10,7 +10,6 @@ use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, LevelImpl};
 struct Barrack{
     #[key]
     player: ContractAddress,
-    #[key]
     building_id: u64,
     level: Level,
     bonus: u64,
@@ -220,7 +219,7 @@ mod barrack_component{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
     use super::{BarrackLevelTrait, BarrackGetLevel, Barrack, UnderTraining, SoldierKind, Troops};
-    use kingdom_lord::constants::{UNDER_TRAINING_COUNT,BARRACK_START_INDEX};
+    use kingdom_lord::constants::{UNDER_TRAINING_COUNT};
     use kingdom_lord::interface::Error;
     use kingdom_lord::models::time::get_current_time;
 
@@ -280,7 +279,7 @@ mod barrack_component{
             let world = self.get_contract().world();
             let current_time = get_current_time();
             let player = get_caller_address();
-            let barrack = get!(world, (player, BARRACK_START_INDEX), (Barrack));
+            let barrack = get!(world, (player), (Barrack));
             let required_time = barrack.bonus * required_time / 100;
             let mut index = 0;
             let mut res: Result<UnderTraining, Error> = Result::Err(Error::UnknownedError('start upgrading failed'));

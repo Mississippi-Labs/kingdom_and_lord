@@ -11,7 +11,7 @@ mod tests {
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{setup_world, city_hall_level2_proof, city_hall_level3_proof};
+    use kingdom_lord::tests::utils::{setup_world, city_hall_level2_proof, city_hall_level1_proof};
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
     };
@@ -24,18 +24,17 @@ mod tests {
 
         context.kingdom_lord.spawn();
         let caller = get_caller_address();
-
         let err = context
             .kingdom_lord
-            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof())
+            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         set_block_number(50);
 
         let res = context
             .kingdom_lord
-            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof());
-        let upgrade_id = res.unwrap();
+            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof());
+        let upgrade_id =res.unwrap();
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
         set_block_number(2670);
@@ -45,17 +44,17 @@ mod tests {
 
         let upgrade = finishe_upgrade.at(0);
         assert(*upgrade.upgrade_id == 0, 'upgrade id should be 0');
+
         // city hall should be level up
         context.kingdom_lord.finish_upgrade(0_u64).unwrap();
-
         let res = context
             .kingdom_lord
-            .start_upgrade(18, 5, 3, 115, 65, 100, 35, 1, 3220, 108, city_hall_level3_proof());
+            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof());
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
 
         let upgrade = under_upgrade.at(0);
-        // 3220 - 3220 * 104 /10000 + 2670
+        // 2620 - 2620 * 104 //10000 + 2670
         // let compute: u64 = 3220_u64 - 3220_u64 * 104_u64 /10000_u64 + 2670_u64;
-        assert(*upgrade.end_time == 5857, 'end block should be 5857');
+        assert(*upgrade.end_time == 5264, 'end block should be 5264');
     }
 }

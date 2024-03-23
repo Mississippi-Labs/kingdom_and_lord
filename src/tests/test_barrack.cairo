@@ -11,7 +11,7 @@ mod tests {
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{setup_world, assert_troop, city_hall_level2_proof, city_hall_level3_proof, assert_resource};
+    use kingdom_lord::tests::utils::{setup_world, assert_troop, city_hall_level2_proof, city_hall_level1_proof, assert_resource};
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
     };
@@ -40,6 +40,7 @@ mod tests {
         assert_resource(context, caller, 660,670,540,870);
 
         set_block_number(150);
+        println!("block number");
         let err = context.kingdom_lord.finish_training(training_id1).unwrap_err();
         assert_eq!(err, Error::TrainingNotFinished, "training not finished");
         set_block_number(1700);
@@ -48,6 +49,7 @@ mod tests {
 
         context.kingdom_lord.finish_training(training_id2).unwrap();
         assert_troop(context, caller, 2,0,0,0,0,0);
+        println!("block number 2");
         let err = context.kingdom_lord.finish_training(training_id3).unwrap_err();
         assert_eq!(err, Error::TrainingNotFinished, "training not finished");
         set_block_number(1860);

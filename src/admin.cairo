@@ -9,8 +9,8 @@ mod kingdom_lord_admin {
     use kingdom_lord::components::outer_city::outer_city_component::{OuterCityInternalImpl};
     use kingdom_lord::constants::{
         WOOD_BUILDING_COUNT, BRICK_BUILDING_COUNT, STEEL_BUILDING_COUNT, FOOD_BUILDING_COUNT,
-        BASE_GROW_RATE,  UNDER_UPGRADING_COUNT, CITY_HALL_START_INDEX,
-        WAREHOUSE_START_INDEX, BARN_START_INDEX, CONFIG_ID
+        BASE_GROW_RATE,  UNDER_UPGRADING_COUNT,
+         CONFIG_ID
     };
     component!(path: barn_component, storage: barn, event: BarnEvent);
     component!(path: warehouse_component, storage: warehouse, event: WarehouseEvent);
@@ -49,20 +49,6 @@ mod kingdom_lord_admin {
             config.receiver = receiver;
             config.merkle_root =  level_root_merkle;
             set!(world, (config))
-        }
-
-        fn set_barn_max_storage(self: @ContractState, addr: ContractAddress, max_storage: u64){
-            let world = self.world_dispatcher.read();
-            let mut barn = get!(world, (addr, BARN_START_INDEX), (Barn));
-            barn.max_storage = max_storage;
-            set!(world, (barn))
-        }
-
-        fn set_warehouse_max_storage(self: @ContractState, addr: ContractAddress, max_storage: u64){
-            let world = self.world_dispatcher.read();
-            let mut warehouse = get!(world, (addr, WAREHOUSE_START_INDEX), (Warehouse));
-            warehouse.max_storage = max_storage;
-            set!(world, (warehouse))
         }
     }
 

@@ -59,7 +59,7 @@ trait IKingdomLord<TState>{
 #[starknet::interface]
 trait IKingdomLordAdmin<TState>{
     fn set_config(self: @TState, erc20_addr: ContractAddress, amount: u256, receiver: ContractAddress, level_root_merkle: felt252) ;
-    fn set_barn_max_storage(self: @TState, addr: ContractAddress, max_storage: u64);
-    fn set_warehouse_max_storage(self: @TState, addr: ContractAddress, max_storage: u64);
+    // fn set_barn_max_storage(self: @TState, addr: ContractAddress, max_storage: u64);
+    // fn set_warehouse_max_storage(self: @TState, addr: ContractAddress, max_storage: u64);
 
 }

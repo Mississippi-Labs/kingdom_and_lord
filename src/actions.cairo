@@ -34,9 +34,9 @@ mod kingdom_lord_controller {
     use kingdom_lord::components::config::{Config, verify_proof};
     use kingdom_lord::constants::{
         WOOD_BUILDING_COUNT, BRICK_BUILDING_COUNT, STEEL_BUILDING_COUNT, FOOD_BUILDING_COUNT,
-        BASE_GROW_RATE, INITIAL_MAX_STORAGE, UNDER_UPGRADING_COUNT, CITY_HALL_START_INDEX,
-        WAREHOUSE_START_INDEX, BARN_START_INDEX, CONFIG_ID, BRICK_BUILDING_START_INDEX,
-        STEEL_BUILDING_START_INDEX, FOOD_BUILDING_START_INDEX, BARRACK_START_INDEX, UNDER_TRAINING_COUNT
+        BASE_GROW_RATE, INITIAL_MAX_STORAGE, UNDER_UPGRADING_COUNT,
+        CONFIG_ID, BRICK_BUILDING_START_INDEX,
+        STEEL_BUILDING_START_INDEX, FOOD_BUILDING_START_INDEX, UNDER_TRAINING_COUNT
     };
     use starknet::get_caller_address;
     use kingdom_lord::models::time::get_current_time;
@@ -222,26 +222,7 @@ mod kingdom_lord_controller {
                 }
                 index += 1
             };
-            let city_hall = CityHall {
-                player, building_id: CITY_HALL_START_INDEX, level: 1_u64.into(), bonus: 0_u64, population: 0_u64
-            };
-            set!(world, (city_hall));
-            set!(
-                world,
-                (BuildingAreaInfo {
-                    player,
-                    building_id: CITY_HALL_START_INDEX,
-                    building_kind: BuildingKind::CityHall.into()
-                })
-            );
 
-            // initialize barrack
-            set!(
-                world,
-                (Barrack {
-                    player, building_id: BARRACK_START_INDEX, level: 0_u64.into(), bonus: 100_u64, population: 0_u64
-                })
-            );
             set!(
                 world,
                 (Troops {
@@ -327,6 +308,7 @@ mod kingdom_lord_controller {
             proof: Array<felt252>
         ) -> Result<u64, Error> {
             let caller_address = get_caller_address();
+            let building_kind_num = building_kind;
             let data: Array<felt252> = array![
                 building_kind.into(),
                 next_level.into(),
@@ -341,9 +323,9 @@ mod kingdom_lord_controller {
 
             let building_kind: BuildingKind = building_kind.into();
             let next_level: Level = next_level.into();
-            let building_kind = self.universal.building_kind(building_id);
+            let curr_building_kind = self.universal.building_kind(building_id);
 
-            if building_kind != building_kind && building_kind != BuildingKind::None {
+            if building_kind != curr_building_kind && curr_building_kind != BuildingKind::None {
                 return Result::Err(Error::UnknownedError('invalid building kind'));
             }
 
@@ -367,9 +349,10 @@ mod kingdom_lord_controller {
                 return Result::Err(Error::InvalidProof);
             }
 
+            let is_new_building = curr_building_kind == BuildingKind::None;
             let res = self
                 .city_hall
-                .start_upgrade(building_id, next_level.into(), required_time, value, population);
+                .start_upgrade(building_id, building_kind_num, next_level.into(), required_time, value, population, is_new_building);
             match res {
                 Result::Ok(under_upgrading) => {
                     self.mine();
@@ -401,8 +384,12 @@ mod kingdom_lord_controller {
                 Result::Ok(under_upgrade) => {
                     let world = self.world_dispatcher.read();
                     let building_id: u64 = under_upgrade.building_id;
-                    let building_kind = self.universal.building_kind(building_id);
-                    self.universal.level_up(building_id, building_kind, (under_upgrade.value, under_upgrade.population));
+                    if under_upgrade.is_new_building {
+                        self.universal.new_building(building_id, under_upgrade.building_kind.into());
+                    } else{
+                        let building_kind = self.universal.building_kind(building_id);
+                        self.universal.level_up(building_id, under_upgrade.building_kind.into(), (under_upgrade.value, under_upgrade.population));
+                    }
                     self.mine();
                     self
                         .emit(
@@ -535,7 +522,7 @@ mod kingdom_lord_controller {
                 res.append(building.get_level());
                 index += 1;
             };
-            let city_hall = get!(world, (player, CITY_HALL_START_INDEX), (CityHall));
+            let city_hall = get!(world, (player), (CityHall));
             res.append(city_hall.get_level());
             res
         }
