@@ -16,13 +16,21 @@ struct Barn{
     population: u64
 }
 
+#[derive(Model, Copy, Drop, Serde)]
+struct BarnStorage{
+    #[key]
+    player: ContractAddress,
+    food: Resource<Food>,
+    max_storage: u64,
+}
+
 #[generate_trait]
-impl BarnTraitImpl of BarnExtension{
-    fn get_food(self: @Barn) -> Resource<Food>{
+impl BarnTraitImpl of BarnStorageExtension{
+    fn get_food(self: @BarnStorage) -> Resource<Food>{
         self.food.clone()
     }
 
-    fn add_food(ref self: Barn, food: Resource<Food>){
+    fn add_food(ref self: BarnStorage, food: Resource<Food>){
         let new_amount = self.food + food;
         if new_amount > self.max_storage.into(){
             self.food = self.max_storage.into();
@@ -31,7 +39,7 @@ impl BarnTraitImpl of BarnExtension{
         }
     }
 
-    fn remove_food(ref self: Barn, food: Resource<Food>){
+    fn remove_food(ref self: BarnStorage, food: Resource<Food>){
         self.food -= food;
     }
 }
@@ -59,7 +67,7 @@ mod barn_component{
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use super::{Barn, Food, Resource, BarnExtension};
+    use super::{Barn, Food, Resource, BarnStorageExtension, BarnStorage};
     use kingdom_lord::constants::BARN_START_INDEX;
 
     #[storage]
@@ -72,7 +80,7 @@ mod barn_component{
         fn add_food(self: @ComponentState<TContractState>, food: Resource<Food>){
             let world = self.get_contract().world();
             let player = get_caller_address();
-            let mut barn = get!(world, (player, BARN_START_INDEX), (Barn));
+            let mut barn = get!(world, (player), (BarnStorage));
             barn.add_food(food);
             set!(world, (barn))
         }
@@ -80,18 +88,18 @@ mod barn_component{
         fn remove_food(self: @ComponentState<TContractState>, food: Resource<Food>){
             let world = self.get_contract().world();
             let player = get_caller_address();
-            let mut barn = get!(world, (player, BARN_START_INDEX), (Barn));
+            let mut barn = get!(world, (player), (BarnStorage));
             barn.remove_food(food);
             set!(world, (barn))
         }
 
         fn get_food(self: @ComponentState<TContractState>, player: ContractAddress) -> Resource<Food>{
-            let barn = get!(self.get_contract().world(), (player, BARN_START_INDEX), (Barn));
+            let barn = get!(self.get_contract().world(), (player), (BarnStorage));
             barn.get_food()
         }
 
         fn get_max_storage(self: @ComponentState<TContractState>, player: ContractAddress) -> u64{
-            let barn = get!(self.get_contract().world(), (player, BARN_START_INDEX), (Barn));
+            let barn = get!(self.get_contract().world(), (player), (BarnStorage));
             barn.max_storage
         }
     }

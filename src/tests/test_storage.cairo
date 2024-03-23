@@ -33,7 +33,7 @@ mod tests {
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         set_block_number(1000);
-        assert_resource(context, caller, 600, 600, 600, 600);
+        assert_resource(context, caller, 1000, 1000, 1000, 1000);
     }
 
     #[test]
@@ -58,6 +58,6 @@ mod tests {
             .kingdom_lord
             .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof())
             .unwrap();
-        assert_resource(context, caller, 510, 550, 525, 575);
+        assert_resource(context, caller, 910, 950, 925, 975);
     }
 }

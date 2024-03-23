@@ -11,20 +11,27 @@ struct Warehouse {
     #[key]
     building_id: u64,
     level: Level,
-    wood: Resource<Wood>,
-    bricks: Resource<Brick>,
-    steel: Resource<Steel>,
     max_storage: u64,
     population: u64,
 }
 
+#[derive(Model, Copy, Drop, Serde)]
+struct WarehouseStorage {
+    #[key]
+    player: ContractAddress,
+    wood: Resource<Wood>,
+    bricks: Resource<Brick>,
+    steel: Resource<Steel>,
+    max_storage: u64,
+}
+
 #[generate_trait]
-impl WarehouseExtensionImpl of WarehouseExtension{
-    fn get_resource(self:@Warehouse) -> (Resource<Wood>, Resource<Brick>, Resource<Steel>) {
+impl WarehouseStorageExtensionImpl of WarehouseExtension{
+    fn get_resource(self:@WarehouseStorage) -> (Resource<Wood>, Resource<Brick>, Resource<Steel>) {
         (self.wood.clone(), self.bricks.clone(), self.steel.clone())
     }
 
-    fn add_resource(ref self:Warehouse, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>) {
+    fn add_resource(ref self:WarehouseStorage, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>) {
         let new_wood_amount = self.wood + wood;
         if new_wood_amount.amount > self.max_storage {
             self.wood = self.max_storage.into();
@@ -45,7 +52,7 @@ impl WarehouseExtensionImpl of WarehouseExtension{
         }
     }
 
-    fn remove_resource(ref self: Warehouse, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>) {
+    fn remove_resource(ref self: WarehouseStorage, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>) {
         self.wood -= wood;
         self.bricks -= bricks;
         self.steel -= steel;
@@ -74,7 +81,7 @@ mod warehouse_component{
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use super::{Warehouse,  Brick, Wood, Steel, Resource, WarehouseExtension};
+    use super::{Warehouse,  Brick, Wood, Steel, Resource, WarehouseStorageExtensionImpl, WarehouseStorage};
     use kingdom_lord::constants::WAREHOUSE_START_INDEX;
 
     #[storage]
@@ -87,7 +94,7 @@ mod warehouse_component{
         fn add_resource(self:@ComponentState<TContractState>, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>){
             let world = self.get_contract().world();
             let player = get_caller_address();
-            let mut warehouse: Warehouse = get!(world, (player, WAREHOUSE_START_INDEX), (Warehouse));
+            let mut warehouse: WarehouseStorage = get!(world, (player), (WarehouseStorage));
             warehouse.add_resource(wood, bricks, steel);
             set!(world, (warehouse))
         }
@@ -95,18 +102,18 @@ mod warehouse_component{
         fn remove_resource(self:@ComponentState<TContractState>, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>){
             let world = self.get_contract().world();
             let player = get_caller_address();
-            let mut warehouse: Warehouse = get!(world, (player, WAREHOUSE_START_INDEX), (Warehouse));
+            let mut warehouse: WarehouseStorage = get!(world, (player), (WarehouseStorage));
             warehouse.remove_resource(wood, bricks, steel);
             set!(world, (warehouse))
         }
 
         fn get_resource(self:@ComponentState<TContractState>, player: ContractAddress) -> (Resource<Wood>, Resource<Brick>, Resource<Steel>){
-            let warehouse = get!(self.get_contract().world(), (player, WAREHOUSE_START_INDEX), (Warehouse));
+            let warehouse = get!(self.get_contract().world(), (player), (WarehouseStorage));
             warehouse.get_resource()
         }
 
         fn get_max_storage(self: @ComponentState<TContractState>, player: ContractAddress) -> u64{
-            let warehouse = get!(self.get_contract().world(), (player, WAREHOUSE_START_INDEX), (Warehouse));
+            let warehouse = get!(self.get_contract().world(), (player), (WarehouseStorage));
             warehouse.max_storage
         }
     }

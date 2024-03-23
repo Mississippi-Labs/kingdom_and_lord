@@ -1,8 +1,8 @@
 #[dojo::contract]
 mod kingdom_lord_controller {
-    use kingdom_lord::components::barn::{barn_component, Barn};
+    use kingdom_lord::components::barn::{barn_component, Barn, BarnStorage};
     use kingdom_lord::components::barn::barn_component::BarnInternalImpl;
-    use kingdom_lord::components::warehouse::{warehouse_component, Warehouse};
+    use kingdom_lord::components::warehouse::{warehouse_component, Warehouse, WarehouseStorage};
     use kingdom_lord::components::outer_city::{outer_city_component, OuterCity};
     use kingdom_lord::components::outer_city::outer_city_component::{OuterCityInternalImpl};
     use kingdom_lord::helpers::contract_address::FmtContractAddr;
@@ -120,33 +120,17 @@ mod kingdom_lord_controller {
             set!(
                 world,
                 (
-                    Warehouse {
+                    WarehouseStorage {
                         player,
-                        building_id: WAREHOUSE_START_INDEX,
-                        level: 0_u64.into(),
                         wood: 0_u64.into(),
                         steel: 0_u64.into(),
                         bricks: 0_u64.into(),
                         max_storage: INITIAL_MAX_STORAGE,
-                        population: 0_u64.into()
                     },
-                    BuildingAreaInfo {
+                    BarnStorage {
                         player,
-                        building_id: WAREHOUSE_START_INDEX,
-                        building_kind: BuildingKind::Warehouse.into()
-                    },
-                    Barn {
-                        player,
-                        building_id: BARN_START_INDEX,
-                        level: 0_u64.into(),
                         food: 0_u64.into(),
                         max_storage: INITIAL_MAX_STORAGE,
-                        population: 0_u64.into()
-                    },
-                    BuildingAreaInfo {
-                        player,
-                        building_id: BARN_START_INDEX,
-                        building_kind: BuildingKind::Barn.into()
                     },
                     OuterCity { player, last_mined_time: time },
                 )
@@ -560,7 +544,11 @@ mod kingdom_lord_controller {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn mine(self: @ContractState) {
+            let player = get_caller_address();
             let (mined_wood, mined_brick, mined_steel, mined_food) = self.outer_city.mine();
+            let current_block_time = get_current_time();
+            let last_mined_time = self.outer_city.get_last_mined_time(player);
+            let consumed_food = (current_block_time - last_mined_time) * self.universal.get_total_population(player);
             self.warehouse.add_resource(mined_wood, mined_brick, mined_steel);
             self.barn.add_food(mined_food);
         }

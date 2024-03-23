@@ -30,19 +30,19 @@ mod tests {
             .start_training(0)
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
-        set_block_number(50);
-        assert_resource(context, caller, 600,600,600,600);
-        let training_id1 = context.kingdom_lord.start_training(0).unwrap();
-        assert_resource(context, caller, 480,500,450,570);
-        let training_id2 = context.kingdom_lord.start_training(0).unwrap();
-        assert_resource(context, caller, 360,400,300,540);
-        let training_id3 = context.kingdom_lord.start_training(1).unwrap();
-        assert_resource(context, caller, 260,270,140,470);
-
         set_block_number(100);
+        assert_resource(context, caller, 1000,1000,1000,1000);
+        let training_id1 = context.kingdom_lord.start_training(0).unwrap();
+        assert_resource(context, caller, 880,900,850,970);
+        let training_id2 = context.kingdom_lord.start_training(0).unwrap();
+        assert_resource(context, caller, 760,800,700,940);
+        let training_id3 = context.kingdom_lord.start_training(1).unwrap();
+        assert_resource(context, caller, 660,670,540,870);
+
+        set_block_number(150);
         let err = context.kingdom_lord.finish_training(training_id1).unwrap_err();
         assert_eq!(err, Error::TrainingNotFinished, "training not finished");
-        set_block_number(1650);
+        set_block_number(1700);
         context.kingdom_lord.finish_training(training_id1).unwrap();
         assert_troop(context, caller, 1,0,0,0,0,0);
 
@@ -50,7 +50,7 @@ mod tests {
         assert_troop(context, caller, 2,0,0,0,0,0);
         let err = context.kingdom_lord.finish_training(training_id3).unwrap_err();
         assert_eq!(err, Error::TrainingNotFinished, "training not finished");
-        set_block_number(1810);
+        set_block_number(1860);
         let res = context.kingdom_lord.finish_training(training_id3).unwrap();
         assert_troop(context, caller, 2,1,0,0,0,0);
     }
