@@ -21,7 +21,8 @@ use kingdom_lord::components::outer_city::OuterCityTraitDispatcher;
 use starknet::contract_address_const;
 use openzeppelin::presets::erc20::ERC20;
 use openzeppelin::token::erc20::interface::IERC20Dispatcher;
-use starknet::testing::{set_caller_address, set_contract_address};
+use kingdom_lord::models::time::get_current_time;
+use starknet::testing::{set_caller_address, set_contract_address, set_block_number};
 trait SerializedAppend<T> {
     fn append_serde(ref self: Array<felt252>, value: T);
 }
@@ -117,6 +118,29 @@ fn assert_troop(
     assert_eq!(troop.scouts, scouts, "scouts should be {} but got {}", troop.scouts, scouts);
     assert_eq!(troop.knights, knights, "knights should be {} but got {}", troop.knights, knights);
     assert_eq!(troop.heavy_knights, heavy_knights, "heavy_knights should be {} but got {}", troop.heavy_knights, heavy_knights);
+}
+
+fn increase_time(time: u64) {
+    let current_time = get_current_time();
+    set_block_number(current_time + time);
+}
+
+
+fn construct_barrack(context: TestContext){
+    increase_time(100);
+    let res = context.kingdom_lord.start_upgrade(19, 8, 1, 210, 140, 260, 120, 4, 2000, 100,     array![
+        0x3e6b3f2c7624525e03ed0c96ff43d0fe1dafa24a61eaca42b1e9dd00a9bf2b9,
+        0x2e42f1daa91953d844c066e52c9355208979c982e0cea128e7ea54db6dd1d75,
+        0x5eeef9158bbb0ed60b496e2dd18f1b50f2efd44a619a1e4f4b312562fd86202,
+        0x76a918559603e1db782e6b05119251069e444c6f0aa1fa6e9f2c21a607fe648,
+        0x5a39d476538786b9849535508804dfe168518b1f6c2d65541109b2534791136,
+        0x0,
+        0x0,
+        0x5f0dde256e23129e6713acf8c87088898a0632c9d3cddcd77fc58c2c1a8922b
+    ]);
+    increase_time(2000);
+    let res = context.kingdom_lord.finish_upgrade(0);
+    res.unwrap();
 }
 
 

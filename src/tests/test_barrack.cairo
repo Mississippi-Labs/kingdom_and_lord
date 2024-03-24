@@ -11,7 +11,10 @@ mod tests {
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{setup_world, assert_troop, city_hall_level2_proof, city_hall_level1_proof, assert_resource};
+    use kingdom_lord::tests::utils::{
+        setup_world, assert_troop, city_hall_level2_proof, city_hall_level1_proof, assert_resource,
+        construct_barrack, increase_time
+    };
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
     };
@@ -23,37 +26,43 @@ mod tests {
         let context = setup_world();
 
         context.kingdom_lord.spawn();
+
+        construct_barrack(context);
         let caller = get_caller_address();
 
-        let err = context
-            .kingdom_lord
-            .start_training(0)
-            .unwrap_err();
-        assert(err == Error::ResourceNotEnough, 'not enough resource');
-        set_block_number(100);
-        assert_resource(context, caller, 1000,1000,1000,1000);
+        assert_resource(context, caller, 1000, 1000, 1000, 1000);
         let training_id1 = context.kingdom_lord.start_training(0).unwrap();
-        assert_resource(context, caller, 880,900,850,970);
+        assert_resource(context, caller, 880, 900, 850, 970);
         let training_id2 = context.kingdom_lord.start_training(0).unwrap();
-        assert_resource(context, caller, 760,800,700,940);
+        assert_resource(context, caller, 760, 800, 700, 940);
         let training_id3 = context.kingdom_lord.start_training(1).unwrap();
-        assert_resource(context, caller, 660,670,540,870);
+        assert_resource(context, caller, 660, 670, 540, 870);
 
-        set_block_number(150);
-        println!("block number");
+        increase_time(150);
         let err = context.kingdom_lord.finish_training(training_id1).unwrap_err();
         assert_eq!(err, Error::TrainingNotFinished, "training not finished");
-        set_block_number(1700);
+        increase_time(1450);
         context.kingdom_lord.finish_training(training_id1).unwrap();
-        assert_troop(context, caller, 1,0,0,0,0,0);
-
+        assert_troop(context, caller, 1, 0, 0, 0, 0, 0);
         context.kingdom_lord.finish_training(training_id2).unwrap();
-        assert_troop(context, caller, 2,0,0,0,0,0);
-        println!("block number 2");
+        assert_troop(context, caller, 2, 0, 0, 0, 0, 0);
         let err = context.kingdom_lord.finish_training(training_id3).unwrap_err();
         assert_eq!(err, Error::TrainingNotFinished, "training not finished");
-        set_block_number(1860);
+        increase_time(160);
         let res = context.kingdom_lord.finish_training(training_id3).unwrap();
-        assert_troop(context, caller, 2,1,0,0,0,0);
+        assert_troop(context, caller, 2, 1, 0, 0, 0, 0);
+    }
+
+
+    #[test]
+    #[available_gas(300000000000)]
+    fn test_no_barrack_training() {
+        let context = setup_world();
+
+        context.kingdom_lord.spawn();
+        let caller = get_caller_address();
+        increase_time(100);
+        let err = context.kingdom_lord.start_training(0).unwrap_err();
+        assert(err == Error::NoBarrackConstructed, 'barrack have not built');
     }
 }

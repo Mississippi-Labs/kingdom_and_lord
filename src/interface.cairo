@@ -17,7 +17,9 @@ enum Error{
     InvalidProof,
     TrainingNotFinished,
     TrainingListFull,
+    NoBarrackConstructed
 }
+
 #[starknet::interface]
 trait IKingdomLord<TState>{
     // read function

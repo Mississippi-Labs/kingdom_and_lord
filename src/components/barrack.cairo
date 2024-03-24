@@ -13,7 +13,7 @@ struct Barrack{
     building_id: u64,
     level: Level,
     bonus: u64,
-    population:u64
+    population:u64,
 }
 
 #[derive(Model, Copy, Drop, Serde)]
@@ -279,9 +279,14 @@ mod barrack_component{
             let world = self.get_contract().world();
             let current_time = get_current_time();
             let player = get_caller_address();
-            let barrack = get!(world, (player), (Barrack));
+            let barrack: Barrack = get!(world, (player), (Barrack));
+
             let required_time = barrack.bonus * required_time / 100;
+            if barrack.population == 0{
+                return Result::Err(Error::NoBarrackConstructed);
+            }
             let mut index = 0;
+
             let mut res: Result<UnderTraining, Error> = Result::Err(Error::UnknownedError('start upgrading failed'));
             loop {
                 if index == UNDER_TRAINING_COUNT {
