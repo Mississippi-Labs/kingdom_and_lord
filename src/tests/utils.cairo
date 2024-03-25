@@ -81,6 +81,7 @@ fn city_hall_level2_proof() -> Array<felt252> {
         0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
     ]
 }
+
 fn city_hall_level1_proof() -> Array<felt252> {
     array![
         0x56e9e5ce79486d11d4079f6521d5de93bc3e474dc2cd647063fe45c22054ac8,
@@ -89,6 +90,19 @@ fn city_hall_level1_proof() -> Array<felt252> {
         0x352510f1269cea2ac10dab006a027dee2dcc6fc82676fbb5b862269d99528ee,
         0x660a74333a6082be847d98d1779c25ab498eaf93ea998125db323a1bc0c8cc7,
         0x53292aa62ac71f440a6c19786b359d3242844aed9effad78c0e7972ef409a1b,
+        0x59dc966df9f4d4b5a02fa4d584ce7280cc0c8633e411a3f92f558abe1ecc464,
+        0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
+    ]
+}
+
+fn warehouse_level1_proof() -> Array<felt252> {
+    array![
+        0x15e13da9e4006b0743b75b13080030f13ed8f485efa02b4a66c8b59e5150ce3,
+        0x3e18c7be39fc9a8cbb8aae595fd4e898abfc9945356debf6b201344d5fa3b82,
+        0x63537e18ece5a69d40ccb8ee30eee5439965b8e3bbaaafd50cd98cb48a3b7a0,
+        0x5db1c0cec9f79605143f8686956a6114b50d34724944c02047b7350ac243a8e,
+        0x53671a3938b8eb7a9e796f00ec21a86a8ceabeb3d1cc45dceec3bd8883c5ed6,
+        0x32c207f7db5b02df3916cb11144023134ad16417964abb3f7fa66d2fa1bdcc6,
         0x59dc966df9f4d4b5a02fa4d584ce7280cc0c8633e411a3f92f558abe1ecc464,
         0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
     ]

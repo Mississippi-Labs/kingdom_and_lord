@@ -25,8 +25,8 @@ mod universal_component {
     use kingdom_lord::models::building_kind::BuildingKind;
     use kingdom_lord::components::city_hall::{CityHall};
     use kingdom_lord::components::city_building::{CityBuilding};
-    use kingdom_lord::components::warehouse::{Warehouse};
-    use kingdom_lord::components::barn::{Barn};
+    use kingdom_lord::components::warehouse::{Warehouse, WarehouseStorage};
+    use kingdom_lord::components::barn::{Barn, BarnStorage};
     use kingdom_lord::components::barrack::{Barrack, BarrackLevelTrait, BarrackGetLevel};
     use kingdom_lord::helpers::contract_address::FmtContractAddr;
     use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl};
@@ -80,11 +80,11 @@ mod universal_component {
                     return city_hall.is_next_level_valid(next_level);
                 },
                 BuildingKind::Warehouse => {
-                    let warehouse = get!(world, (player), (Warehouse));
+                    let warehouse = get!(world, (player, building_id), (Warehouse));
                     return warehouse.is_next_level_valid(next_level);
                 },
                 BuildingKind::Barn => {
-                    let barn = get!(world, (player), (Barn));
+                    let barn = get!(world, (player, building_id), (Barn));
                     return barn.is_next_level_valid(next_level);
                 },
                 BuildingKind::Barrack => {
@@ -125,22 +125,32 @@ mod universal_component {
                     set!(world, (city_building));
                 },
                 BuildingKind::CityHall => {
-                    let mut city_hall = get!(world, (player, building_id), (CityHall));
+                    let mut city_hall = get!(world, (player), (CityHall));
                     city_hall.level_up(value);
                     set!(world, (city_hall));
                 },
                 BuildingKind::Warehouse => {
                     let mut warehouse = get!(world, (player, building_id), (Warehouse));
+                    let mut warehouse_storage = get!(world, (player), WarehouseStorage);
+                    let (max_storage, population) = value;
+                    warehouse_storage.max_storage -= warehouse.max_storage;
+                    warehouse_storage.max_storage += max_storage;
                     warehouse.level_up(value);
                     set!(world, (warehouse));
+                    set!(world, (warehouse_storage));
                 },
                 BuildingKind::Barn => {
                     let mut barn = get!(world, (player, building_id), (Barn));
+                    let mut barn_storage = get!(world, (player), BarnStorage);
+                    let (max_storage, population) = value;
+                    barn_storage.max_storage -= barn.max_storage;
+                    barn_storage.max_storage += max_storage;
                     barn.level_up(value);
                     set!(world, (barn));
+                    set!(world, (barn_storage));
                 },
                 BuildingKind::Barrack => {
-                    let mut barrack = get!(world, (player, building_id), (Barrack));
+                    let mut barrack = get!(world, (player), (Barrack));
                     barrack.level_up(value);
                     set!(world, (barrack));
                 },
@@ -189,6 +199,9 @@ mod universal_component {
                         building_id: building_id,
                         building_kind: BuildingKind::Warehouse.into(),
                     };
+                    let mut warehouse_storage = get!(world, (player), WarehouseStorage);
+                    warehouse_storage.max_storage += warehouse.max_storage;
+                    set!(world, (warehouse_storage));
                     set!(world, (warehouse));
                     set!(world, (building_area_info));
                 },
@@ -205,6 +218,9 @@ mod universal_component {
                         building_id: building_id,
                         building_kind: BuildingKind::Barn.into(),
                     };
+                    let mut barn_storage = get!(world, (player), BarnStorage);
+                    barn_storage.max_storage += barn.max_storage;
+                    set!(world, (barn_storage));
                     set!(world, (barn));
                     set!(world, (building_area_info));
                 },

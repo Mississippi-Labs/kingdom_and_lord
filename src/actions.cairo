@@ -382,6 +382,7 @@ mod kingdom_lord_controller {
             let player = get_caller_address();
             match res {
                 Result::Ok(under_upgrade) => {
+                    self.mine();
                     let world = self.world_dispatcher.read();
                     let building_id: u64 = under_upgrade.building_id;
                     if under_upgrade.is_new_building {
@@ -390,7 +391,6 @@ mod kingdom_lord_controller {
                         let building_kind = self.universal.building_kind(building_id);
                         self.universal.level_up(building_id, under_upgrade.building_kind.into(), (under_upgrade.value, under_upgrade.population));
                     }
-                    self.mine();
                     self
                         .emit(
                             UpgradeCompleteEvent {

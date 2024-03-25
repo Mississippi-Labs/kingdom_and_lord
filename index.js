@@ -202,7 +202,7 @@ const leaves = data.map((d) =>
 const tree = new merkle.MerkleTree(leaves, hash.computePoseidonHash);
 console.log("root: ", tree.root)
 
-const h = hash_posei([8, 1, 210, 140, 260, 120, 4, 2000, 100])
+const h = hash_posei([6, 1, 130, 160, 90, 40, 1, 2000, 1200])
 console.log("h: ", h)
 const proof = tree.getProof(h);
 console.log("proof: ", proof)
