@@ -3,14 +3,14 @@ mod tests {
     use kingdom_lord::interface::{IKingdomLordDispatcherTrait, Error};
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::get_caller_address;
-    use starknet::testing::{set_caller_address, set_block_number};
+    use starknet::testing::{set_caller_address};
 
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{setup_world, assert_resource};
+    use kingdom_lord::tests::utils::{setup_world, assert_resource, increase_time};
     use kingdom_lord::interface::{IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl};
 
     #[test]
@@ -19,7 +19,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
         let caller = get_caller_address();
-        set_block_number(1_u64);
+        increase_time(1_u64);
         context.kingdom_lord.spawn();
         assert_resource(context, caller, 0, 0, 0, 0);
 

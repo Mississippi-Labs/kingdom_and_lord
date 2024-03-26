@@ -4,7 +4,7 @@ mod tests {
     use kingdom_lord::interface::IKingdomLordDispatcherTrait;
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::get_caller_address;
-    use starknet::testing::{set_caller_address, set_block_number, set_block_timestamp};
+    use starknet::testing::{set_caller_address, set_block_timestamp};
 
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};

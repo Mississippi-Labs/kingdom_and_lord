@@ -4,14 +4,14 @@ mod tests {
     use kingdom_lord::interface::IKingdomLordDispatcherTrait;
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::get_caller_address;
-    use starknet::testing::{set_caller_address, set_block_number, set_block_timestamp, set_contract_address};
+    use starknet::testing::{set_caller_address, set_block_timestamp, set_contract_address};
     use kingdom_lord::helpers::contract_address::FmtContractAddr;
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{setup_world, OWNER, PLAYER, wood_level_1_proof};
+    use kingdom_lord::tests::utils::{setup_world, OWNER, PLAYER, wood_level_1_proof, increase_time};
     use kingdom_lord::interface::{IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error};
     use kingdom_lord::components::city_hall::UnderUpgrading;
     use openzeppelin::token::erc20::interface::IERC20DispatcherImpl;
@@ -36,12 +36,12 @@ mod tests {
 
         let err = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof()).unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
-        set_block_number(25);
+        increase_time(25);
         let res = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof());
         let upgrade_id = res.unwrap();
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
-        set_block_number(29);
+        increase_time(4);
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
         let upgrade = under_upgrade.at(0);
         assert(under_upgrade.len() == 1, 'under_upgrade should be 1');
@@ -81,12 +81,12 @@ mod tests {
         
         let err = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof()).unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
-        set_block_number(25);
+        increase_time(25);
         let res = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof());
         let upgrade_id = res.unwrap();
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
-        set_block_number(29);
+        increase_time(4);
         let under_upgrade = context.kingdom_lord.get_under_upgrading(player);
         assert(under_upgrade.len() == 1, 'under_upgrade should be 1');
 
