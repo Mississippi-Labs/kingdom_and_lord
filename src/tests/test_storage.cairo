@@ -13,7 +13,7 @@ mod tests {
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{
         setup_world, city_hall_level1_proof, city_hall_level2_proof, warehouse_level1_proof,
-        assert_resource, increase_time
+        assert_resource, increase_time, warehouse_level2_proof, barn_level1_proof, barn_level2_proof
     };
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
@@ -93,9 +93,70 @@ mod tests {
 
         context.kingdom_lord.finish_upgrade(0).unwrap();
 
-        assert_resource(context, caller, 1000,1000,1000, 1000);
+        assert_resource(context, caller, 1000, 1000, 1000, 1000);
 
         increase_time(100);
-        assert_resource(context, caller, 2200,2200,2200, 1000);
+        assert_resource(context, caller, 2200, 2200, 2200, 1000);
+
+        context
+            .kingdom_lord
+            .start_upgrade(18, 6, 2, 165, 205, 115, 50, 1, 2620, 1700, warehouse_level2_proof())
+            .expect('start upgrade level 2 failed');
+
+        increase_time(2620);
+
+        context.kingdom_lord.finish_upgrade(0).unwrap();
+        assert_resource(context, caller, 2200, 2200, 2200, 1000);
+
+        increase_time(100);
+        assert_resource(context, caller, 2700, 2700, 2700, 1000);
+    }
+
+    #[test]
+    #[available_gas(300000000000)]
+    fn test_build_barn() {
+        // deploy world with models
+        let context = setup_world();
+
+        context.kingdom_lord.spawn();
+        let caller = get_caller_address();
+
+        assert_resource(context, caller, 0, 0, 0, 0);
+
+        let err = context
+            .kingdom_lord
+            .start_upgrade(18, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof())
+            .unwrap_err();
+        assert(err == Error::ResourceNotEnough, 'not enough resource');
+        increase_time(100);
+
+        let res = context
+            .kingdom_lord
+            .start_upgrade(18, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof())
+            .unwrap();
+
+        assert_resource(context, caller, 920, 900, 930, 980);
+
+        increase_time(1600);
+
+        context.kingdom_lord.finish_upgrade(0).unwrap();
+
+        assert_resource(context, caller, 1000, 1000, 1000, 1000);
+
+        increase_time(100);
+        assert_resource(context, caller, 1000, 1000, 1000, 2200);
+
+        context
+            .kingdom_lord
+            .start_upgrade(18, 7, 2, 100, 130, 90, 25, 1, 2160, 1700, barn_level2_proof())
+            .expect('upgrade barn level 2 failed');
+
+        increase_time(2160);
+
+        context.kingdom_lord.finish_upgrade(0).unwrap();
+        assert_resource(context, caller, 1000, 1000, 1000, 2200);
+
+        increase_time(100);
+        assert_resource(context, caller, 1000, 1000, 1000, 2700);
     }
 }

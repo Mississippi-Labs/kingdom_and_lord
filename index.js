@@ -4,9 +4,6 @@ const { hash, num, merkle } = require('starknet');
 function hash_posei (data) {
   return hash.computePoseidonHashOnElements(data);
 }
-const a = hash_posei([1, 2, 3, 4]);
-
-console.log(a)
 
 const wood = [[1, 1, 40, 100, 50, 60, 2, 260, 7],
 [1, 2, 65, 165, 85, 100, 1, 620, 13],
@@ -202,7 +199,7 @@ const leaves = data.map((d) =>
 const tree = new merkle.MerkleTree(leaves, hash.computePoseidonHash);
 console.log("root: ", tree.root)
 
-const h = hash_posei([6, 1, 130, 160, 90, 40, 1, 2000, 1200])
+const h = hash_posei([7, 2, 100, 130, 90, 25, 1, 2160, 1700])
 console.log("h: ", h)
 const proof = tree.getProof(h);
 console.log("proof: ", proof)
