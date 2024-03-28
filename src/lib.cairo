@@ -34,7 +34,7 @@ mod tests {
     mod test_upgrade;
     mod test_city_hall;
     mod test_barrack;
-    mod test_pay_upgrade;
+    // mod test_pay_upgrade;
     mod utils;
 }
 

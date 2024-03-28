@@ -39,7 +39,7 @@ mod kingdom_lord_controller {
     };
     use starknet::get_caller_address;
     use kingdom_lord::models::time::get_current_time;
-    use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherImpl};
+    // use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherImpl};
 
     component!(path: barn_component, storage: barn, event: BarnEvent);
     component!(path: warehouse_component, storage: warehouse, event: WarehouseEvent);
@@ -404,35 +404,35 @@ mod kingdom_lord_controller {
             res
         }
 
-        fn pay_to_finish_upgrade(ref self: ContractState, upgrade_id: u64) -> Result<(), Error> {
-            let caller = starknet::get_caller_address();
+        // fn pay_to_finish_upgrade(ref self: ContractState, upgrade_id: u64) -> Result<(), Error> {
+        //     let caller = starknet::get_caller_address();
             
-            let world = self.world_dispatcher.read();
-            let config = get!(world, (CONFIG_ID), (Config));
-            let erc20_dispatcher = IERC20Dispatcher { contract_address: config.erc20_addr };
-            let res = erc20_dispatcher.transfer_from(caller, config.receiver, config.amount);
-            if res {
-                let result = self.city_hall.pay_to_finish_upgrade(upgrade_id);
-                match result {
-                    Result::Ok(under_upgrade) => {
-                        let caller = get_caller_address();
-                        self
-                            .emit(
-                                PayToFinishedUpgradeEvent {
-                                    player: caller,
-                                    upgrade_id,
-                                    building_id: under_upgrade.building_id,
-                                    level: under_upgrade.target_level
-                                }
-                            );
-                        Result::Ok(())
-                    },
-                    Result::Err(_) => { panic!("pay to finish upgrade error") }
-                }
-            } else {
-                Result::Err(Error::PayToUpgradeError)
-            }
-        }
+        //     let world = self.world_dispatcher.read();
+        //     let config = get!(world, (CONFIG_ID), (Config));
+        //     let erc20_dispatcher = IERC20Dispatcher { contract_address: config.erc20_addr };
+        //     let res = erc20_dispatcher.transfer_from(caller, config.receiver, config.amount);
+        //     if res {
+        //         let result = self.city_hall.pay_to_finish_upgrade(upgrade_id);
+        //         match result {
+        //             Result::Ok(under_upgrade) => {
+        //                 let caller = get_caller_address();
+        //                 self
+        //                     .emit(
+        //                         PayToFinishedUpgradeEvent {
+        //                             player: caller,
+        //                             upgrade_id,
+        //                             building_id: under_upgrade.building_id,
+        //                             level: under_upgrade.target_level
+        //                         }
+        //                     );
+        //                 Result::Ok(())
+        //             },
+        //             Result::Err(_) => { panic!("pay to finish upgrade error") }
+        //         }
+        //     } else {
+        //         Result::Err(Error::PayToUpgradeError)
+        //     }
+        // }
 
         fn get_under_upgrading(
             self: @ContractState, player: ContractAddress,

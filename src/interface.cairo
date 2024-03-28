@@ -55,7 +55,7 @@ trait IKingdomLord<TState>{
             barrack_kind: u64,
         ) -> Result<u64, Error>;
     fn finish_training(ref self: TState, training_id: u64) -> Result<UnderTraining, Error>;
-    fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
+    // fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
 }
 
 #[starknet::interface]
