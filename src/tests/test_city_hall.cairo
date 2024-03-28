@@ -37,6 +37,10 @@ mod tests {
         let upgrade_id =res.unwrap();
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
+        let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
+        let upgrade = under_upgrade.at(0);
+        assert(under_upgrade.len() == 1, 'under_upgrade should be 1');
+
         increase_time(2500);
 
         let finishe_upgrade = context.kingdom_lord.get_complete_upgrading(caller);
