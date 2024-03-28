@@ -4,3 +4,5 @@ local
 node_modules
 .pdm-python
 __pycache__
+abis
+manifests

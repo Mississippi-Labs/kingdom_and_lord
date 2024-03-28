@@ -4,7 +4,7 @@ version = 1
 [[package]]
 name = "dojo"
 version = "0.5.1"
-source = "git+https://github.com/dojoengine/dojo#118ed84f7b5cb9e4e0c1963fca88b71a222ae50d"
+source = "git+https://github.com/dojoengine/dojo?tag=v0.6.0-alpha.9#57fa2dccbf2c5a3c66cfd1e6b353742fcf596980"
 dependencies = [
  "dojo_plugin",
 ]
@@ -25,4 +25,4 @@ dependencies = [
 [[package]]
 name = "openzeppelin"
 version = "0.8.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.8.0#c23e8e96de60e6e3159b1ff8591a1187269c0eb7"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.8.0#6ab91b5cf57d6a7d02f2d5c5abfc7b5712bc8e47"

@@ -14,7 +14,6 @@ use kingdom_lord::interface::{
     IKingdomLordDispatcherTrait
 };
  use openzeppelin::token::erc20::interface::IERC20DispatcherImpl;
- use kingdom_lord::helpers::contract_address::FmtContractAddr;
 use kingdom_lord::actions::kingdom_lord_controller::world_dispatcherContractMemberStateTrait;
 use kingdom_lord::admin::kingdom_lord_admin;
 use kingdom_lord::components::outer_city::OuterCityTraitDispatcher;
@@ -44,8 +43,15 @@ struct TestContext {
 }
 
 
-const NAME: felt252 = 'test';
-const SYNBOL: felt252 = 'test';
+
+fn NAME() -> ByteArray {
+    "NAME"
+}
+
+fn SYMBOL() -> ByteArray {
+    "SYMBOL"
+}
+
 const SUPPLY: u256 = 2000000;
 
 fn OWNER() -> ContractAddress {
@@ -180,7 +186,7 @@ fn increase_time(time: u64) {
 
 fn construct_barrack(context: TestContext){
     increase_time(100);
-    let res = context.kingdom_lord.start_upgrade(19, 8, 1, 210, 140, 260, 120, 4, 2000, 100,     array![
+    context.kingdom_lord.start_upgrade(19, 8, 1, 210, 140, 260, 120, 4, 2000, 100,     array![
         0x3e6b3f2c7624525e03ed0c96ff43d0fe1dafa24a61eaca42b1e9dd00a9bf2b9,
         0x2e42f1daa91953d844c066e52c9355208979c982e0cea128e7ea54db6dd1d75,
         0x5eeef9158bbb0ed60b496e2dd18f1b50f2efd44a619a1e4f4b312562fd86202,
@@ -189,10 +195,10 @@ fn construct_barrack(context: TestContext){
         0x0,
         0x0,
         0x5f0dde256e23129e6713acf8c87088898a0632c9d3cddcd77fc58c2c1a8922b
-    ]);
+    ]).expect('start construct barrack');
     increase_time(2000);
     let res = context.kingdom_lord.finish_upgrade(0);
-    res.unwrap();
+    res.expect('construct barrack');
 }
 
 
@@ -208,21 +214,24 @@ fn setup_world() -> TestContext {
     let world = spawn_test_world(models);
     // deploy systems contract
     let contract_address = world
-        .deploy_contract('salt1', kingdom_lord_controller::TEST_CLASS_HASH.try_into().unwrap());
+        .deploy_contract('salt1', kingdom_lord_controller::TEST_CLASS_HASH.try_into().expect('kingdom controller'));
     let admin_contract_address = world
-        .deploy_contract('salt2', kingdom_lord_admin::TEST_CLASS_HASH.try_into().unwrap());
+        .deploy_contract('salt2', kingdom_lord_admin::TEST_CLASS_HASH.try_into().expect('kindom admin'));
 
     // deploy erc20 contract
     let mut calldata: Array<felt252> = array![];
     let owner = OWNER();
-    NAME.serialize(ref calldata);
-    SYNBOL.serialize(ref calldata);
+    let name = NAME();
+    let symbol = SYMBOL();
+    name.serialize(ref calldata);
+    symbol.serialize(ref calldata);
     SUPPLY.serialize(ref calldata);
     owner.serialize(ref calldata);
     let (erc20_contract_address, _) = starknet::deploy_syscall(
-        ERC20::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), false
+        ERC20::TEST_CLASS_HASH.try_into().expect('erc20 test classs'), 0, calldata.span(), false
     )
-        .unwrap();
+        .expect('expect deploy erc20');
+
 
     let admin_dispatcher = IKingdomLordAdminDispatcher { contract_address: admin_contract_address };
     let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_contract_address };

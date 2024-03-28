@@ -4,7 +4,6 @@ use super::city_building::{CityBuilding, CityBuildingLevelImpl};
 use kingdom_lord::models::level::Level;
 use kingdom_lord::models::building::{BuildingUpgradeResource};
 use kingdom_lord::models::level::{LevelTrait, LevelUpTrait};
-use kingdom_lord::helpers::contract_address::FmtContractAddr;
 
 #[derive(Model, Drop, Copy, Serde)]
 struct UnderUpgrading {

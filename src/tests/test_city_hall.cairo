@@ -22,7 +22,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
         let caller = get_caller_address();
         let err = context
             .kingdom_lord
@@ -38,7 +38,6 @@ mod tests {
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
-        let upgrade = under_upgrade.at(0);
         assert(under_upgrade.len() == 1, 'under_upgrade should be 1');
 
         increase_time(2500);
@@ -51,15 +50,15 @@ mod tests {
 
         // city hall should be level up
         context.kingdom_lord.finish_upgrade(0_u64).unwrap();
-        let res = context
+        context
             .kingdom_lord
-            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof());
+            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof()).expect('start upgrade level 2 ');
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
 
         let upgrade = under_upgrade.at(0);
-        // 2620 - 2620 * 104 //10000 + 2670
+        // 2620 - 2620 * 104 //10000 + 2550
         // let compute: u64 = 3220_u64 - 3220_u64 * 104_u64 /10000_u64 + 2670_u64;
-        assert(*upgrade.end_time == 5264, 'end block should be 5264');
+        assert(*upgrade.end_time == 5144, 'end block should be 5144');
 
         increase_time(2620);
         context.kingdom_lord.finish_upgrade(0_u64).unwrap();

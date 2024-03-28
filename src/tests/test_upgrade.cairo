@@ -22,7 +22,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
         let caller = get_caller_address();
         let err = context
             .kingdom_lord
@@ -58,10 +58,9 @@ mod tests {
         // double finish should failed
         context.kingdom_lord.finish_upgrade(0_u64).unwrap_err();
 
-        let (wood_growth_rate, steel_growth_rate, brick_growth_rate, food_growth_rate) = context
+        let (wood_growth_rate, _steel_growth_rate, _brick_growth_rate, _food_growth_rate) = context
             .kingdom_lord
             .get_growth_rate(caller);
-        let w:u64 = wood_growth_rate.into();
         assert(wood_growth_rate.into() == 19_u64, 'wood growth rate should be 19');
         let levels = context.kingdom_lord.get_buildings_levels(caller);
         assert(*levels.at(0) == 1_u64.into(), '0 should be 1');
@@ -74,8 +73,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
-        let caller = get_caller_address();
+        context.kingdom_lord.spawn().expect('spawn works');
 
         increase_time(25);
         let res = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7,array![0x1]);

@@ -25,7 +25,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
 
         construct_barrack(context);
         let caller = get_caller_address();
@@ -49,7 +49,7 @@ mod tests {
         let err = context.kingdom_lord.finish_training(training_id3).unwrap_err();
         assert_eq!(err, Error::TrainingNotFinished, "training not finished");
         increase_time(160);
-        let res = context.kingdom_lord.finish_training(training_id3).unwrap();
+        context.kingdom_lord.finish_training(training_id3).expect('finish training');
         assert_troop(context, caller, 2, 1, 0, 0, 0, 0);
     }
 
@@ -59,8 +59,7 @@ mod tests {
     fn test_no_barrack_training() {
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
-        let caller = get_caller_address();
+        context.kingdom_lord.spawn().expect('spawn works');
         increase_time(100);
         let err = context.kingdom_lord.start_training(0).unwrap_err();
         assert(err == Error::NoBarrackConstructed, 'barrack have not built');

@@ -1,5 +1,6 @@
 [package]
-cairo-version = "2.4.0"
+cairo-version = "2.5.4"
+edition = "2023_01"
 name = "kingdom_lord"
 version = "0.5.0"
 
@@ -7,8 +8,9 @@ version = "0.5.0"
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", version = "0.5.1" }
-openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.8.0" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0-alpha.9" }
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.10.0" }
+starknet = "2.5.4"
 # alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "01a7690dc25d19a086f525b8ce66aa505c8e7527"}
 
 [[target.dojo]]

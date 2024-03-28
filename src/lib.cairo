@@ -26,16 +26,15 @@ mod components {
 
 mod helpers {
     mod array;
-    mod contract_address;
 }
 
 mod tests {
-    // mod test_spawn;
+    mod test_spawn;
     mod test_storage;
-    // mod test_upgrade;
-    // mod test_city_hall;
-    // mod test_barrack;
-    // mod test_pay_upgrade;
+    mod test_upgrade;
+    mod test_city_hall;
+    mod test_barrack;
+    mod test_pay_upgrade;
     mod utils;
 }
 

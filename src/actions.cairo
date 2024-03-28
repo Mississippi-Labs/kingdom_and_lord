@@ -5,7 +5,6 @@ mod kingdom_lord_controller {
     use kingdom_lord::components::warehouse::{warehouse_component, Warehouse, WarehouseStorage};
     use kingdom_lord::components::outer_city::{outer_city_component, OuterCity};
     use kingdom_lord::components::outer_city::outer_city_component::{OuterCityInternalImpl};
-    use kingdom_lord::helpers::contract_address::FmtContractAddr;
     use kingdom_lord::components::city_hall::{
         city_hall_component, UnderUpgrading, new_under_upgrading, CityHall, CityHallGetLevel
     };
@@ -326,13 +325,13 @@ mod kingdom_lord_controller {
             let curr_building_kind = self.universal.building_kind(building_id);
 
             if building_kind != curr_building_kind && curr_building_kind != BuildingKind::None {
-                panic!("invalid building kind");
-                // return Result::Err(Error::UnknownedError('invalid building kind'));
+                // panic!("invalid building kind");
+                return Result::Err(Error::UnknownedError('invalid building kind'));
             }
 
             if !self.universal.is_next_level_valid(building_id, building_kind, next_level) {
-                panic!("next level is not valid");
-                // return Result::Err(Error::UnknownedError('next level is not valid'));
+                // panic!("next level is not valid");
+                return Result::Err(Error::UnknownedError('next level is not valid'));
             }
 
             let req_wood = req_wood.into();
@@ -342,15 +341,15 @@ mod kingdom_lord_controller {
             let (wood, brick, steel, food) = self.get_resource(caller_address);
             if wood < req_wood || brick < req_brick || steel < req_steel || food < req_food {
                 self.emit(UpgradeNotEnoughResourceEvent { player: caller_address, building_id });
-                panic!("resource not enough");
-                // return Result::Err(Error::ResourceNotEnough);
+                // panic!("resource not enough");
+                return Result::Err(Error::ResourceNotEnough);
             }
 
             let world = self.world_dispatcher.read();
             let config = get!(world, (CONFIG_ID), (Config));
             if !verify_proof(config, data.span(), proof.span()) {
-                panic!("invalid proof");
-                // return Result::Err(Error::InvalidProof);
+                // panic!("invalid proof");
+                return Result::Err(Error::InvalidProof);
             }
 
             let is_new_building = curr_building_kind == BuildingKind::None;
@@ -387,12 +386,10 @@ mod kingdom_lord_controller {
             match res {
                 Result::Ok(under_upgrade) => {
                     self.mine();
-                    let world = self.world_dispatcher.read();
                     let building_id: u64 = under_upgrade.building_id;
                     if under_upgrade.is_new_building {
                         self.universal.new_building(building_id, under_upgrade.building_kind.into());
                     } else{
-                        let building_kind = self.universal.building_kind(building_id);
                         self.universal.level_up(building_id, under_upgrade.building_kind.into(), (under_upgrade.value, under_upgrade.population));
                     }
                     self
@@ -402,7 +399,7 @@ mod kingdom_lord_controller {
                             }
                         );
                 },
-                Result::Err(err) => { self.emit(UpgradeNotFinishedEvent { player, upgrade_id }) }
+                Result::Err(_) => { self.emit(UpgradeNotFinishedEvent { player, upgrade_id }) }
             }
             res
         }
@@ -492,12 +489,12 @@ mod kingdom_lord_controller {
         ) -> Result<UnderTraining, Error> {
             let res = self.barrack.finish_training(training_id);
             match res {
-                Result::Ok(traning_res) => {
+                Result::Ok(_) => {
                     self.mine();
                     let player = get_caller_address();
                     self.emit(TrainingFinishedEvent { player, training_id });
                 },
-                Result::Err(err) => {}
+                Result::Err(_) => {}
             }
             res
         }
@@ -535,11 +532,7 @@ mod kingdom_lord_controller {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn mine(self: @ContractState) {
-            let player = get_caller_address();
             let (mined_wood, mined_brick, mined_steel, mined_food) = self.outer_city.mine();
-            let current_block_time = get_current_time();
-            let last_mined_time = self.outer_city.get_last_mined_time(player);
-            let consumed_food = (current_block_time - last_mined_time) * self.universal.get_total_population(player);
             self.warehouse.add_resource(mined_wood, mined_brick, mined_steel);
             self.barn.add_food(mined_food);
         }

@@ -25,7 +25,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
         let caller = get_caller_address();
 
         assert_resource(context, caller, 0, 0, 0, 0);
@@ -45,7 +45,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
         let caller = get_caller_address();
 
         assert_resource(context, caller, 0, 0, 0, 0);
@@ -57,7 +57,7 @@ mod tests {
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(1000);
 
-        let err = context
+        context
             .kingdom_lord
             .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
             .unwrap();
@@ -70,7 +70,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
         let caller = get_caller_address();
 
         assert_resource(context, caller, 0, 0, 0, 0);
@@ -82,7 +82,7 @@ mod tests {
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(100);
 
-        let res = context
+        context
             .kingdom_lord
             .start_upgrade(18, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
             .unwrap();
@@ -118,7 +118,7 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
         let caller = get_caller_address();
 
         assert_resource(context, caller, 0, 0, 0, 0);
@@ -130,16 +130,16 @@ mod tests {
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(100);
 
-        let res = context
+        context
             .kingdom_lord
             .start_upgrade(18, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof())
-            .unwrap();
+            .expect('upgrade barn level 1');
 
         assert_resource(context, caller, 920, 900, 930, 980);
 
         increase_time(1600);
 
-        context.kingdom_lord.finish_upgrade(0).unwrap();
+        context.kingdom_lord.finish_upgrade(0).expect('finish upgrade 0');
 
         assert_resource(context, caller, 1000, 1000, 1000, 1000);
 
@@ -153,7 +153,7 @@ mod tests {
 
         increase_time(2160);
 
-        context.kingdom_lord.finish_upgrade(0).unwrap();
+        context.kingdom_lord.finish_upgrade(0).expect('finish upgrade level 2');
         assert_resource(context, caller, 1000, 1000, 1000, 2200);
 
         increase_time(100);

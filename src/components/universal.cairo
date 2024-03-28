@@ -28,7 +28,6 @@ mod universal_component {
     use kingdom_lord::components::warehouse::{Warehouse, WarehouseStorage};
     use kingdom_lord::components::barn::{Barn, BarnStorage};
     use kingdom_lord::components::barrack::{Barrack, BarrackLevelTrait, BarrackGetLevel};
-    use kingdom_lord::helpers::contract_address::FmtContractAddr;
     use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl};
 
     #[storage]
@@ -132,7 +131,7 @@ mod universal_component {
                 BuildingKind::Warehouse => {
                     let mut warehouse = get!(world, (player, building_id), (Warehouse));
                     let mut warehouse_storage = get!(world, (player), WarehouseStorage);
-                    let (max_storage, population) = value;
+                    let (max_storage, _population) = value;
                     warehouse_storage.max_storage -= warehouse.max_storage;
                     warehouse_storage.max_storage += max_storage;
                     warehouse.level_up(value);
@@ -142,7 +141,7 @@ mod universal_component {
                 BuildingKind::Barn => {
                     let mut barn = get!(world, (player, building_id), (Barn));
                     let mut barn_storage = get!(world, (player), BarnStorage);
-                    let (max_storage, population) = value;
+                    let (max_storage, _population) = value;
                     barn_storage.max_storage -= barn.max_storage;
                     barn_storage.max_storage += max_storage;
                     barn.level_up(value);

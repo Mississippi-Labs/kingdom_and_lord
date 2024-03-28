@@ -124,7 +124,6 @@ mod outer_city_component {
         fn get_growth_rate(
             self: @ComponentState<TContractState>, player: ContractAddress,
         ) -> (GrowthRate<Wood>, GrowthRate<Brick>, GrowthRate<Steel>, GrowthRate<Food>) {
-            let outer_city = get!(self.get_contract().world(), player, (OuterCity));
             let wood_growth_rate: GrowthRate<Wood> = self
                 .get_wood_building(player)
                 .get_growth_rate();

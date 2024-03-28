@@ -20,7 +20,7 @@ mod tests {
         let context = setup_world();
         let caller = get_caller_address();
         increase_time(1_u64);
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
         assert_resource(context, caller, 0, 0, 0, 0);
 
         // building levels 4446
@@ -64,8 +64,7 @@ mod tests {
     fn test_dup_spawn() {
         // deploy world with models
         let context = setup_world();
-        let caller = get_caller_address();
-        context.kingdom_lord.spawn();
+        context.kingdom_lord.spawn().expect('spawn works');
 
         let res = context.kingdom_lord.spawn().unwrap_err();
         assert(res == Error::AlreadySpawned, 'dup spawned should be error')
