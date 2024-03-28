@@ -1,44 +1,32 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/mark-dark.svg">
-  <img alt="Dojo logo" align="right" width="120" src=".github/mark-light.svg">
+  <img alt="K&L logo" align="right" width="120" src="./assets/logo_big.png">
 </picture>
 
-<a href="https://twitter.com/dojostarknet">
-<img src="https://img.shields.io/twitter/follow/dojostarknet?style=social"/>
+<a href="https://twitter.com/0xMississippi">
+<img src="https://img.shields.io/twitter/follow/0xMississippi?style=social"/>
 </a>
-<a href="https://github.com/dojoengine/dojo">
-<img src="https://img.shields.io/github/stars/dojoengine/dojo?style=social"/>
+<a href="https://github.com/Mississippi-Labs/kingdom_and_lord">
+<img src="https://img.shields.io/github/stars/Mississippi-Labs/kingdom_and_lord?style=social"/>
 </a>
 
-[![discord](https://img.shields.io/badge/join-dojo-green?logo=discord&logoColor=white)](https://discord.gg/PwDa2mKhR4)
+[![discord](https://img.shields.io/badge/join-dojo-green?logo=discord&logoColor=white)](https://discord.gg/Ngnm5Nh9v3)
 [![Telegram Chat][tg-badge]][tg-url]
 
-[tg-badge]: https://img.shields.io/endpoint?color=neon&logo=telegram&label=chat&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fdojoengine
-[tg-url]: https://t.me/dojoengine
 
-# Dojo Starter: Official Guide
+# Kingdom & Lords
 
-The official Dojo Starter guide, the quickest and most streamlined way to get your Dojo Autonomous World up and running. This guide will assist you with the initial setup, from cloning the repository to deploying your world.
+The kindom&Lords is a fully on-chain SLG game designed specifically for the Starknet
 
-Read the full tutorial [here](https://book.dojoengine.org/cairo/hello-dojo.html)
+<picture>
+  <img alt="K&L Cover"  width="100%" src="./assets/cover.jpeg">
+</picture>
+
+In the world of "Kingdom&Lords," you embark on an epic journey, where strategy and wisdom go hand in hand, and alliances are forged to conquer new territories. Build your village, develop agriculture and economy, muster a mighty army, and erect invincible walls.
+<picture>
+  <img alt="K&L Cover"  width="100%" src="./assets/interface.jpeg">
+</picture>
+
+But "Kingdom&Lords" is more than this—it's a realm of social strategy where no hero stands alone, only with brave and wise allies. Every decision you make can alter the course of battle, and your alliance is your unbreakable shield. Send envoys, make allies with heroes from all corners of the world, and fight side by side with players globally to witness the rise of a dynasty.
 
 ---
 
-## Contribution
-
-This starter project is a constant work in progress and contributions are greatly appreciated!
-
-1. **Report a Bug**
-
-    - If you think you have encountered a bug, and we should know about it, feel free to report it [here](https://github.com/dojoengine/dojo-starter/issues) and we will take care of it.
-
-2. **Request a Feature**
-
-    - You can also request for a feature [here](https://github.com/dojoengine/dojo-starter/issues), and if it's viable, it will be picked for development.
-
-3. **Create a Pull Request**
-    - It can't get better then this, your pull request will be appreciated by the community.
-
-For any other questions, feel free to reach out to us [here](https://dojoengine.org/contact).
-
-Happy coding!
