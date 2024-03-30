@@ -22,6 +22,7 @@ mod components {
     mod universal;
     mod config;
     mod barrack;
+    mod college;
 }
 
 mod helpers {

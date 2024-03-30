@@ -27,6 +27,7 @@ mod universal_component {
     use kingdom_lord::components::city_building::{CityBuilding};
     use kingdom_lord::components::warehouse::{Warehouse, WarehouseStorage};
     use kingdom_lord::components::barn::{Barn, BarnStorage};
+    use kingdom_lord::components::college::{College};
     use kingdom_lord::components::barrack::{Barrack, BarrackLevelTrait, BarrackGetLevel};
     use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl};
 
@@ -90,6 +91,10 @@ mod universal_component {
                     let barrack = get!(world, (player), (Barrack));
                     return barrack.is_next_level_valid(next_level);
                 },
+                BuildingKind::College => {
+                    let college = get!(world, (player), (College));
+                    return college.is_next_level_valid(next_level);
+                }
             }
         }
 
@@ -153,6 +158,11 @@ mod universal_component {
                     barrack.level_up(value);
                     set!(world, (barrack));
                 },
+                BuildingKind::College =>{
+                    let mut college = get!(world, (player), (College));
+                    college.level_up(value);
+                    set!(world, (college));
+                }
             }
         }
 
@@ -239,6 +249,20 @@ mod universal_component {
                     set!(world, (barrack));
                     set!(world, (building_area_info));
                 },
+                BuildingKind::College => {
+                    let college = College{
+                        player,
+                        level: 1_u64.into(),
+                        population: 4,
+                    };
+                    let building_area_info = BuildingAreaInfo{
+                        player: player,
+                        building_id: building_id,
+                        building_kind: BuildingKind::College.into(),
+                    };
+                    set!(world, (college));
+                    set!(world, (building_area_info));
+                }
             }
         }
         fn get_total_population(
@@ -283,7 +307,7 @@ mod universal_component {
                     },
                     BuildingKind::CityHall => {
                         let city_hall = get!(
-                            self.get_contract().world(), (player, index), (CityHall)
+                            self.get_contract().world(), (player), (CityHall)
                         );
                         consume_rate += city_hall.population;
                     },
@@ -298,9 +322,13 @@ mod universal_component {
                         consume_rate += barn.population;
                     },
                     BuildingKind::Barrack => {
-                        let barrack = get!(self.get_contract().world(), (player, index), (Barrack));
+                        let barrack = get!(self.get_contract().world(), (player), (Barrack));
                         consume_rate += barrack.population;
                     },
+                    BuildingKind::College => {
+                        let college = get!(self.get_contract().world(), (player), (College));
+                        consume_rate += college.population;
+                    }
                 }
                 index += 1;
             };

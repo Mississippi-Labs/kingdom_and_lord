@@ -286,7 +286,6 @@ mod barrack_component{
                 return Result::Err(Error::NoBarrackConstructed);
             }
             let mut index = 0;
-
             let mut res: Result<UnderTraining, Error> = Result::Err(Error::UnknownedError('start upgrading failed'));
             loop {
                 if index == UNDER_TRAINING_COUNT {

@@ -44,7 +44,7 @@ impl BarnTraitImpl of BarnStorageExtension{
 }
 
 
-impl WarehouseLeveTrait of LevelUpTrait<Barn, (u64, u64)>{
+impl BarnLeveTrait of LevelUpTrait<Barn, (u64, u64)>{
     fn level_up(ref self: Barn, value: (u64, u64)){
         self.level.level_up(());
         let (max_storage, population) = value;
@@ -53,7 +53,7 @@ impl WarehouseLeveTrait of LevelUpTrait<Barn, (u64, u64)>{
     }
 }
 
-impl WarehouseGetLevel of LevelTrait<Barn>{
+impl BarnGetLevel of LevelTrait<Barn>{
         fn get_level(self: @Barn) -> Level{
         self.level.get_level()
     }

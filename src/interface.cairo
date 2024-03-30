@@ -17,7 +17,8 @@ enum Error{
     InvalidProof,
     TrainingNotFinished,
     TrainingListFull,
-    NoBarrackConstructed
+    NoBarrackConstructed,
+    CollegeLevelNotEnough,
 }
 
 #[starknet::interface]
@@ -52,7 +53,7 @@ trait IKingdomLord<TState>{
     fn finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<UnderUpgrading, Error>;
     fn start_training(
             ref self: TState,
-            barrack_kind: u64,
+            soldier_kind: u64,
         ) -> Result<u64, Error>;
     fn finish_training(ref self: TState, training_id: u64) -> Result<UnderTraining, Error>;
     // fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
