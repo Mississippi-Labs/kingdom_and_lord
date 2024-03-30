@@ -285,7 +285,7 @@ let soldiers = [
 // The information in the list is: attack power, defense power, movement speed, load capacity, wood, bricks, steel, food, population occupied by soldiers, and time required to build.
 
 // chain wood, brick, stell, food, cityhall, warehouse, barn into a big list
-const data = wood.concat(brick, steel, food, cityhall, warehouse, barn, barracks);
+const data = wood.concat(brick, steel, food, cityhall, warehouse, barn, barracks, stable, college, embassy, city_wall);
 
 const leaves = data.map((d) =>
   hash_posei(d)
