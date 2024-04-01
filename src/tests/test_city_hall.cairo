@@ -15,6 +15,7 @@ mod tests {
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
     };
+    use kingdom_lord::models::building_kind::BuildingKind;
 
     #[test]
     #[available_gas(300000000000)]
@@ -38,29 +39,23 @@ mod tests {
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
-        assert(under_upgrade.len() == 1, 'under_upgrade should be 1');
+        assert(under_upgrade.building_kind == BuildingKind::CityHall.into(), 'under_upgrade should be 1');
+        assert(under_upgrade.current_upgrade_id == 0, 'upgrade id should be 0');
 
         increase_time(2500);
 
-        let finishe_upgrade = context.kingdom_lord.get_complete_upgrading(caller);
-        assert(finishe_upgrade.len() == 1, 'finished should be 1');
-
-        let upgrade = finishe_upgrade.at(0);
-        assert(*upgrade.upgrade_id == 0, 'upgrade id should be 0');
-
         // city hall should be level up
-        context.kingdom_lord.finish_upgrade(0_u64).unwrap();
+        context.kingdom_lord.finish_upgrade().unwrap();
         context
             .kingdom_lord
             .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, city_hall_level2_proof()).expect('start upgrade level 2 ');
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
 
-        let upgrade = under_upgrade.at(0);
         // 2620 - 2620 * 104 //10000 + 2550
         // let compute: u64 = 3220_u64 - 3220_u64 * 104_u64 /10000_u64 + 2670_u64;
-        assert(*upgrade.end_time == 5144, 'end block should be 5144');
+        assert(under_upgrade.end_time == 5144, 'end block should be 5144');
 
         increase_time(2620);
-        context.kingdom_lord.finish_upgrade(0_u64).unwrap();
+        context.kingdom_lord.finish_upgrade().unwrap();
     }
 }

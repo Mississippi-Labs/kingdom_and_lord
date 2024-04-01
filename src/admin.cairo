@@ -9,7 +9,7 @@ mod kingdom_lord_admin {
     use kingdom_lord::components::outer_city::outer_city_component::{OuterCityInternalImpl};
     use kingdom_lord::constants::{
         WOOD_BUILDING_COUNT, BRICK_BUILDING_COUNT, STEEL_BUILDING_COUNT, FOOD_BUILDING_COUNT,
-        BASE_GROW_RATE,  UNDER_UPGRADING_COUNT,
+        BASE_GROW_RATE,  WAITING_UPGRADING_COUNT,
          CONFIG_ID
     };
     component!(path: barn_component, storage: barn, event: BarnEvent);

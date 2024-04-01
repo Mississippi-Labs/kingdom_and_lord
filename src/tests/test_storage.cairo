@@ -91,7 +91,7 @@ mod tests {
 
         increase_time(2000);
 
-        context.kingdom_lord.finish_upgrade(0).unwrap();
+        context.kingdom_lord.finish_upgrade().unwrap();
 
         assert_resource(context, caller, 1000, 1000, 1000, 1000);
 
@@ -105,7 +105,7 @@ mod tests {
 
         increase_time(2620);
 
-        context.kingdom_lord.finish_upgrade(0).unwrap();
+        context.kingdom_lord.finish_upgrade().unwrap();
         assert_resource(context, caller, 2200, 2200, 2200, 1000);
 
         increase_time(100);
@@ -139,7 +139,7 @@ mod tests {
 
         increase_time(1600);
 
-        context.kingdom_lord.finish_upgrade(0).expect('finish upgrade 0');
+        context.kingdom_lord.finish_upgrade().expect('finish upgrade 0');
 
         assert_resource(context, caller, 1000, 1000, 1000, 1000);
 
@@ -153,7 +153,7 @@ mod tests {
 
         increase_time(2160);
 
-        context.kingdom_lord.finish_upgrade(0).expect('finish upgrade level 2');
+        context.kingdom_lord.finish_upgrade().expect('finish upgrade level 2');
         assert_resource(context, caller, 1000, 1000, 1000, 2200);
 
         increase_time(100);

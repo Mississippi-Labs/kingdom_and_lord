@@ -6,7 +6,8 @@ mod kingdom_lord_controller {
     use kingdom_lord::components::outer_city::{outer_city_component, OuterCity};
     use kingdom_lord::components::outer_city::outer_city_component::{OuterCityInternalImpl};
     use kingdom_lord::components::city_hall::{
-        city_hall_component, UnderUpgrading, new_under_upgrading, CityHall, CityHallGetLevel
+        city_hall_component, UnderUpgrading, new_under_upgrading, CityHall, CityHallGetLevel,
+        WaitingToUpgrade
     };
     use kingdom_lord::components::city_building::{
         CityBuilding, new_city_building, CityBuildingGetLevelImpl
@@ -33,9 +34,9 @@ mod kingdom_lord_controller {
     use kingdom_lord::components::config::{Config, verify_proof};
     use kingdom_lord::constants::{
         WOOD_BUILDING_COUNT, BRICK_BUILDING_COUNT, STEEL_BUILDING_COUNT, FOOD_BUILDING_COUNT,
-        BASE_GROW_RATE, INITIAL_MAX_STORAGE, UNDER_UPGRADING_COUNT,
-        CONFIG_ID, BRICK_BUILDING_START_INDEX,
-        STEEL_BUILDING_START_INDEX, FOOD_BUILDING_START_INDEX, UNDER_TRAINING_COUNT
+        BASE_GROW_RATE, INITIAL_MAX_STORAGE, WAITING_UPGRADING_COUNT, CONFIG_ID,
+        BRICK_BUILDING_START_INDEX, STEEL_BUILDING_START_INDEX, FOOD_BUILDING_START_INDEX,
+        UNDER_TRAINING_COUNT
     };
     use starknet::get_caller_address;
     use kingdom_lord::models::time::get_current_time;
@@ -134,11 +135,7 @@ mod kingdom_lord_controller {
                         bricks: 0_u64.into(),
                         max_storage: INITIAL_MAX_STORAGE,
                     },
-                    BarnStorage {
-                        player,
-                        food: 0_u64.into(),
-                        max_storage: INITIAL_MAX_STORAGE,
-                    },
+                    BarnStorage { player, food: 0_u64.into(), max_storage: INITIAL_MAX_STORAGE, },
                     OuterCity { player, last_mined_time: time },
                 )
             );
@@ -224,7 +221,7 @@ mod kingdom_lord_controller {
             index = 0;
             loop {
                 set!(world, (new_under_upgrading(player, index)));
-                if index == UNDER_UPGRADING_COUNT {
+                if index == WAITING_UPGRADING_COUNT {
                     break;
                 }
                 index += 1
@@ -258,7 +255,7 @@ mod kingdom_lord_controller {
             Result::Ok(())
         }
 
-        fn get_total_population(self: @ContractState, player: ContractAddress) -> u64{
+        fn get_total_population(self: @ContractState, player: ContractAddress) -> u64 {
             self.universal.get_total_population(player)
         }
 
@@ -363,9 +360,17 @@ mod kingdom_lord_controller {
             let is_new_building = curr_building_kind == BuildingKind::None;
             let res = self
                 .city_hall
-                .start_upgrade(building_id, building_kind_num, next_level.into(), required_time, value, population, is_new_building);
+                .start_upgrade(
+                    building_id,
+                    building_kind_num,
+                    next_level.into(),
+                    required_time,
+                    value,
+                    population,
+                    is_new_building
+                );
             match res {
-                Result::Ok(under_upgrading) => {
+                Result::Ok(upgrade_id) => {
                     self.mine();
                     self.warehouse.remove_resource(req_wood, req_brick, req_steel);
                     self.barn.remove_food(req_food);
@@ -373,48 +378,59 @@ mod kingdom_lord_controller {
                         .emit(
                             StartUpgradeEvent {
                                 player: caller_address,
-                                upgrade_id: under_upgrading.upgrade_id,
-                                building_id: under_upgrading.building_id,
-                                level: under_upgrading.target_level,
-                                start_time: under_upgrading.start_time,
-                                end_time: under_upgrading.end_time,
+                                upgrade_id,
+                                building_id: building_id,
+                                level: next_level,
                             }
                         );
-                    Result::Ok(under_upgrading.upgrade_id)
+                    Result::Ok(upgrade_id)
                 },
                 Result::Err(err) => Result::Err(err)
             }
         }
 
-        fn finish_upgrade(
-            ref self: ContractState, upgrade_id: u64
-        ) -> Result<UnderUpgrading, Error> {
-            let res = self.city_hall.finish_upgrade(upgrade_id);
+        fn finish_upgrade(ref self: ContractState) -> Result<(), Error> {
+            let res = self.city_hall.finish_upgrade();
             let player = get_caller_address();
             match res {
-                Result::Ok(under_upgrade) => {
+                Result::Ok(finished_building_info) => {
                     self.mine();
-                    let building_id: u64 = under_upgrade.building_id;
-                    if under_upgrade.is_new_building {
-                        self.universal.new_building(building_id, under_upgrade.building_kind.into());
-                    } else{
-                        self.universal.level_up(building_id, under_upgrade.building_kind.into(), (under_upgrade.value, under_upgrade.population));
+                    if finished_building_info.is_new_building {
+                        self
+                            .universal
+                            .new_building(
+                                finished_building_info.building_id,
+                                finished_building_info.building_kind.into()
+                            );
+                    } else {
+                        self
+                            .universal
+                            .level_up(
+                                finished_building_info.building_id,
+                                finished_building_info.building_kind.into(),
+                                (finished_building_info.value, finished_building_info.population)
+                            );
                     }
                     self
                         .emit(
                             UpgradeCompleteEvent {
-                                player, upgrade_id, building_id, level: under_upgrade.target_level
+                                player,
+                                upgrade_id: finished_building_info.upgrade_id,
+                                building_next: finished_building_info.building_next
                             }
                         );
+                    Result::Ok(())
                 },
-                Result::Err(_) => { self.emit(UpgradeNotFinishedEvent { player, upgrade_id }) }
+                Result::Err(err) => {
+                    self.emit(UpgradeNotFinishedEvent { player });
+                    Result::Err(err)
+                }
             }
-            res
         }
 
         // fn pay_to_finish_upgrade(ref self: ContractState, upgrade_id: u64) -> Result<(), Error> {
         //     let caller = starknet::get_caller_address();
-            
+
         //     let world = self.world_dispatcher.read();
         //     let config = get!(world, (CONFIG_ID), (Config));
         //     let erc20_dispatcher = IERC20Dispatcher { contract_address: config.erc20_addr };
@@ -442,16 +458,14 @@ mod kingdom_lord_controller {
         //     }
         // }
 
-        fn get_under_upgrading(
-            self: @ContractState, player: ContractAddress,
-        ) -> Array<UnderUpgrading> {
+        fn get_under_upgrading(self: @ContractState, player: ContractAddress,) -> UnderUpgrading {
             self.city_hall.get_under_upgrading(player)
         }
 
-        fn get_complete_upgrading(
+        fn get_waiting_upgrading(
             self: @ContractState, player: ContractAddress,
-        ) -> Array<UnderUpgrading> {
-            self.city_hall.get_complete_upgrading(player)
+        ) -> Array<WaitingToUpgrade> {
+            self.city_hall.get_waiting_upgrading(player)
         }
         fn get_troops(self: @ContractState, player: ContractAddress) -> Troops {
             self.barrack.get_troops(player)
@@ -468,7 +482,7 @@ mod kingdom_lord_controller {
             if wood < req_wood || brick < req_brick || steel < req_steel || food < req_food {
                 return Result::Err(Error::ResourceNotEnough);
             }
-            if !self.college.is_solider_allowed(soldier_kind.into()){
+            if !self.college.is_solider_allowed(soldier_kind.into()) {
                 return Result::Err(Error::CollegeLevelNotEnough);
             }
 

@@ -2,7 +2,7 @@ use kingdom_lord::models::building::BuildingUpgradeInfo;
 use kingdom_lord::models::resource::{ Brick, Wood, Steel,Food, Resource};
 use kingdom_lord::models::growth::{GrowthRate};
 use kingdom_lord::models::level::Level;
-use kingdom_lord::components::city_hall::city_hall_component::{UnderUpgrading};
+use kingdom_lord::components::city_hall::city_hall_component::{UnderUpgrading, WaitingToUpgrade};
 use kingdom_lord::components::barrack::{UnderTraining, Troops};
 use starknet::ContractAddress;
 
@@ -26,8 +26,8 @@ trait IKingdomLord<TState>{
     // read function
     fn get_resource(self: @TState, player: ContractAddress) -> (Resource<Wood>, Resource<Brick>, Resource<Steel>, Resource<Food>);
     fn get_growth_rate(self: @TState, player: ContractAddress) -> (GrowthRate<Wood>, GrowthRate<Brick>, GrowthRate<Steel>, GrowthRate<Food>);
-    fn get_under_upgrading(self: @TState, player: ContractAddress) -> Array<UnderUpgrading>;
-    fn get_complete_upgrading(self: @TState, player: ContractAddress) -> Array<UnderUpgrading>;
+    fn get_under_upgrading(self: @TState, player: ContractAddress) -> UnderUpgrading;
+    fn get_waiting_upgrading(self: @TState, player: ContractAddress) -> Array<WaitingToUpgrade>;
     fn get_buildings_levels(self: @TState, player: ContractAddress) -> Array<Level>;
     fn get_under_training(self: @TState, player: ContractAddress) -> Array<UnderTraining>;
     fn get_complete_training(self: @TState, player: ContractAddress) -> Array<UnderTraining>;
@@ -50,7 +50,7 @@ trait IKingdomLord<TState>{
             value: u64,
             proof: Array<felt252>
         ) -> Result<u64, Error>;
-    fn finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<UnderUpgrading, Error>;
+    fn finish_upgrade(ref self: TState) -> Result<(), Error>;
     fn start_training(
             ref self: TState,
             soldier_kind: u64,

@@ -52,10 +52,10 @@ mod tests {
         assert(food_growth_rate.into() == 24_u64, 'food growth rate should be 24');
 
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
-        assert(under_upgrade.len() == 0_u32, 'under_upgrade should be 0');
+        assert(under_upgrade.is_finished == true, 'under_upgrade is finished');
 
-        let complete_upgrade = context.kingdom_lord.get_complete_upgrading(caller);
-        assert(complete_upgrade.len() == 0_u32, 'complete_upgrade should be 0');
+        let complete_upgrade = context.kingdom_lord.get_waiting_upgrading(caller);
+        assert(complete_upgrade.len() == 0_u32, 'waiting upgrading should be 0');
 
 
     }

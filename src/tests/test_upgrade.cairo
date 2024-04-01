@@ -35,28 +35,19 @@ mod tests {
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
         increase_time(4);
-        let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
+        let upgrade = context.kingdom_lord.get_under_upgrading(caller);
 
-        let upgrade = under_upgrade.at(0);
-        assert(under_upgrade.len() == 1, 'under_upgrade should be 1');
-        assert(*upgrade.upgrade_id == 0, 'upgrade id should be 0');
-        assert(*upgrade.start_time == 25, 'end block should be 25');
-        assert(*upgrade.end_time == 285, 'end block should be 285');
+        assert(upgrade.current_upgrade_id == 0, 'upgrade id should be 0');
+        assert(upgrade.start_time == 25, 'end block should be 25');
+        assert(upgrade.end_time == 285, 'end block should be 285');
 
-        let finishe_upgrade = context.kingdom_lord.get_complete_upgrading(caller);
-        assert(finishe_upgrade.len() == 0, 'finished should be 0');
 
         increase_time(260);
 
-        let finishe_upgrade = context.kingdom_lord.get_complete_upgrading(caller);
-        assert(finishe_upgrade.len() == 1, 'finished should be 1');
-
-        let upgrade = under_upgrade.at(0);
-        assert(*upgrade.upgrade_id == 0, 'upgrade id should be 0');
-        context.kingdom_lord.finish_upgrade(0_u64).unwrap();
+        context.kingdom_lord.finish_upgrade().unwrap();
 
         // double finish should failed
-        context.kingdom_lord.finish_upgrade(0_u64).unwrap_err();
+        context.kingdom_lord.finish_upgrade().unwrap_err();
 
         let (wood_growth_rate, _steel_growth_rate, _brick_growth_rate, _food_growth_rate) = context
             .kingdom_lord

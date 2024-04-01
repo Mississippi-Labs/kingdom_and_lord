@@ -239,7 +239,7 @@ fn construct_barrack(context: TestContext) {
         )
         .expect('start construct barrack');
     increase_time(2000);
-    let res = context.kingdom_lord.finish_upgrade(0);
+    let res = context.kingdom_lord.finish_upgrade();
     res.expect('construct barrack');
 }
 

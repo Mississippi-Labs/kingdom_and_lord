@@ -17,8 +17,6 @@ struct StartUpgradeEvent{
     building_id: u64,
     upgrade_id: u64,
     level: Level, 
-    start_time: u64,
-    end_time: u64
 }
 
 #[derive(Drop, starknet::Event)]
@@ -34,17 +32,13 @@ struct UpgradeCompleteEvent{
     #[key]
     player: ContractAddress,
     upgrade_id: u64,
-    #[key]
-    building_id: u64,
-    level: Level
+    building_next: bool
 }
 
 #[derive(Drop, starknet::Event)]
 struct UpgradeNotFinishedEvent{
     #[key]
     player: ContractAddress,
-    #[key]
-    upgrade_id: u64,
 }
 
 #[derive(Drop, starknet::Event)]
