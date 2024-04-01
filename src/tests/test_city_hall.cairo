@@ -36,11 +36,11 @@ mod tests {
             .kingdom_lord
             .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof());
         let upgrade_id =res.unwrap();
-        assert(upgrade_id == 0, 'first upgrade id is 0');
+        assert(upgrade_id == 1, 'first upgrade id is 1');
 
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
         assert(under_upgrade.building_kind == BuildingKind::CityHall.into(), 'under_upgrade should be 1');
-        assert(under_upgrade.current_upgrade_id == 0, 'upgrade id should be 0');
+        assert(under_upgrade.current_upgrade_id == 1, 'upgrade id should be 1');
 
         increase_time(2500);
 

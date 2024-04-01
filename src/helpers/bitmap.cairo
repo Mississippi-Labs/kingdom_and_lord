@@ -21,11 +21,11 @@ impl BitmapImpl of BitMapExtention{
 }
 
 
-#[test]
-fn test_bitmap(){
-    let a:u64  = 2;
-    let b:u64 =  2^4;
+// #[test]
+// fn test_bitmap(){
+//     let a:u64  = 2;
+//     let b:u64 =  2^4;
 
-    let c: u64 = a & b;
-    println!("{:?}, {}, {}", a, b, c);
-}
+//     let c: u64 = a & b;
+//     println!("{:?}, {}, {}", a, b, c);
+// }

@@ -4,17 +4,11 @@ use super::merkle_tree::{
     MerkleTreeImpl
 };
 use core::fmt::{Debug, Formatter, Error};
-impl FmtArrayFelt252 of Debug<Span<felt252>>{
-     fn fmt(self: @Span<felt252>, ref f: Formatter) -> Result<(), Error>{
-        Result::Ok(())
-     }
-}
-
 
 mod regular_call_merkle_tree_pedersen {
     // Internal imports
     use super::{
-        Hasher, MerkleTree, PedersenHasherImpl, MerkleTreeTrait, FmtArrayFelt252
+        Hasher, MerkleTree, PedersenHasherImpl, MerkleTreeTrait
     };
     #[test]
     #[available_gas(2000000)]

@@ -55,7 +55,7 @@ mod tests {
         assert(under_upgrade.is_finished == true, 'under_upgrade is finished');
 
         let complete_upgrade = context.kingdom_lord.get_waiting_upgrading(caller);
-        assert(complete_upgrade.len() == 0_u32, 'waiting upgrading should be 0');
+        assert(complete_upgrade.len() == 6, 'waiting upgrading should be 6');
 
 
     }

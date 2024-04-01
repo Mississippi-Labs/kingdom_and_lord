@@ -6,7 +6,7 @@ mod kingdom_lord_controller {
     use kingdom_lord::components::outer_city::{outer_city_component, OuterCity};
     use kingdom_lord::components::outer_city::outer_city_component::{OuterCityInternalImpl};
     use kingdom_lord::components::city_hall::{
-        city_hall_component, UnderUpgrading, new_under_upgrading, CityHall, CityHallGetLevel,
+        city_hall_component, UnderUpgrading, new_waiting_upgrading, CityHall, CityHallGetLevel,
         WaitingToUpgrade
     };
     use kingdom_lord::components::city_building::{
@@ -220,12 +220,26 @@ mod kingdom_lord_controller {
             // initialize upgrading list
             index = 0;
             loop {
-                set!(world, (new_under_upgrading(player, index)));
+                set!(world, (new_waiting_upgrading(player, index)));
                 if index == WAITING_UPGRADING_COUNT {
                     break;
                 }
                 index += 1
             };
+
+            set!(world, UnderUpgrading{
+                player,
+                building_id: 0,
+                building_kind: 0,
+                target_level: 0_u64.into(),
+                start_time: 0,
+                end_time: 0,
+                is_new_building: false,
+                is_finished: true,
+                value: 0,
+                population:0,
+                current_upgrade_id: 0
+            });
 
             set!(
                 world,

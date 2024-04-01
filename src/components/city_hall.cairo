@@ -4,12 +4,11 @@ use super::city_building::{CityBuilding, CityBuildingLevelImpl};
 use kingdom_lord::models::level::Level;
 use kingdom_lord::models::building::{BuildingUpgradeResource};
 use kingdom_lord::models::level::{LevelTrait, LevelUpTrait};
-use kingdom_lord::helpers::contract_addr::FmtContractAddr;
 
-#[derive(Model, Drop, Copy, Serde)]
+#[derive(Model, Drop, Copy, Serde, Debug)]
 struct UnderUpgrading {
     #[key]
-    address: ContractAddress,
+    player: ContractAddress,
     building_id: u64,
     building_kind: u64,
     target_level: Level,
@@ -34,7 +33,7 @@ struct FinishedBuildingInfo{
     population: u64,
 }
 
-#[derive(Model, Drop, Copy, Serde)]
+#[derive(Model, Drop, Copy, Serde, Debug)]
 struct WaitingToUpgrade {
     #[key]
     address: ContractAddress,
@@ -43,22 +42,22 @@ struct WaitingToUpgrade {
     building_id: u64,
     building_kind: u64,
     target_level: Level,
-    require_time: u64,
+    required_time: u64,
     is_planned: bool,
     is_new_building: bool,
     value: u64,
     population:u64,
 }
 
-fn new_under_upgrading( player: ContractAddress, upgrade_id:u64) -> WaitingToUpgrade{
+fn new_waiting_upgrading( player: ContractAddress, upgrade_id:u64) -> WaitingToUpgrade{
     WaitingToUpgrade{
         address: player,
         upgrade_id,
         building_id: 0_u64,
         building_kind: 0_u64,
         target_level: 0_u64.into(),
-        require_time: 0_u64,
-        is_planned: true,
+        required_time: 0_u64,
+        is_planned: false,
         is_new_building: false,
         value: 0_u64,
         population: 0_u64,
@@ -116,7 +115,6 @@ mod city_hall_component {
         TContractState, +HasComponent<TContractState>, +IWorldProvider<TContractState>
     > of CityHallInternalTrait<TContractState> {
         fn get_under_upgrading(self: @ComponentState<TContractState>, player: ContractAddress) -> UnderUpgrading{
-            let current_block_time = get_current_time();
             let world = self.get_contract().world();
             let upgrading: UnderUpgrading = get!(world, (player), (UnderUpgrading));
 
@@ -124,7 +122,6 @@ mod city_hall_component {
         }
 
         fn get_waiting_upgrading(self: @ComponentState<TContractState>, player: ContractAddress) -> Array<WaitingToUpgrade>{
-            let current_block_time = get_current_time();
             let world = self.get_contract().world();
             let mut upgradings = array![];
             let mut index = 0;
@@ -160,7 +157,6 @@ mod city_hall_component {
             let required_time = required_time - city_hall.bonus * required_time / 10000;
             let mut upgrading: UnderUpgrading = get!(world, (player), UnderUpgrading);
             let mut res: Result<u64, Error> = Result::Err(Error::UnknownedError('start upgrading failed'));
-
             if upgrading.is_finished {
                 upgrading.building_id = building_id;
                 upgrading.building_kind = building_kind;
@@ -171,36 +167,45 @@ mod city_hall_component {
                 upgrading.is_new_building = is_new_building;
                 upgrading.value = value;
                 upgrading.population = population;
+                let mut next_upgrading_id = upgrading.current_upgrade_id + 1;
+                if next_upgrading_id == WAITING_UPGRADING_COUNT{
+                    next_upgrading_id = 0;
+                }
+                upgrading.current_upgrade_id = next_upgrading_id;
                 set!(world, (upgrading));
                 res = Result::Ok(upgrading.current_upgrade_id);
             } else {
                 let mut touch_end = false;
                 let start_index = upgrading.current_upgrade_id;
                 let mut index = upgrading.current_upgrade_id + 1;
+                // this println could fix https://github.com/dojoengine/dojo/issues/1747
+                println!("start_index: {}", start_index);
                 loop {
                     if index == WAITING_UPGRADING_COUNT && !touch_end{
                         index = 0;
                         touch_end =true
                     }
-
+                    if index == start_index {
+                        res = Result::Err(Error::UpgradingListFull);
+                        break;
+                    }
                     let mut upgrade: WaitingToUpgrade = get!(world, (player, index), (WaitingToUpgrade));
                     if !upgrade.is_planned {
                         upgrade.upgrade_id = index;
                         upgrade.building_id = building_id;
                         upgrade.building_kind = building_kind;
-                        upgrade.is_planned = true;
                         upgrade.target_level = next_level;
-                        upgrade.require_time = required_time;
-                        upgrade.value = value;
-                        upgrade.population = population;
+                        upgrade.required_time = required_time;
+                        upgrade.is_planned = true;
+                        upgrade.is_new_building = is_new_building;
+                        upgrading.value = value;
+                        upgrading.population = population;
+
                         set!(world, (upgrade));
                         res = Result::Ok(index);
                         break;
                     }
-                    if index == start_index {
-                        res = Result::Err(Error::UpgradingListFull);
-                        break;
-                    }
+
                     index += 1;
                 };
             }
@@ -229,30 +234,28 @@ mod city_hall_component {
                     value: upgrading.value,
                     population: upgrading.population,
                 };
-                let origin_upgrade_id = upgrading.current_upgrade_id;
-                let origin_building_id = upgrading.building_id;
-                let is_new_building = upgrading.is_new_building;
-                let mut building_next = false;
                 // line next waiting into under upgrading
                 let mut next_upgrade_id = upgrading.current_upgrade_id + 1;
                 if next_upgrade_id == WAITING_UPGRADING_COUNT{
                     next_upgrade_id = 0;
                 }
                 let mut next_upgrade: WaitingToUpgrade = get!(world, (player, next_upgrade_id), (WaitingToUpgrade));
-                if !next_upgrade.is_planned {
+                if next_upgrade.is_planned {
                     upgrading.building_id = next_upgrade.building_id;
                     upgrading.building_kind = next_upgrade.building_kind;
                     upgrading.is_finished = false;
                     upgrading.start_time = current_time;
-                    upgrading.end_time = current_time + next_upgrade.require_time;
+                    upgrading.end_time = current_time + next_upgrade.required_time;
                     upgrading.target_level = next_upgrade.target_level;
                     upgrading.is_new_building = next_upgrade.is_new_building;
                     upgrading.value = next_upgrade.value;
                     upgrading.population = next_upgrade.population;
                     upgrading.current_upgrade_id = next_upgrade_id; 
 
-                    finished_building_info.building_next = true
-
+                    finished_building_info.building_next = true;
+                     
+                    next_upgrade.is_planned = false;
+                    set!(world, (next_upgrade));
                 }
 
                 set!(world, (upgrading));
