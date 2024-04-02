@@ -3,7 +3,7 @@ use kingdom_lord::models::resource::{ Brick, Wood, Steel,Food, Resource};
 use kingdom_lord::models::growth::{GrowthRate};
 use kingdom_lord::models::level::Level;
 use kingdom_lord::components::city_hall::city_hall_component::{UnderUpgrading, WaitingToUpgrade};
-use kingdom_lord::components::barrack::{UnderTraining, Troops, WaitingToTrain};
+use kingdom_lord::components::barrack::{BarrackUnderTraining, Troops, BarrackWaitingToTrain};
 use starknet::ContractAddress;
 
 #[derive(Debug, Serde, Drop, Copy, PartialEq)]
@@ -17,7 +17,7 @@ enum Error{
     InvalidProof,
     TrainingNotFinished,
     TrainingListFull,
-    NoBarrackConstructed,
+    NoTargetBuildingConstructed,
     CollegeLevelNotEnough,
 }
 
@@ -29,8 +29,8 @@ trait IKingdomLord<TState>{
     fn get_under_upgrading(self: @TState, player: ContractAddress) -> UnderUpgrading;
     fn get_waiting_upgrading(self: @TState, player: ContractAddress) -> Array<WaitingToUpgrade>;
     fn get_buildings_levels(self: @TState, player: ContractAddress) -> Array<Level>;
-    fn get_under_training(self: @TState, player: ContractAddress) -> UnderTraining;
-    fn get_waiting_to_train(self: @TState, player: ContractAddress) -> Array<WaitingToTrain>;
+    fn get_under_training(self: @TState, player: ContractAddress) -> BarrackUnderTraining;
+    fn get_waiting_to_train(self: @TState, player: ContractAddress) -> Array<BarrackWaitingToTrain>;
     fn get_troops(self: @TState, player: ContractAddress) -> Troops;
     fn get_total_population(self: @TState, player: ContractAddress) -> u64;
 
@@ -55,7 +55,7 @@ trait IKingdomLord<TState>{
             ref self: TState,
             soldier_kind: u64,
         ) -> Result<u64, Error>;
-    fn finish_training(ref self: TState, training_id: u64) -> Result<UnderTraining, Error>;
+    fn finish_training(ref self: TState, training_id: u64, is_barrack: bool) -> Result<(), Error>;
     // fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
 }
 

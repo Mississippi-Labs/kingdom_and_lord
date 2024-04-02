@@ -53,7 +53,8 @@ mod college_component {
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use kingdom_lord::components::barrack::SoldierKind;
+    use kingdom_lord::components::barrack::{Barrack, SoldierKind};
+    use kingdom_lord::components::stable::Stable;
     use super::{College, CollegeImpl};
 
     #[storage]
@@ -63,11 +64,16 @@ mod college_component {
     impl CollegeInternalImpl<
         TContractState, +HasComponent<TContractState>, +IWorldProvider<TContractState>
     > of CollegeInternalTrait<TContractState> {
-        fn is_solider_allowed(self: @ComponentState<TContractState>, soldier_kind: SoldierKind) -> bool {
+        fn is_solider_allowed(
+            self: @ComponentState<TContractState>, soldier_kind: SoldierKind
+        ) -> bool {
             let player = get_caller_address();
             let world = self.get_contract().world();
             match soldier_kind {
-                SoldierKind::Millitia => { true },
+                SoldierKind::Millitia => {
+                    let barrack = get!(world, (player), (Barrack));
+                    barrack.level.level > 0
+                },
                 SoldierKind::Guard => {
                     let college = get!(world, (player), (College));
                     college.is_guard_allowed()
@@ -76,7 +82,10 @@ mod college_component {
                     let college = get!(world, (player), (College));
                     college.is_heavy_infantry_allowed()
                 },
-                SoldierKind::Scouts => { true },
+                SoldierKind::Scouts => {
+                    let stable = get!(world, (player), (Stable));
+                    stable.level.level > 0
+                },
                 SoldierKind::Knights => {
                     let college = get!(world, (player), (College));
                     college.is_knight_allowed()

@@ -14,8 +14,8 @@ mod kingdom_lord_controller {
     };
     use kingdom_lord::components::universal::{universal_component, BuildingAreaInfo};
     use kingdom_lord::components::barrack::{
-        barrack_component, Barrack, Troops, UnderTraining, SoldierKind, new_wait_to_train,
-        soldier_info, WaitingToTrain
+        barrack_component, Barrack, Troops, BarrackUnderTraining, SoldierKind, new_wait_to_train,
+        soldier_info, BarrackWaitingToTrain
     };
     use kingdom_lord::components::barrack::barrack_component::BarrackInternalImpl;
     use kingdom_lord::components::universal::universal_component::UniversalInternalImpl;
@@ -42,6 +42,8 @@ mod kingdom_lord_controller {
     use kingdom_lord::models::time::get_current_time;
     use kingdom_lord::components::college::{college_component, College};
     use kingdom_lord::components::college::college_component::CollegeInternalTrait;
+    use kingdom_lord::components::stable::{stable_component, Stable, new_stable_wait_to_train, StableUnderTraining};
+    use kingdom_lord::components::stable::stable_component::StableInternalTrait;
     // use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherImpl};
 
     component!(path: barn_component, storage: barn, event: BarnEvent);
@@ -51,6 +53,8 @@ mod kingdom_lord_controller {
     component!(path: universal_component, storage: universal, event: UniversalEvent);
     component!(path: barrack_component, storage: barrack, event: BarrackEvent);
     component!(path: college_component, storage: college, event: CollegeEvent);
+    component!(path: stable_component, storage: stable, event: StableEvent);
+    
 
     #[derive(Model, Serde, Drop)]
     struct SpawnStatus {
@@ -75,6 +79,8 @@ mod kingdom_lord_controller {
         barrack: barrack_component::Storage,
         #[substorage(v0)]
         college: college_component::Storage,
+        #[substorage(v0)]
+        stable: stable_component::Storage,
     }
 
 
@@ -88,6 +94,7 @@ mod kingdom_lord_controller {
         UniversalEvent: universal_component::Event,
         BarrackEvent: barrack_component::Event,
         CollegeEvent: college_component::Event,
+        StableEvent: stable_component::Event,
         // custom
         NewPlayerSpawnEvent: NewPlayerSpawnEvent,
         StartUpgradeEvent: StartUpgradeEvent,
@@ -112,6 +119,8 @@ mod kingdom_lord_controller {
     impl KLBarrackImpl = barrack_component::BarrackInternalImpl<ContractState>;
 
     impl KLCollegeImpl = college_component::CollegeInternalImpl<ContractState>;
+
+    impl KLStableImpl = stable_component::StableInternalImpl<ContractState>;
 
     #[abi(embed_v0)]
     impl KingdomLordImpl of IKingdomLord<ContractState> {
@@ -264,7 +273,25 @@ mod kingdom_lord_controller {
                 index += 1
             };
 
-            set!(world, UnderTraining {
+            set!(world, BarrackUnderTraining {
+                address: player,
+                current_training_id: 0,
+                soldier_kind: 0,
+                start_time: 0,
+                end_time: 0,
+                is_finished: true
+            });
+
+            index = 0;
+            loop {
+                set!(world, (new_stable_wait_to_train(player, index)));
+                if index == UNDER_TRAINING_COUNT {
+                    break;
+                }
+                index += 1
+            };
+
+            set!(world, StableUnderTraining {
                 address: player,
                 current_training_id: 0,
                 soldier_kind: 0,
@@ -496,7 +523,9 @@ mod kingdom_lord_controller {
 
         fn start_training(ref self: ContractState, soldier_kind: u64) -> Result<u64, Error> {
             let caller_address = get_caller_address();
-            let soldier_info = soldier_info(soldier_kind.into());
+            let soldier_kind_num = soldier_kind;
+            let soldier_kind: SoldierKind = soldier_kind.into();
+            let soldier_info = soldier_info(soldier_kind);
             let req_wood = soldier_info.req_wood.into();
             let req_brick = soldier_info.req_brick.into();
             let req_steel = soldier_info.req_steel.into();
@@ -505,15 +534,19 @@ mod kingdom_lord_controller {
             if wood < req_wood || brick < req_brick || steel < req_steel || food < req_food {
                 return Result::Err(Error::ResourceNotEnough);
             }
-            if !self.college.is_solider_allowed(soldier_kind.into()) {
+            if !self.college.is_solider_allowed(soldier_kind) {
                 return Result::Err(Error::CollegeLevelNotEnough);
             }
 
             self.mine();
             self.warehouse.remove_resource(req_wood, req_brick, req_steel);
             self.barn.remove_food(req_food);
-            let soldier_kind: SoldierKind = soldier_kind.into();
-            let res = self.barrack.start_training(soldier_kind, soldier_info.required_time);
+
+            let res = if soldier_kind_num < 3{
+                self.barrack.start_training(soldier_kind, soldier_info.required_time)
+            }   else {
+                self.stable.start_training(soldier_kind, soldier_info.required_time)
+            };
             match res {
                 Result::Ok(training_id) => {
                     self
@@ -521,7 +554,7 @@ mod kingdom_lord_controller {
                             StartTrainingEvent {
                                 player: caller_address,
                                 training_id: training_id,
-                                soldier_kind: soldier_kind.into(),
+                                soldier_kind: soldier_kind_num,
                             }
                         );
                     Result::Ok(training_id)
@@ -531,9 +564,13 @@ mod kingdom_lord_controller {
         }
 
         fn finish_training(
-            ref self: ContractState, training_id: u64
-        ) -> Result<UnderTraining, Error> {
-            let res = self.barrack.finish_training(training_id);
+            ref self: ContractState, training_id: u64, is_barrack: bool,
+        ) -> Result<(), Error> {
+            let res = if is_barrack{
+                self.barrack.finish_training(training_id)
+            } else {
+                self.stable.finish_training(training_id)
+            };
             match res {
                 Result::Ok(_) => {
                     self.mine();
@@ -547,13 +584,13 @@ mod kingdom_lord_controller {
 
         fn get_under_training(
             self: @ContractState, player: ContractAddress,
-        ) -> UnderTraining {
+        ) -> BarrackUnderTraining {
             self.barrack.get_under_training(player)
         }
 
         fn get_waiting_to_train(
             self: @ContractState, player: ContractAddress,
-        ) -> Array<WaitingToTrain> {
+        ) -> Array<BarrackWaitingToTrain> {
             self.barrack.get_waiting_to_train(player)
         }
 

@@ -1,3 +1,5 @@
+
+
 use core::traits::Into;
 use starknet::ContractAddress;
 use super::super::models::resource::{Food, Resource};
@@ -7,7 +9,7 @@ use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, LevelImpl};
 
 
 #[derive(Model, Copy, Drop, Serde)]
-struct Barrack{
+struct Stable{
     #[key]
     player: ContractAddress,
     building_id: u64,
@@ -16,20 +18,9 @@ struct Barrack{
     population:u64,
 }
 
-#[derive(Model, Copy, Drop, Serde)]
-struct Troops{
-    #[key]
-    player: ContractAddress,
-    millitia: u64,
-    guard: u64,
-    heavy_infantry: u64,
-    scouts: u64,
-    knights: u64,
-    heavy_knights: u64
-}
 
 #[derive(Model, Copy, Drop, Serde)]
-struct BarrackUnderTraining{
+struct StableUnderTraining{
     #[key]
     address: ContractAddress,
     current_training_id: u64,
@@ -40,7 +31,7 @@ struct BarrackUnderTraining{
 }
 
 #[derive(Model, Copy, Drop, Serde)]
-struct BarrackWaitingToTrain{
+struct StableWaitingToTrain{
     #[key]
     address: ContractAddress,
     #[key]
@@ -51,62 +42,8 @@ struct BarrackWaitingToTrain{
 }
 
 
-#[derive(Copy, Drop, Serde)]
-struct SoldierInfo{
-    attack_power: u64,
-    defense_power: u64,
-    movement_speed: u64,
-    load_capacity: u64,
-    req_wood: u64,
-    req_brick: u64,
-    req_steel: u64,
-    req_food: u64,
-    population: u64,
-    required_time: u64,
-}
-
-
-
-#[derive(Copy, Drop, Serde)]
-enum SoldierKind{
-    Millitia,
-    Guard,
-    HeavyInfantry,
-    Scouts,
-    Knights,
-    HeavyKnights
-}
-
-impl SoldierKindIntou64 of Into<u64, SoldierKind>{
-    fn into(self: u64) -> SoldierKind{
-        let self:felt252 = self.into();
-        match self{
-            0 => SoldierKind::Millitia,
-            1 => SoldierKind::Guard,
-            2 => SoldierKind::HeavyInfantry,
-            3 => SoldierKind::Scouts,
-            4 => SoldierKind::Knights,
-            5 => SoldierKind::HeavyKnights,
-            _ => panic!("Invalid SoldierKind")
-        }
-    }
-}
-
-impl IntoSoldierKind of Into<SoldierKind, u64>{
-    fn into(self: SoldierKind) -> u64{
-        match self{
-            SoldierKind::Millitia => 0,
-            SoldierKind::Guard => 1,
-            SoldierKind::HeavyInfantry => 2,
-            SoldierKind::Scouts => 3,
-            SoldierKind::Knights => 4,
-            SoldierKind::HeavyKnights => 5,
-        }
-    }
-}
-
-fn new_wait_to_train(address: ContractAddress, training_id: u64) -> BarrackWaitingToTrain{
-    BarrackWaitingToTrain{
+fn new_stable_wait_to_train(address: ContractAddress, training_id: u64) -> StableWaitingToTrain{
+    StableWaitingToTrain{
         address: address,
         training_id: training_id,
         soldier_kind: 0,
@@ -115,99 +52,9 @@ fn new_wait_to_train(address: ContractAddress, training_id: u64) -> BarrackWaiti
     }
 }
 
-fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
-    match soldier_kind{
-        SoldierKind::Millitia => {
-            SoldierInfo{
-                attack_power: 40,
-                defense_power: 35,
-                movement_speed: 6,
-                load_capacity: 50,
-                req_wood: 120,
-                req_brick: 100,
-                req_steel: 150,
-                req_food: 30,
-                population: 1,
-                required_time: 1600
-            }
-        },
-        SoldierKind::Guard => {
-            SoldierInfo{
-                attack_power: 30,
-                defense_power: 65,
-                movement_speed: 5,
-                load_capacity: 20,
-                req_wood: 100,
-                req_brick: 130,
-                req_steel: 160,
-                req_food: 70,
-                population: 1,
-                required_time: 1760
-            }
-        },
-        SoldierKind::HeavyInfantry => {
-            SoldierInfo{
-                attack_power: 70,
-                defense_power: 40,
-                movement_speed: 7,
-                load_capacity: 50,
-                req_wood: 150,
-                req_brick: 160,
-                req_steel: 210,
-                req_food: 80,
-                population: 1,
-                required_time: 1920
-            }
-        },
-        SoldierKind::Scouts => {
-            SoldierInfo{
-                attack_power: 0,
-                defense_power: 20,
-                movement_speed: 16,
-                load_capacity: 0,
-                req_wood: 140,
-                req_brick: 160,
-                req_steel: 20,
-                req_food: 40,
-                population: 2,
-                required_time: 1360
-            }
-        },
-        SoldierKind::Knights => {
-            SoldierInfo{
-                attack_power: 120,
-                defense_power: 65,
-                movement_speed: 14,
-                load_capacity: 100,
-                req_wood: 550,
-                req_brick: 440,
-                req_steel: 320,
-                req_food: 100,
-                population: 3,
-                required_time: 2640
-            }
-        },
-        SoldierKind::HeavyKnights => {
-            SoldierInfo{
-                attack_power: 180,
-                defense_power: 80,
-                movement_speed: 10,
-                load_capacity: 70,
-                req_wood: 550,
-                req_brick: 640,
-                req_steel: 800,
-                req_food: 180,
-                population: 4,
-                required_time: 3520
-            }
-        }
-    }
-}
 
-
-
-impl BarrackLevelTrait of LevelUpTrait<Barrack, (u64, u64)>{
-    fn level_up(ref self: Barrack, value: (u64, u64)){
+impl StableLevelTrait of LevelUpTrait<Stable, (u64, u64)>{
+    fn level_up(ref self: Stable, value: (u64, u64)){
         self.level.level_up(());
         let (bonus, population) = value;
         self.population = population;
@@ -215,20 +62,21 @@ impl BarrackLevelTrait of LevelUpTrait<Barrack, (u64, u64)>{
     }
 }
 
-impl BarrackGetLevel of LevelTrait<Barrack>{
-    fn get_level(self: @Barrack) -> Level{
+impl StableGetLevel of LevelTrait<Stable>{
+    fn get_level(self: @Stable) -> Level{
         self.level.get_level()
     }
 }
 
 #[starknet::component]
-mod barrack_component{
+mod stable_component{
     use starknet::{get_caller_address, ContractAddress};
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use super::{BarrackLevelTrait, BarrackGetLevel, Barrack, BarrackUnderTraining, SoldierKind, Troops, BarrackWaitingToTrain};
+    use super::{StableLevelTrait, StableGetLevel, Stable, StableUnderTraining, StableWaitingToTrain};
     use kingdom_lord::constants::{UNDER_TRAINING_COUNT};
+    use kingdom_lord::components::barrack::{Troops,SoldierKind};
     use kingdom_lord::interface::Error;
     use kingdom_lord::models::time::get_current_time;
 
@@ -236,22 +84,18 @@ mod barrack_component{
     struct Storage {}
 
     #[generate_trait]
-    impl BarrackInternalImpl<
+    impl StableInternalImpl<
         TContractState, +HasComponent<TContractState>, +IWorldProvider<TContractState>
-    > of BarrackInternalTrait<TContractState> {
+    > of StableInternalTrait<TContractState> {
 
-        fn get_troops(self: @ComponentState<TContractState>, player:ContractAddress) -> Troops{
+        fn get_under_training(self: @ComponentState<TContractState>, player: ContractAddress) -> StableUnderTraining {
             let world = self.get_contract().world();
-            get!(world, (player), (Troops))
-        }
-        fn get_under_training(self: @ComponentState<TContractState>, player: ContractAddress) -> BarrackUnderTraining {
-            let world = self.get_contract().world();
-            let training: BarrackUnderTraining = get!(world, (player), (BarrackUnderTraining));
+            let training: StableUnderTraining = get!(world, (player), (StableUnderTraining));
 
             training
         }
 
-        fn get_waiting_to_train(self: @ComponentState<TContractState>, player: ContractAddress) -> Array<BarrackWaitingToTrain> {
+        fn get_waiting_to_train(self: @ComponentState<TContractState>, player: ContractAddress) -> Array<StableWaitingToTrain> {
             let world = self.get_contract().world();
             let mut trainings = array![];
             let mut index = 0;
@@ -259,7 +103,7 @@ mod barrack_component{
                 if index == UNDER_TRAINING_COUNT {
                     break;
                 }
-                let training: BarrackWaitingToTrain = get!(world, (player, index), (BarrackWaitingToTrain));
+                let training: StableWaitingToTrain = get!(world, (player, index), (StableWaitingToTrain));
                 if !training.is_planned {
                     trainings.append(training);
                 }
@@ -275,11 +119,11 @@ mod barrack_component{
             let world = self.get_contract().world();
             let current_time = get_current_time();
             let player = get_caller_address();
-            let barrack: Barrack = get!(world, (player), (Barrack));
-            let mut under_training = get!(world, (player), (BarrackUnderTraining));
+            let stable: Stable = get!(world, (player), (Stable));
+            let mut under_training = get!(world, (player), (StableUnderTraining));
 
-            let required_time = barrack.bonus * required_time / 100;
-            if barrack.population == 0{
+            let required_time = stable.bonus * required_time / 100;
+            if stable.population == 0{
                 return Result::Err(Error::NoTargetBuildingConstructed);
             }
             let mut res: Result<u64, Error> = Result::Err(Error::UnknownedError('start training failed'));
@@ -310,7 +154,7 @@ mod barrack_component{
                         res = Result::Err(Error::TrainingListFull);
                         break;
                     }
-                    let mut train: BarrackWaitingToTrain = get!(world, (player, index), (BarrackWaitingToTrain));
+                    let mut train: StableWaitingToTrain = get!(world, (player, index), (StableWaitingToTrain));
                     if !train.is_planned {
                         train.training_id = index;
                         train.soldier_kind = soldier_kind.into();
@@ -332,7 +176,7 @@ mod barrack_component{
             let world = self.get_contract().world();
             let current_time = get_current_time();
             let player = get_caller_address();
-            let mut training = get!(world, (player), (BarrackUnderTraining));
+            let mut training = get!(world, (player), (StableUnderTraining));
             if training.is_finished{
                 return Result::Err(Error::UnknownedError('Training is already finished'));
             }
@@ -365,7 +209,7 @@ mod barrack_component{
                 if next_upgrade_id == UNDER_TRAINING_COUNT{
                     next_upgrade_id = 0;
                 }
-                let mut next_train: BarrackWaitingToTrain = get!(world, (player, next_upgrade_id), (BarrackWaitingToTrain));
+                let mut next_train: StableWaitingToTrain = get!(world, (player, next_upgrade_id), (StableWaitingToTrain));
                 if next_train.is_planned{
                     next_train.is_planned = false;
                     training.current_training_id = next_upgrade_id;

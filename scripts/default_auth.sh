@@ -29,7 +29,7 @@ echo actions : $ACTIONS_ADDRESS
 echo "---------------------------------------------------------------------------"
 
 # enable system -> component authorizations
-COMPONENTS=("Barn" "OuterCity" "Warehouse" "CityBuilding" "SpawnStatus" "UnderUpgrading" "CityHall" "BuildingAreaInfo" "Barrack" "Troops" "UnderTraining" "BarnStorage" "WarehouseStorage")
+COMPONENTS=("Barn" "OuterCity" "Warehouse" "CityBuilding" "SpawnStatus" "UnderUpgrading" "CityHall" "BuildingAreaInfo" "Barrack" "Troops" "BarrackUnderTraining" "BarnStorage" "WarehouseStorage")
 
 for component in ${COMPONENTS[@]}; do
     sozo auth grant --world $WORLD_ADDRESS --rpc-url $RPC_URL writer  $component,$ACTIONS_ADDRESS 

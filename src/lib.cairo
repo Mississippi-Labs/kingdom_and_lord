@@ -23,6 +23,7 @@ mod components {
     mod config;
     mod barrack;
     mod college;
+    mod stable;
 }
 
 mod helpers {
