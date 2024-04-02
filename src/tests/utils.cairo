@@ -15,6 +15,7 @@ use openzeppelin::token::erc20::interface::IERC20DispatcherImpl;
 use kingdom_lord::actions::kingdom_lord_controller::world_dispatcherContractMemberStateTrait;
 use kingdom_lord::admin::kingdom_lord_admin;
 use kingdom_lord::components::outer_city::OuterCityTraitDispatcher;
+use kingdom_lord::tests::upgrade_info::{barrack_level1_proof, stable_level1_proof};
 use starknet::contract_address_const;
 use openzeppelin::presets::erc20::ERC20;
 use openzeppelin::token::erc20::interface::IERC20Dispatcher;
@@ -64,96 +65,6 @@ fn OWNER() -> ContractAddress {
 
 fn PLAYER() -> ContractAddress {
     contract_address_const::<'PLAYER'>()
-}
-
-fn wood_level_1_proof() -> Array<felt252> {
-    array![
-        0x5bd703a76bfe8b2261ff982e1896c88a6d6e2452bc696278f2a5c19f653e0c4,
-        0xbbafcb4a5708030baa205ce47a23e2590c83d319fe625bdf662b99e510ab8c,
-        0x7311928e7a8f9bcc86d715a6a7d4028f125daf5b5bf841de4ebdd288f6e4368,
-        0x4bd1dbe10d1ef0faa8a2a9d79e269fccb754465edae46c66e440254d6a1e8ab,
-        0x2ca45d555302aaf1dd30099b789063b0b293e9282c7cf0d50072a69e748e2e,
-        0x58ea808ed1dd6d4eb8c2412089e406fd565973ae11f097a8ef1cd395484fff3,
-        0x30a686f921ae094fb5747465a4390f70c1d521603c8a1da5799450feeb567fb,
-        0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
-    ]
-}
-
-fn city_hall_level2_proof() -> Array<felt252> {
-    array![
-        0x56221680bf3d6661ba394e3c97541cd07fe77d832a713572201b3bee1604735,
-        0x575978c19ae8821f17dcb09f2865515b661bb72486a758da18853b0208c5081,
-        0x751fea1cdd1b21696ae357f83c2b96fbd0a7891b053cdc652807c88320c942c,
-        0x352510f1269cea2ac10dab006a027dee2dcc6fc82676fbb5b862269d99528ee,
-        0x660a74333a6082be847d98d1779c25ab498eaf93ea998125db323a1bc0c8cc7,
-        0x53292aa62ac71f440a6c19786b359d3242844aed9effad78c0e7972ef409a1b,
-        0x59dc966df9f4d4b5a02fa4d584ce7280cc0c8633e411a3f92f558abe1ecc464,
-        0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
-    ]
-}
-
-fn city_hall_level1_proof() -> Array<felt252> {
-    array![
-        0x56e9e5ce79486d11d4079f6521d5de93bc3e474dc2cd647063fe45c22054ac8,
-        0x575978c19ae8821f17dcb09f2865515b661bb72486a758da18853b0208c5081,
-        0x751fea1cdd1b21696ae357f83c2b96fbd0a7891b053cdc652807c88320c942c,
-        0x352510f1269cea2ac10dab006a027dee2dcc6fc82676fbb5b862269d99528ee,
-        0x660a74333a6082be847d98d1779c25ab498eaf93ea998125db323a1bc0c8cc7,
-        0x53292aa62ac71f440a6c19786b359d3242844aed9effad78c0e7972ef409a1b,
-        0x59dc966df9f4d4b5a02fa4d584ce7280cc0c8633e411a3f92f558abe1ecc464,
-        0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
-    ]
-}
-
-fn warehouse_level1_proof() -> Array<felt252> {
-    array![
-        0x15e13da9e4006b0743b75b13080030f13ed8f485efa02b4a66c8b59e5150ce3,
-        0x3e18c7be39fc9a8cbb8aae595fd4e898abfc9945356debf6b201344d5fa3b82,
-        0x63537e18ece5a69d40ccb8ee30eee5439965b8e3bbaaafd50cd98cb48a3b7a0,
-        0x5db1c0cec9f79605143f8686956a6114b50d34724944c02047b7350ac243a8e,
-        0x53671a3938b8eb7a9e796f00ec21a86a8ceabeb3d1cc45dceec3bd8883c5ed6,
-        0x32c207f7db5b02df3916cb11144023134ad16417964abb3f7fa66d2fa1bdcc6,
-        0x59dc966df9f4d4b5a02fa4d584ce7280cc0c8633e411a3f92f558abe1ecc464,
-        0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
-    ]
-}
-fn warehouse_level2_proof() -> Array<felt252> {
-    array![
-        0x17b2ed4aa3c534241297c23aeec5b531e52f33633ca7b496015edf7cd43a6c7,
-        0x3e18c7be39fc9a8cbb8aae595fd4e898abfc9945356debf6b201344d5fa3b82,
-        0x63537e18ece5a69d40ccb8ee30eee5439965b8e3bbaaafd50cd98cb48a3b7a0,
-        0x5db1c0cec9f79605143f8686956a6114b50d34724944c02047b7350ac243a8e,
-        0x53671a3938b8eb7a9e796f00ec21a86a8ceabeb3d1cc45dceec3bd8883c5ed6,
-        0x32c207f7db5b02df3916cb11144023134ad16417964abb3f7fa66d2fa1bdcc6,
-        0x59dc966df9f4d4b5a02fa4d584ce7280cc0c8633e411a3f92f558abe1ecc464,
-        0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
-    ]
-}
-
-fn barn_level1_proof() -> Array<felt252> {
-    array![
-        0xdcccb6130a7a525537aabe70bec0d27e3d2c3ed92b7764ff8ceef8eb00fcb1,
-        0x2f217246a324a606456391b8acd67841b15d7413fa27c80c2323648b038aed1,
-        0x1b07b07b8087c5c86f955baf7468f026258c72c8c3796f7c027c799600a9c45,
-        0x5390c87e4816e68af685bd2ca272e342be2f86360e67d523f9ef37eb1221abd,
-        0x387c3796475ce4e3c9bfcbd89e1964f82dc78054e062e6497d79abe0c883ec3,
-        0x32c207f7db5b02df3916cb11144023134ad16417964abb3f7fa66d2fa1bdcc6,
-        0x59dc966df9f4d4b5a02fa4d584ce7280cc0c8633e411a3f92f558abe1ecc464,
-        0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
-    ]
-}
-
-fn barn_level2_proof() -> Array<felt252> {
-    array![
-        0x35b9f2092a9e94a1bc315e7dcbfb50d88da70b4ce0803dd30d9eae321c021df,
-        0x2f217246a324a606456391b8acd67841b15d7413fa27c80c2323648b038aed1,
-        0x1b07b07b8087c5c86f955baf7468f026258c72c8c3796f7c027c799600a9c45,
-        0x5390c87e4816e68af685bd2ca272e342be2f86360e67d523f9ef37eb1221abd,
-        0x387c3796475ce4e3c9bfcbd89e1964f82dc78054e062e6497d79abe0c883ec3,
-        0x32c207f7db5b02df3916cb11144023134ad16417964abb3f7fa66d2fa1bdcc6,
-        0x59dc966df9f4d4b5a02fa4d584ce7280cc0c8633e411a3f92f558abe1ecc464,
-        0x6f083eb9dc40b555e9f8c6ed4529c2c5bfd33087c0f80701992b254230a0c32
-    ]
 }
 
 fn assert_resource(
@@ -226,21 +137,27 @@ fn construct_barrack(context: TestContext) {
             4,
             2000,
             100,
-            array![
-                0x3e6b3f2c7624525e03ed0c96ff43d0fe1dafa24a61eaca42b1e9dd00a9bf2b9,
-                0x2e42f1daa91953d844c066e52c9355208979c982e0cea128e7ea54db6dd1d75,
-                0x5eeef9158bbb0ed60b496e2dd18f1b50f2efd44a619a1e4f4b312562fd86202,
-                0x76a918559603e1db782e6b05119251069e444c6f0aa1fa6e9f2c21a607fe648,
-                0x5a39d476538786b9849535508804dfe168518b1f6c2d65541109b2534791136,
-                0x0,
-                0x0,
-                0x5f0dde256e23129e6713acf8c87088898a0632c9d3cddcd77fc58c2c1a8922b
-            ]
+            barrack_level1_proof()
         )
         .expect('start construct barrack');
     increase_time(2000);
     let res = context.kingdom_lord.finish_upgrade();
     res.expect('construct barrack');
+}
+
+fn construct_stable(context: TestContext){
+    increase_time(100);
+    context
+        .kingdom_lord
+        .start_upgrade(
+            20,
+            9, 1, 260, 140, 220, 100, 5, 2200, 100,
+            stable_level1_proof()
+        )
+        .expect('start construct stable');
+    increase_time(2200);
+    let res = context.kingdom_lord.finish_upgrade();
+    res.expect('construct stable');
 }
 
 
@@ -288,7 +205,7 @@ fn setup_world() -> TestContext {
             erc20_contract_address,
             200_u256,
             owner,
-            0x2e3aa949c5d014218a1194b9d5c84c7457a027fc34826547b8dfe5b52d72220
+            0x686c6d5767c7589e969d41aff9ff070fecd03c23aef65128668c36613659e49
         );
     TestContext {
         world,

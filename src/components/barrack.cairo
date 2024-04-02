@@ -111,7 +111,7 @@ fn new_wait_to_train(address: ContractAddress, training_id: u64) -> BarrackWaiti
         training_id: training_id,
         soldier_kind: 0,
         required_time: 0,
-        is_planned: true
+        is_planned: false
     }
 }
 
@@ -301,6 +301,7 @@ mod barrack_component{
                 let start_index = under_training.current_training_id;
                 let mut index = under_training.current_training_id + 1;
                 println!("fix bug");
+
                 loop {
                     if index == UNDER_TRAINING_COUNT && !touch_end{
                         index = 0;
@@ -328,7 +329,7 @@ mod barrack_component{
             res
         }
 
-        fn finish_training(self: @ComponentState<TContractState>, training_id: u64)  -> Result<(), Error>{
+        fn finish_training(self: @ComponentState<TContractState>)  -> Result<u64, Error>{
             let world = self.get_contract().world();
             let current_time = get_current_time();
             let player = get_caller_address();
@@ -340,6 +341,7 @@ mod barrack_component{
                 training.is_finished = true;
                 let mut troops: Troops = get!(world, (player), (Troops));
                 let soldier_kind: SoldierKind = training.soldier_kind.into();
+                let origin_training_id = training.current_training_id;
                 match soldier_kind{
                     SoldierKind::Millitia => {
                         troops.millitia += 1;
@@ -377,7 +379,7 @@ mod barrack_component{
                 }
                 set!(world, (troops));
                 set!(world, (training));
-                return Result::Ok(());
+                return Result::Ok(origin_training_id);
             } else {
                 return Result::Err(Error::TrainingNotFinished);
             }

@@ -76,11 +76,13 @@ mod college_component {
                 },
                 SoldierKind::Guard => {
                     let college = get!(world, (player), (College));
-                    college.is_guard_allowed()
+                    let barrack = get!(world, (player), (Barrack));
+                    college.is_guard_allowed() && barrack.level.level > 0
                 },
                 SoldierKind::HeavyInfantry => {
                     let college = get!(world, (player), (College));
-                    college.is_heavy_infantry_allowed()
+                    let barrack = get!(world, (player), (Barrack));
+                    college.is_heavy_infantry_allowed() && barrack.level.level > 0
                 },
                 SoldierKind::Scouts => {
                     let stable = get!(world, (player), (Stable));
@@ -88,11 +90,13 @@ mod college_component {
                 },
                 SoldierKind::Knights => {
                     let college = get!(world, (player), (College));
-                    college.is_knight_allowed()
+                    let stable = get!(world, (player), (Stable));
+                    college.is_knight_allowed() && stable.level.level > 0
                 },
                 SoldierKind::HeavyKnights => {
                     let college = get!(world, (player), (College));
-                    college.is_heavy_knight_allowed()
+                    let stable = get!(world, (player), (Stable));
+                    college.is_heavy_knight_allowed() && stable.level.level > 0
                 },
             }
         }

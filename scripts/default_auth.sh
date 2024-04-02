@@ -43,6 +43,6 @@ echo "Setting pay address for upgrading"
 
 sozo execute --world $WORLD_ADDRESS --rpc-url $RPC_URL \
     $ADMIN_ADDRESS \
-    set_config --calldata 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7,0,100,0x6162896d1d7ab204c7ccac6dd5f8e9e7c25ecd5ae4fcb4ad32e57786bb46e03,0x2e3aa949c5d014218a1194b9d5c84c7457a027fc34826547b8dfe5b52d72220 \
+    set_config --calldata 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7,0,100,0x6162896d1d7ab204c7ccac6dd5f8e9e7c25ecd5ae4fcb4ad32e57786bb46e03,0x686c6d5767c7589e969d41aff9ff070fecd03c23aef65128668c36613659e49 \
    
 echo "Setting pay address for upgrading done"

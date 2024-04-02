@@ -18,7 +18,7 @@ enum Error{
     TrainingNotFinished,
     TrainingListFull,
     NoTargetBuildingConstructed,
-    CollegeLevelNotEnough,
+    TrainingPrerequirementNotMatch,
 }
 
 #[starknet::interface]
@@ -55,7 +55,7 @@ trait IKingdomLord<TState>{
             ref self: TState,
             soldier_kind: u64,
         ) -> Result<u64, Error>;
-    fn finish_training(ref self: TState, training_id: u64, is_barrack: bool) -> Result<(), Error>;
+    fn finish_training(ref self: TState, is_barrack: bool) -> Result<u64, Error>;
     // fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
 }
 

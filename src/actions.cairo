@@ -535,7 +535,7 @@ mod kingdom_lord_controller {
                 return Result::Err(Error::ResourceNotEnough);
             }
             if !self.college.is_solider_allowed(soldier_kind) {
-                return Result::Err(Error::CollegeLevelNotEnough);
+                return Result::Err(Error::TrainingPrerequirementNotMatch);
             }
 
             self.mine();
@@ -564,15 +564,15 @@ mod kingdom_lord_controller {
         }
 
         fn finish_training(
-            ref self: ContractState, training_id: u64, is_barrack: bool,
-        ) -> Result<(), Error> {
+            ref self: ContractState, is_barrack: bool,
+        ) -> Result<u64, Error> {
             let res = if is_barrack{
-                self.barrack.finish_training(training_id)
+                self.barrack.finish_training()
             } else {
-                self.stable.finish_training(training_id)
+                self.stable.finish_training()
             };
             match res {
-                Result::Ok(_) => {
+                Result::Ok(training_id) => {
                     self.mine();
                     let player = get_caller_address();
                     self.emit(TrainingFinishedEvent { player, training_id });

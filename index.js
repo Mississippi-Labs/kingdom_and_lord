@@ -1,5 +1,5 @@
-const { hash, num, merkle } = require('starknet');
-
+const { hash, num, merkle, fixStack } = require('starknet');
+const fs = require('node:fs');
 
 function hash_posei (data) {
   return hash.computePoseidonHashOnElements(data);
@@ -292,7 +292,43 @@ const leaves = data.map((d) =>
 const tree = new merkle.MerkleTree(leaves, hash.computePoseidonHash);
 console.log("root: ", tree.root)
 
-const h = hash_posei([8, 1, 210, 140, 260, 120, 4, 2000, 100])
+const h = hash_posei([1, 1, 40, 100, 50, 60, 2, 260, 7])
 console.log("h: ", h)
 const proof = tree.getProof(h);
 console.log("proof: ", proof)
+
+
+
+function write (data, name) {
+  const content = data.map((d) => {
+    const hash_value = hash_posei(d)
+    const proof = tree.getProof(hash_value)
+    const content = `fn ${name}_level${d[1]}_proof() -> Array<felt252> {
+    array![
+        ${proof}
+    ]
+}`
+    return content
+  })
+  return content.join("\n")
+}
+
+function write_all(){
+  const wood_content = write(wood, "wood")
+  const brick_content = write(brick, "brick")
+  const steel_content = write(steel, "steel")
+  const food_content = write(food, "food")
+  const cityhall_content = write(cityhall, "cityhall")
+  const warehouse_content = write(warehouse, "warehouse")
+  const barn_content = write(barn, "barn")
+  const barrack_content = write(barracks, "barrack")
+  const stable_content = write(stable, "stable")
+  const college_content = write(college, "college")
+  const embassy_content = write(embassy, "embassy")
+  const city_wall_content = write(city_wall, "city_wall")
+
+  const content = `${wood_content}\n${brick_content}\n${steel_content}\n${food_content}\n${cityhall_content}\n${warehouse_content}\n${barn_content}\n${barrack_content}\n${stable_content}\n${college_content}\n${embassy_content}\n${city_wall_content}`
+  fs.writeFileSync('./src/tests/upgrade_info.cairo', content);
+}
+
+write_all()
