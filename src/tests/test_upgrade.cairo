@@ -11,14 +11,13 @@ mod tests {
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{
-        setup_world, wood_level_1_proof, increase_time, city_hall_level1_proof,
-        warehouse_level1_proof, TestContext
+    use kingdom_lord::tests::utils::{setup_world, increase_time, TestContext};
+    use kingdom_lord::tests::upgrade_info::{
+        cityhall_level1_proof, cityhall_level2_proof, warehouse_level2_proof, barn_level1_proof,
+        barn_level2_proof, warehouse_level1_proof, wood_level1_proof
     };
     use starknet::ContractAddress;
-    use kingdom_lord::interface::{
-        IKingdomLord,  IKingdomLordLibraryDispatcherImpl, Error
-    };
+    use kingdom_lord::interface::{IKingdomLord, IKingdomLordLibraryDispatcherImpl, Error};
 
     fn assert_under_upgrading(
         context: TestContext,
@@ -32,13 +31,48 @@ mod tests {
         is_finished: bool
     ) {
         let upgrading = context.kingdom_lord.get_under_upgrading(player);
-        assert!(upgrading.current_upgrade_id == upgrade_id, "current upgrade id should be {} got {}", upgrade_id, upgrading.current_upgrade_id);
-        assert!(upgrading.building_id == building_id, "building id should be {} got {}", building_id, upgrading.building_id);
-        assert!(upgrading.start_time == start_time, "start time should be {} got {}", start_time, upgrading.start_time);
-        assert!(upgrading.end_time == end_time, "end time should be {} got {}", end_time, upgrading.end_time);
-        assert!(upgrading.target_level == target_level.into(), "target level should be {} got {}", target_level, upgrading.target_level.level);
-        assert!(upgrading.is_new_building == is_new_building, "is new building should be {} got {}", is_new_building, upgrading.is_new_building);
-        assert!(upgrading.is_finished ==  is_finished, "upgrading status should be {} got {}", is_finished, upgrading.is_finished);
+        assert!(
+            upgrading.current_upgrade_id == upgrade_id,
+            "current upgrade id should be {} got {}",
+            upgrade_id,
+            upgrading.current_upgrade_id
+        );
+        assert!(
+            upgrading.building_id == building_id,
+            "building id should be {} got {}",
+            building_id,
+            upgrading.building_id
+        );
+        assert!(
+            upgrading.start_time == start_time,
+            "start time should be {} got {}",
+            start_time,
+            upgrading.start_time
+        );
+        assert!(
+            upgrading.end_time == end_time,
+            "end time should be {} got {}",
+            end_time,
+            upgrading.end_time
+        );
+        assert!(
+            upgrading.target_level == target_level.into(),
+            "target level should be {} got {}",
+            target_level,
+            upgrading.target_level.level
+        );
+        assert!(
+            upgrading.is_new_building == is_new_building,
+            "is new building should be {} got {}",
+            is_new_building,
+            upgrading.is_new_building
+        );
+        assert!(
+            upgrading.is_finished == is_finished,
+            "upgrading status should be {} got {}",
+            is_finished,
+            upgrading.is_finished
+        );
     }
 
     #[test]
@@ -51,11 +85,13 @@ mod tests {
         let caller = get_caller_address();
         let err = context
             .kingdom_lord
-            .start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof())
+            .start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(25);
-        let res = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof());
+        let res = context
+            .kingdom_lord
+            .start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level1_proof());
         let upgrade_id = res.unwrap();
         assert(upgrade_id == 1, 'first upgrade id is 1');
 
@@ -90,7 +126,9 @@ mod tests {
         context.kingdom_lord.spawn().expect('spawn works');
 
         increase_time(25);
-        let res = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, array![0x1]);
+        let res = context
+            .kingdom_lord
+            .start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, array![0x1]);
         let err = res.unwrap_err();
         assert(err == Error::InvalidProof, 'invalid proof');
     }
@@ -106,23 +144,23 @@ mod tests {
         increase_time(100);
         context
             .kingdom_lord
-            .start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof())
+            .start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level1_proof())
             .expect('upgrading 0 works');
         context
             .kingdom_lord
-            .start_upgrade(1, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof())
+            .start_upgrade(1, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level1_proof())
             .expect('upgrading 1 works');
         context
             .kingdom_lord
-            .start_upgrade(2, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof())
+            .start_upgrade(2, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level1_proof())
             .expect('upgrading 2 works');
         context
             .kingdom_lord
-            .start_upgrade(3, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof())
+            .start_upgrade(3, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level1_proof())
             .expect('upgrading 3 works');
         context
             .kingdom_lord
-            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
+            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .expect('start 18 works');
         context
             .kingdom_lord
@@ -136,7 +174,6 @@ mod tests {
         assert_under_upgrading(context, caller, 1, 0, 100, 360, 1, false, false);
         increase_time(260);
         assert_under_upgrading(context, caller, 1, 0, 100, 360, 1, false, false);
-
 
         context.kingdom_lord.finish_upgrade().expect('finish upgrading 0');
         assert_under_upgrading(context, caller, 2, 1, 360, 620, 1, false, false);
@@ -166,7 +203,7 @@ mod tests {
             .kingdom_lord
             .start_upgrade(22, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
             .expect('start 22 works');
-        
+
         let res = context
             .kingdom_lord
             .start_upgrade(23, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof());
@@ -175,7 +212,6 @@ mod tests {
         increase_time(260);
         context.kingdom_lord.finish_upgrade().expect('finish upgrading 3');
         assert_under_upgrading(context, caller, 5, 18, 1140, 3640, 1, true, false);
-        
 
         increase_time(2500);
         context.kingdom_lord.finish_upgrade().expect('finish upgrading 18');

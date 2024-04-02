@@ -33,10 +33,10 @@ mod helpers {
 }
 
 mod tests {
-    // mod test_spawn;
-    // mod test_storage;
-    // mod test_upgrade;
-    // mod test_city_hall;
+    mod test_spawn;
+    mod test_storage;
+    mod test_upgrade;
+    mod test_city_hall;
     mod test_train;
     // mod test_pay_upgrade;
     mod utils;
@@ -45,5 +45,5 @@ mod tests {
 
 mod merkle{
     mod merkle_tree;
-    // mod merkle_tree_tests;
+    mod merkle_tree_tests;
 }

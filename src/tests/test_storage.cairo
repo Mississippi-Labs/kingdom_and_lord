@@ -12,9 +12,9 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{
-        setup_world, city_hall_level1_proof, city_hall_level2_proof, warehouse_level1_proof,
-        assert_resource, increase_time, warehouse_level2_proof, barn_level1_proof, barn_level2_proof
+        setup_world, assert_resource, increase_time, 
     };
+    use kingdom_lord::tests::upgrade_info::{cityhall_level1_proof, cityhall_level2_proof, warehouse_level2_proof, barn_level1_proof, barn_level2_proof, warehouse_level1_proof};
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
     };
@@ -32,7 +32,7 @@ mod tests {
 
         let err = context
             .kingdom_lord
-            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
+            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(1000);
@@ -52,14 +52,14 @@ mod tests {
 
         let err = context
             .kingdom_lord
-            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
+            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(1000);
 
         context
             .kingdom_lord
-            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
+            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .unwrap();
         assert_resource(context, caller, 930, 960, 940, 980);
     }
