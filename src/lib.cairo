@@ -28,7 +28,7 @@ mod components {
 
 mod helpers {
     mod array;
-    // mod contract_addr;
+    mod contract_addr;
     mod bitmap;
 }
 
