@@ -32,14 +32,33 @@ struct Troops{
 struct UnderTraining{
     #[key]
     address: ContractAddress,
-    #[key]
-    training_id: u64,
+    current_training_id: u64,
     soldier_kind: u64,
     start_time: u64,
     end_time: u64,
     is_finished: bool,
 }
 
+#[derive(Model, Copy, Drop, Serde)]
+struct WaitingToTrain{
+    #[key]
+    address: ContractAddress,
+    #[key]
+    training_id: u64,
+    soldier_kind: u64,
+    required_time: u64,
+    is_planned: bool,
+}
+
+#[derive(Model, Copy, Drop, Serde)]
+struct Stable{
+    #[key]
+    player: ContractAddress,
+    building_id: u64,
+    level: Level,
+    bonus: u64,
+    population:u64,
+}
 
 #[derive(Copy, Drop, Serde)]
 struct SoldierInfo{
@@ -95,14 +114,13 @@ impl IntoSoldierKind of Into<SoldierKind, u64>{
     }
 }
 
-fn new_under_training(address: ContractAddress, training_id: u64) -> UnderTraining{
-    UnderTraining{
+fn new_wait_to_train(address: ContractAddress, training_id: u64) -> WaitingToTrain{
+    WaitingToTrain{
         address: address,
         training_id: training_id,
         soldier_kind: 0,
-        start_time: 0,
-        end_time: 0,
-        is_finished: true
+        required_time: 0,
+        is_planned: true
     }
 }
 
@@ -218,7 +236,7 @@ mod barrack_component{
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use super::{BarrackLevelTrait, BarrackGetLevel, Barrack, UnderTraining, SoldierKind, Troops};
+    use super::{BarrackLevelTrait, BarrackGetLevel, Barrack, UnderTraining, SoldierKind, Troops, WaitingToTrain};
     use kingdom_lord::constants::{UNDER_TRAINING_COUNT};
     use kingdom_lord::interface::Error;
     use kingdom_lord::models::time::get_current_time;
@@ -235,27 +253,14 @@ mod barrack_component{
             let world = self.get_contract().world();
             get!(world, (player), (Troops))
         }
-        fn get_under_training(self: @ComponentState<TContractState>, player: ContractAddress) -> Array<UnderTraining> {
-            let current_block_time = get_current_time();
+        fn get_under_training(self: @ComponentState<TContractState>, player: ContractAddress) -> UnderTraining {
             let world = self.get_contract().world();
-            let mut trainings = array![];
-            let mut index = 0;
-            loop {
-                if index == UNDER_TRAINING_COUNT {
-                    break;
-                }
-                let training: UnderTraining = get!(world, (player, index), (UnderTraining));
-                if !training.is_finished && training.end_time > current_block_time {
-                    trainings.append(training);
-                }
-                index += 1;
-            };
+            let training: UnderTraining = get!(world, (player), (UnderTraining));
 
-            trainings
+            training
         }
 
-        fn get_complete_training(self: @ComponentState<TContractState>, player: ContractAddress) -> Array<UnderTraining> {
-            let current_block_time = get_current_time();
+        fn get_waiting_to_train(self: @ComponentState<TContractState>, player: ContractAddress) -> Array<WaitingToTrain> {
             let world = self.get_contract().world();
             let mut trainings = array![];
             let mut index = 0;
@@ -263,8 +268,8 @@ mod barrack_component{
                 if index == UNDER_TRAINING_COUNT {
                     break;
                 }
-                let training: UnderTraining = get!(world, (player, index), (UnderTraining));
-                if !training.is_finished && training.end_time <= current_block_time {
+                let training: WaitingToTrain = get!(world, (player, index), (WaitingToTrain));
+                if !training.is_planned {
                     trainings.append(training);
                 }
                 index += 1;
@@ -275,36 +280,60 @@ mod barrack_component{
         fn start_training(self: @ComponentState<TContractState>,            
             soldier_kind: SoldierKind,
             required_time: u64
-        )-> Result<UnderTraining, Error>{
+        )-> Result<u64, Error>{
             let world = self.get_contract().world();
             let current_time = get_current_time();
             let player = get_caller_address();
             let barrack: Barrack = get!(world, (player), (Barrack));
+            let mut under_training = get!(world, (player), (UnderTraining));
 
             let required_time = barrack.bonus * required_time / 100;
             if barrack.population == 0{
                 return Result::Err(Error::NoBarrackConstructed);
             }
-            let mut index = 0;
-            let mut res: Result<UnderTraining, Error> = Result::Err(Error::UnknownedError('start upgrading failed'));
-            loop {
-                if index == UNDER_TRAINING_COUNT {
-                    res = Result::Err(Error::TrainingListFull);
-                    break;
+            let mut res: Result<u64, Error> = Result::Err(Error::UnknownedError('start training failed'));
+            
+            if under_training.is_finished{
+                under_training.is_finished = false;
+                under_training.start_time = current_time;
+                under_training.end_time = current_time + required_time;
+                under_training.soldier_kind = soldier_kind.into();
+                let mut next_training_id = under_training.current_training_id + 1;
+                if next_training_id == UNDER_TRAINING_COUNT{
+                    next_training_id = 0;
                 }
-                let mut training: UnderTraining = get!(world, (player, index), (UnderTraining));
-                if training.is_finished {
-                    training.soldier_kind = soldier_kind.into();
-                    training.is_finished = false;
-                    training.start_time = current_time;
-                    training.end_time = current_time + required_time;
+                under_training.current_training_id = next_training_id;
+                set!(world, (under_training));
+                res = Result::Ok(under_training.current_training_id);
+            } else {
+                let mut touch_end = false;
+                let start_index = under_training.current_training_id;
+                let mut index = under_training.current_training_id + 1;
+                println!("fix bug");
+                loop {
+                    if index == UNDER_TRAINING_COUNT && !touch_end{
+                        index = 0;
+                        touch_end =true
+                    }
+                    if index == start_index {
+                        res = Result::Err(Error::TrainingListFull);
+                        break;
+                    }
+                    let mut train: WaitingToTrain = get!(world, (player, index), (WaitingToTrain));
+                    if !train.is_planned {
+                        train.training_id = index;
+                        train.soldier_kind = soldier_kind.into();
+                        train.required_time = required_time;
+                        train.is_planned = true;
+ 
+                        set!(world, (train));
+                        res = Result::Ok(index);
+                        break;
+                    }
 
-                    set!(world, (training));
-                    res = Result::Ok(training);
-                    break;
-                } 
-                index += 1;
-            };
+                    index += 1;
+                };
+            }
             res
         }
 
@@ -312,11 +341,11 @@ mod barrack_component{
             let world = self.get_contract().world();
             let current_time = get_current_time();
             let player = get_caller_address();
-            let mut training = get!(world, (player, training_id), (UnderTraining));
+            let mut training = get!(world, (player), (UnderTraining));
             if training.is_finished{
                 return Result::Err(Error::UnknownedError('Training is already finished'));
             }
-            if training.end_time <= current_time{
+            if training.end_time <= current_time&& !training.is_finished{
                 training.is_finished = true;
                 let mut troops: Troops = get!(world, (player), (Troops));
                 let soldier_kind: SoldierKind = training.soldier_kind.into();
@@ -339,6 +368,21 @@ mod barrack_component{
                     SoldierKind::HeavyKnights => {
                         troops.heavy_knights += 1;
                     }
+                }
+
+                let mut next_upgrade_id = training.current_training_id + 1;
+                if next_upgrade_id == UNDER_TRAINING_COUNT{
+                    next_upgrade_id = 0;
+                }
+                let mut next_train: WaitingToTrain = get!(world, (player, next_upgrade_id), (WaitingToTrain));
+                if next_train.is_planned{
+                    next_train.is_planned = false;
+                    training.current_training_id = next_upgrade_id;
+                    training.soldier_kind = next_train.soldier_kind;
+                    training.start_time = current_time;
+                    training.end_time = current_time + next_train.required_time;
+                    training.is_finished = false;
+                    set!(world, (next_train));
                 }
                 set!(world, (troops));
                 set!(world, (training));

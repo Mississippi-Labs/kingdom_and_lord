@@ -31,11 +31,11 @@ mod tests {
         let caller = get_caller_address();
 
         assert_resource(context, caller, 1000, 1000, 1000, 1000);
-        let training_id1 = context.kingdom_lord.start_training(0).unwrap();
+        let training_id1 = context.kingdom_lord.start_training(0).expect('train 0 works');
         assert_resource(context, caller, 880, 900, 850, 970);
-        let training_id2 = context.kingdom_lord.start_training(0).unwrap();
+        let training_id2 = context.kingdom_lord.start_training(0).expect('train 0 works');
         assert_resource(context, caller, 760, 800, 700, 940);
-        let training_id3 = context.kingdom_lord.start_training(1).unwrap();
+        let training_id3 = context.kingdom_lord.start_training(1).expect('');
         assert_resource(context, caller, 660, 670, 540, 870);
 
         increase_time(150);

@@ -14,8 +14,8 @@ mod kingdom_lord_controller {
     };
     use kingdom_lord::components::universal::{universal_component, BuildingAreaInfo};
     use kingdom_lord::components::barrack::{
-        barrack_component, Barrack, Troops, UnderTraining, SoldierKind, new_under_training,
-        soldier_info
+        barrack_component, Barrack, Troops, UnderTraining, SoldierKind, new_wait_to_train,
+        soldier_info, WaitingToTrain
     };
     use kingdom_lord::components::barrack::barrack_component::BarrackInternalImpl;
     use kingdom_lord::components::universal::universal_component::UniversalInternalImpl;
@@ -257,12 +257,21 @@ mod kingdom_lord_controller {
             // initialize upgrading list
             index = 0;
             loop {
-                set!(world, (new_under_training(player, index)));
+                set!(world, (new_wait_to_train(player, index)));
                 if index == UNDER_TRAINING_COUNT {
                     break;
                 }
                 index += 1
             };
+
+            set!(world, UnderTraining {
+                address: player,
+                current_training_id: 0,
+                soldier_kind: 0,
+                start_time: 0,
+                end_time: 0,
+                is_finished: true
+            });
 
             set!(world, (SpawnStatus { player, already_spawned: true }));
             self.emit(NewPlayerSpawnEvent { player, time });
@@ -506,18 +515,16 @@ mod kingdom_lord_controller {
             let soldier_kind: SoldierKind = soldier_kind.into();
             let res = self.barrack.start_training(soldier_kind, soldier_info.required_time);
             match res {
-                Result::Ok(under_training) => {
+                Result::Ok(training_id) => {
                     self
                         .emit(
                             StartTrainingEvent {
                                 player: caller_address,
-                                training_id: under_training.training_id,
-                                soldier_kind: under_training.soldier_kind,
-                                start_time: under_training.start_time,
-                                end_time: under_training.end_time,
+                                training_id: training_id,
+                                soldier_kind: soldier_kind.into(),
                             }
                         );
-                    Result::Ok(under_training.training_id)
+                    Result::Ok(training_id)
                 },
                 Result::Err(err) => Result::Err(err)
             }
@@ -540,14 +547,14 @@ mod kingdom_lord_controller {
 
         fn get_under_training(
             self: @ContractState, player: ContractAddress,
-        ) -> Array<UnderTraining> {
+        ) -> UnderTraining {
             self.barrack.get_under_training(player)
         }
 
-        fn get_complete_training(
+        fn get_waiting_to_train(
             self: @ContractState, player: ContractAddress,
-        ) -> Array<UnderTraining> {
-            self.barrack.get_complete_training(player)
+        ) -> Array<WaitingToTrain> {
+            self.barrack.get_waiting_to_train(player)
         }
 
         fn get_buildings_levels(self: @ContractState, player: ContractAddress) -> Array<Level> {

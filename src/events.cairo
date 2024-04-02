@@ -65,8 +65,6 @@ struct StartTrainingEvent{
     player: ContractAddress,
     training_id: u64,
     soldier_kind: u64, 
-    start_time: u64,
-    end_time:u64
 }
 
 
