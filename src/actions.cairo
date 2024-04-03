@@ -380,13 +380,13 @@ mod kingdom_lord_controller {
             let curr_building_kind = self.universal.building_kind(building_id);
 
             if building_kind != curr_building_kind && curr_building_kind != BuildingKind::None {
-                // panic!("invalid building kind");
-                return Result::Err(Error::UnknownedError('invalid building kind'));
+                panic!("invalid building kind");
+                // return Result::Err(Error::UnknownedError('invalid building kind'));
             }
 
             if !self.universal.is_next_level_valid(building_id, building_kind, next_level) {
-                // panic!("next level is not valid");
-                return Result::Err(Error::UnknownedError('next level is not valid'));
+                panic!("next level is not valid");
+                // return Result::Err(Error::UnknownedError('next level is not valid'));
             }
 
             let req_wood = req_wood.into();
@@ -396,15 +396,15 @@ mod kingdom_lord_controller {
             let (wood, brick, steel, food) = self.get_resource(caller_address);
             if wood < req_wood || brick < req_brick || steel < req_steel || food < req_food {
                 self.emit(UpgradeNotEnoughResourceEvent { player: caller_address, building_id });
-                // panic!("resource not enough");
-                return Result::Err(Error::ResourceNotEnough);
+                panic!("resource not enough");
+                // return Result::Err(Error::ResourceNotEnough);
             }
 
             let world = self.world_dispatcher.read();
             let config = get!(world, (CONFIG_ID), (Config));
             if !verify_proof(config, data.span(), proof.span()) {
-                // panic!("invalid proof");
-                return Result::Err(Error::InvalidProof);
+                panic!("invalid proof");
+                // return Result::Err(Error::InvalidProof);
             }
 
             let is_new_building = curr_building_kind == BuildingKind::None;
