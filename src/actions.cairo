@@ -435,7 +435,7 @@ mod kingdom_lord_controller {
                         );
                     Result::Ok(upgrade_id)
                 },
-                Result::Err(err) => Result::Err(err)
+                Result::Err(err) => panic!("start upgrade err: {:?}", err)
             }
         }
 
@@ -473,7 +473,7 @@ mod kingdom_lord_controller {
                 },
                 Result::Err(err) => {
                     self.emit(UpgradeNotFinishedEvent { player });
-                    Result::Err(err)
+                    panic!("finish upgrade err: {:?}", err)
                 }
             }
         }
@@ -559,7 +559,7 @@ mod kingdom_lord_controller {
                         );
                     Result::Ok(training_id)
                 },
-                Result::Err(err) => Result::Err(err)
+                Result::Err(err) => panic!("start training err: {:?}", err)
             }
         }
 
@@ -577,7 +577,7 @@ mod kingdom_lord_controller {
                     let player = get_caller_address();
                     self.emit(TrainingFinishedEvent { player, training_id });
                 },
-                Result::Err(_) => {}
+                Result::Err(err) => panic!("finish training err {:?}", err)
             }
             res
         }
