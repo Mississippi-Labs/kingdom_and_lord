@@ -12,30 +12,24 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{
-        setup_world, city_hall_level1_proof, city_hall_level2_proof, warehouse_level1_proof,
-        assert_resource, increase_time, warehouse_level2_proof, barn_level1_proof, barn_level2_proof
+        setup_world, assert_resource, increase_time,
     };
     use kingdom_lord::interface::{
-        IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
+        IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl, IKingdomLordTest,IKingdomLordLibraryDispatcherImpl, Error
     };
 
     #[test]
     #[available_gas(300000000000)]
-    fn test_storage() {
+    fn test_total_population() {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn().expect('spawn works');
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
         let caller = get_caller_address();
 
         assert_resource(context, caller, 0, 0, 0, 0);
-
-        let err = context
-            .kingdom_lord
-            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, city_hall_level1_proof())
-            .unwrap_err();
-        assert(err == Error::ResourceNotEnough, 'not enough resource');
-        increase_time(1000);
-        assert_resource(context, caller, 1000, 1000, 1000, 1000);
+        
+        let population = context.kingdom_lord.get_total_population(caller);
+        assert!(population == 0, "initial population is 0")
     }
 }

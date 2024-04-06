@@ -11,7 +11,7 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{setup_world, assert_resource, increase_time};
-    use kingdom_lord::interface::{IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl};
+    use kingdom_lord::interface::{IKingdomLord, IKingdomLordTestDispatcherImpl, IKingdomLordTest,IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl};
 
     #[test]
     #[available_gas(300000000000)]
@@ -20,7 +20,7 @@ mod tests {
         let context = setup_world();
         let caller = get_caller_address();
         increase_time(1_u64);
-        context.kingdom_lord.spawn().expect('spawn works');
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
         assert_resource(context, caller, 0, 0, 0, 0);
 
         // building levels 4446
@@ -64,9 +64,9 @@ mod tests {
     fn test_dup_spawn() {
         // deploy world with models
         let context = setup_world();
-        context.kingdom_lord.spawn().expect('spawn works');
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
 
-        let res = context.kingdom_lord.spawn().unwrap_err();
+        let res = context.kingdom_lord_test.spawn_test().unwrap_err();
         assert(res == Error::AlreadySpawned, 'dup spawned should be error')
     }
 }

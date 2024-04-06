@@ -8,8 +8,8 @@ use kingdom_lord::components::city_building::city_building;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use kingdom_lord::actions::{kingdom_lord_controller};
 use kingdom_lord::interface::{
-    IKingdomLordDispatcher, IKingdomLordAdminDispatcher, IKingdomLordAdmin,
-    IKingdomLordLibraryDispatcherImpl, IKingdomLordAdminDispatcherImpl, IKingdomLordDispatcherTrait
+    IKingdomLordDispatcher, IKingdomLordAdminDispatcher, IKingdomLordAdmin,IKingdomLordTestDispatcherImpl, 
+    IKingdomLordLibraryDispatcherImpl, IKingdomLordAdminDispatcherImpl, IKingdomLordDispatcherTrait, IKingdomLordTestDispatcher
 };
 use openzeppelin::token::erc20::interface::IERC20DispatcherImpl;
 use kingdom_lord::actions::kingdom_lord_controller::world_dispatcherContractMemberStateTrait;
@@ -36,6 +36,7 @@ struct TestContext {
     world: IWorldDispatcher,
     contract_address: ContractAddress,
     kingdom_lord: IKingdomLordDispatcher,
+    kingdom_lord_test: IKingdomLordTestDispatcher,
     kingdom_lord_admin: IKingdomLordAdminDispatcher,
     erc20_dispatcher: IERC20Dispatcher,
     erc20_address: ContractAddress
@@ -125,8 +126,8 @@ fn increase_time(time: u64) {
 fn construct_barrack(context: TestContext) {
     increase_time(100);
     context
-        .kingdom_lord
-        .start_upgrade(
+        .kingdom_lord_test
+        .start_upgrade_test(
             19,
             8,
             1,
@@ -141,22 +142,22 @@ fn construct_barrack(context: TestContext) {
         )
         .expect('start construct barrack');
     increase_time(2000);
-    let res = context.kingdom_lord.finish_upgrade();
+    let res = context.kingdom_lord_test.finish_upgrade_test();
     res.expect('construct barrack');
 }
 
 fn construct_stable(context: TestContext){
     increase_time(100);
     context
-        .kingdom_lord
-        .start_upgrade(
+        .kingdom_lord_test
+        .start_upgrade_test(
             20,
             9, 1, 260, 140, 220, 100, 5, 2200, 100,
             stable_level1_proof()
         )
         .expect('start construct stable');
     increase_time(2200);
-    let res = context.kingdom_lord.finish_upgrade();
+    let res = context.kingdom_lord_test.finish_upgrade_test();
     res.expect('construct stable');
 }
 
@@ -211,6 +212,7 @@ fn setup_world() -> TestContext {
         world,
         contract_address,
         kingdom_lord: IKingdomLordDispatcher { contract_address },
+        kingdom_lord_test: IKingdomLordTestDispatcher{ contract_address},
         kingdom_lord_admin: admin_dispatcher,
         erc20_dispatcher,
         erc20_address: erc20_contract_address

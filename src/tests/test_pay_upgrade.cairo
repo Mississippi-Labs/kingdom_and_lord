@@ -11,7 +11,7 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{setup_world, OWNER, PLAYER, wood_level_1_proof, increase_time};
-    use kingdom_lord::interface::{IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error};
+    use kingdom_lord::interface::{IKingdomLord, IKingdomLordDispatcher,IKingdomLordTest, IKingdomLordTestDispatcherImpl, IKingdomLordLibraryDispatcherImpl, Error};
     use kingdom_lord::components::city_hall::UnderUpgrading;
     use openzeppelin::token::erc20::interface::IERC20DispatcherImpl;
 
@@ -31,13 +31,13 @@ mod tests {
         set_caller_address(player);
 
         context.erc20_dispatcher.approve(context.kingdom_lord.contract_address, 200_u256);
-        context.kingdom_lord.spawn().expect('spawn works');
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
         let caller = get_caller_address();
 
-        let err = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof()).unwrap_err();
+        let err = context.kingdom_lord_test.start_upgrade_test(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof()).unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(25);
-        let res = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof());
+        let res = context.kingdom_lord_test.start_upgrade_test(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof());
         let upgrade_id = res.unwrap();
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
@@ -51,7 +51,7 @@ mod tests {
         let finishe_upgrade = context.kingdom_lord.get_complete_upgrading(caller);
         assert(finishe_upgrade.len() == 0, 'finished should be 0');
 
-        context.kingdom_lord.pay_to_finish_upgrade(0_u64).unwrap();
+        context.kingdom_lord.pay_to_finish_upgrade_test(0_u64).unwrap();
 
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
         assert(under_upgrade.len() == 0, 'under_upgrade should be 0 ');
@@ -76,12 +76,12 @@ mod tests {
 
         set_caller_address(player);
         set_contract_address(player);
-        context.kingdom_lord.spawn().expect('spawn works');
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
         
-        let err = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof()).unwrap_err();
+        let err = context.kingdom_lord_test.start_upgrade_test(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof()).unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(25);
-        let res = context.kingdom_lord.start_upgrade(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof());
+        let res = context.kingdom_lord_test.start_upgrade_test(0, 1, 1, 40, 100, 50, 60, 2, 260, 7, wood_level_1_proof());
         let upgrade_id = res.unwrap();
         assert(upgrade_id == 0, 'first upgrade id is 0');
 
@@ -96,7 +96,7 @@ mod tests {
 
         let finishe_upgrade = context.kingdom_lord.get_complete_upgrading(player);
         assert(finishe_upgrade.len() == 0, 'finished should be 0');
-        context.kingdom_lord.pay_to_finish_upgrade(0_u64).expect('panic');
+        context.kingdom_lord.pay_to_finish_upgrade_test(0_u64).expect('panic');
 
     }
 }

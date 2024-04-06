@@ -17,7 +17,7 @@ mod tests {
         barn_level2_proof, warehouse_level1_proof
     };
     use kingdom_lord::interface::{
-        IKingdomLord, IKingdomLordDispatcher, IKingdomLordLibraryDispatcherImpl, Error
+        IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl, IKingdomLordTest,IKingdomLordLibraryDispatcherImpl, Error
     };
     use kingdom_lord::models::building_kind::BuildingKind;
 
@@ -27,18 +27,18 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
-        context.kingdom_lord.spawn().expect('spawn works');
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
         let caller = get_caller_address();
         let err = context
-            .kingdom_lord
-            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
+            .kingdom_lord_test
+            .start_upgrade_test(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(50);
 
         let res = context
-            .kingdom_lord
-            .start_upgrade(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof());
+            .kingdom_lord_test
+            .start_upgrade_test(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof());
         let upgrade_id = res.unwrap();
         assert(upgrade_id == 1, 'first upgrade id is 1');
 
@@ -52,10 +52,10 @@ mod tests {
         increase_time(2500);
 
         // city hall should be level up
-        context.kingdom_lord.finish_upgrade().unwrap();
+        context.kingdom_lord_test.finish_upgrade_test().unwrap();
         context
-            .kingdom_lord
-            .start_upgrade(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, cityhall_level2_proof())
+            .kingdom_lord_test
+            .start_upgrade_test(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, cityhall_level2_proof())
             .expect('start upgrade level 2 ');
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
 
@@ -64,6 +64,6 @@ mod tests {
         assert(under_upgrade.end_time == 5144, 'end block should be 5144');
 
         increase_time(2620);
-        context.kingdom_lord.finish_upgrade().unwrap();
+        context.kingdom_lord_test.finish_upgrade_test().unwrap();
     }
 }

@@ -66,3 +66,28 @@ trait IKingdomLordAdmin<TState>{
     // fn set_warehouse_max_storage(self: @TState, addr: ContractAddress, max_storage: u64);
 
 }
+
+#[starknet::interface]
+trait IKingdomLordTest<ContractState>{
+        fn spawn_test(ref self: ContractState) -> Result<(), Error>;
+        fn start_upgrade_test(
+            ref self: ContractState,
+            building_id: u64,
+            building_kind: u64,
+            next_level: u64,
+            req_wood: u64,
+            req_brick: u64,
+            req_steel: u64,
+            req_food: u64,
+            population: u64,
+            required_time: u64,
+            value: u64,
+            proof: Array<felt252>
+        ) -> Result<u64, Error>;
+        fn finish_upgrade_test(ref self: ContractState) -> Result<(), Error>;
+        fn start_training_test(
+            ref self: ContractState,
+            soldier_kind: u64,
+        ) -> Result<u64, Error>;
+        fn finish_training_test(ref self: ContractState, is_barrack: bool) -> Result<u64, Error>;
+}
