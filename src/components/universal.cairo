@@ -278,6 +278,7 @@ mod universal_component {
                 BuildingKind::College => {
                     let college = College{
                         player,
+                        building_id,
                         level: 1_u64.into(),
                         population: 4,
                     };

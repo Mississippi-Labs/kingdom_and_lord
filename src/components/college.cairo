@@ -9,6 +9,7 @@ use kingdom_lord::models::level::{LevelTrait, LevelUpTrait};
 struct College {
     #[key]
     player: ContractAddress,
+    building_id: u64,
     level: Level,
     population: u64
 }
