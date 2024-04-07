@@ -28,7 +28,7 @@ mod universal_component {
     use kingdom_lord::components::warehouse::{Warehouse, WarehouseStorage};
     use kingdom_lord::components::barn::{Barn, BarnStorage};
     use kingdom_lord::components::college::{College};
-    use kingdom_lord::components::barrack::{Barrack, BarrackLevelTrait, BarrackGetLevel};
+    use kingdom_lord::components::barrack::{Barrack, BarrackLevelTrait, BarrackGetLevel, Troops, soldier_info, SoldierKind};
     use kingdom_lord::components::stable::{Stable, StableLevelTrait, StableGetLevel};
     use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl};
 
@@ -294,7 +294,7 @@ mod universal_component {
         fn get_total_population(
             self: @ComponentState<TContractState>, player: ContractAddress
         ) -> u64 {
-            let mut consume_rate: u64 = 0;
+            let mut population: u64 = 0;
             let mut index: u64 = 0;
             let max_count = OUTER_CITY_BUILDING_AMOUNT + INNER_CITY_BUILDING_AMOUNT;
             loop {
@@ -311,58 +311,67 @@ mod universal_component {
                         let city_building = get!(
                             self.get_contract().world(), (player, index), (CityBuilding)
                         );
-                        consume_rate += city_building.population;
+                        population += city_building.population;
                     },
                     BuildingKind::BrickBuilding => {
                         let city_building = get!(
                             self.get_contract().world(), (player, index), (CityBuilding)
                         );
-                        consume_rate += city_building.population;
+                        population += city_building.population;
                     },
                     BuildingKind::SteelBuilding => {
                         let city_building = get!(
                             self.get_contract().world(), (player, index), (CityBuilding)
                         );
-                        consume_rate += city_building.population;
+                        population += city_building.population;
                     },
                     BuildingKind::FoodBuilding => {
                         let city_building = get!(
                             self.get_contract().world(), (player, index), (CityBuilding)
                         );
-                        consume_rate += city_building.population;
+                        population += city_building.population;
                     },
                     BuildingKind::CityHall => {
                         let city_hall = get!(
                             self.get_contract().world(), (player), (CityHall)
                         );
-                        consume_rate += city_hall.population;
+                        population += city_hall.population;
                     },
                     BuildingKind::Warehouse => {
                         let warehouse = get!(
                             self.get_contract().world(), (player, index), (Warehouse)
                         );
-                        consume_rate += warehouse.population;
+                        population += warehouse.population;
                     },
                     BuildingKind::Barn => {
                         let barn = get!(self.get_contract().world(), (player, index), (Barn));
-                        consume_rate += barn.population;
+                        population += barn.population;
                     },
                     BuildingKind::Barrack => {
                         let barrack = get!(self.get_contract().world(), (player), (Barrack));
-                        consume_rate += barrack.population;
+                        population += barrack.population;
                     },
                     BuildingKind::Stable => {
                         let stable = get!(self.get_contract().world(), (player), (Stable));
-                        consume_rate += stable.population;
+                        population += stable.population;
                     },
                     BuildingKind::College => {
                         let college = get!(self.get_contract().world(), (player), (College));
-                        consume_rate += college.population;
+                        population += college.population;
                     }
                 }
                 index += 1;
             };
-            consume_rate
+            let troops = get!(self.get_contract().world(), (player), (Troops));
+
+            population += troops.millitia * soldier_info(SoldierKind::Millitia).population;
+            population += troops.guard * soldier_info(SoldierKind::Guard).population;
+            population += troops.heavy_infantry * soldier_info(SoldierKind::HeavyInfantry).population;
+            population += troops.scouts * soldier_info(SoldierKind::Scouts).population;
+            population += troops.knights * soldier_info(SoldierKind::Knights).population;
+            population += troops.heavy_knights * soldier_info(SoldierKind::HeavyKnights).population;
+
+            population
         }
     }
 }

@@ -36,7 +36,7 @@ impl CollegeLevelTrait of LevelUpTrait<College, (u64, u64)> {
     fn level_up(ref self: College, value: (u64, u64)) {
         self.level.level_up(());
         let (_, population) = value;
-        self.population = population;
+        self.population += population;
     }
 }
 

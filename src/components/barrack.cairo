@@ -210,7 +210,7 @@ impl BarrackLevelTrait of LevelUpTrait<Barrack, (u64, u64)>{
     fn level_up(ref self: Barrack, value: (u64, u64)){
         self.level.level_up(());
         let (bonus, population) = value;
-        self.population = population;
+        self.population += population;
         self.bonus = bonus;
     }
 }

@@ -64,7 +64,7 @@ impl WarehouseLeveTrait of LevelUpTrait<Warehouse, (u64, u64)>{
         self.level.level_up(());
         let (max_storage, population) = value;
         self.max_storage = max_storage;
-        self.population = population;
+        self.population += population;
     }
 }
 

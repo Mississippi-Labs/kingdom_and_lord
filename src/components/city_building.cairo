@@ -47,7 +47,7 @@ impl CityBuildingLevelImpl of LevelUpTrait<CityBuilding, (u64, u64)> {
         self.level.level_up(());
         let (growth_rate, population) = value;
         self.growth_rate = growth_rate;
-        self.population = population;
+        self.population += population;
     }
 }
 
