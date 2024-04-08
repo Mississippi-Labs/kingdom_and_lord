@@ -128,7 +128,7 @@ fn construct_barrack(context: TestContext) {
     context
         .kingdom_lord_test
         .start_upgrade_test(
-            19,
+            21,
             8,
             1,
             210,
@@ -150,7 +150,7 @@ fn level2_barrack(context: TestContext){
     context
         .kingdom_lord_test
         .start_upgrade_test(
-            19,8, 2, 270, 180, 335, 155, 2, 2620, 90,
+            21,8, 2, 270, 180, 335, 155, 2, 2620, 90,
             barrack_level2_proof()
         )
         .expect('start construct barrack');

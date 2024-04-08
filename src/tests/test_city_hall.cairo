@@ -31,14 +31,14 @@ mod tests {
         let caller = get_caller_address();
         let err = context
             .kingdom_lord_test
-            .start_upgrade_test(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
+            .start_upgrade_test(20, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(50);
 
         let res = context
             .kingdom_lord_test
-            .start_upgrade_test(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof());
+            .start_upgrade_test(20, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof());
         let upgrade_id = res.unwrap();
         assert(upgrade_id == 1, 'first upgrade id is 1');
 
@@ -55,7 +55,7 @@ mod tests {
         context.kingdom_lord_test.finish_upgrade_test().unwrap();
         context
             .kingdom_lord_test
-            .start_upgrade_test(18, 5, 2, 90, 50, 75, 25, 1, 2620, 104, cityhall_level2_proof())
+            .start_upgrade_test(20, 5, 2, 90, 50, 75, 25, 1, 2620, 104, cityhall_level2_proof())
             .expect('start upgrade level 2 ');
         let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
 

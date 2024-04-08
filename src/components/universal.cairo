@@ -19,7 +19,7 @@ mod universal_component {
     };
     use super::BuildingAreaInfo;
     use kingdom_lord::constants::{
-        OUTER_CITY_BUILDING_AMOUNT, INNER_CITY_BUILDING_AMOUNT, CITY_WALL_BUILDING_ID
+        OUTER_CITY_BUILDING_AMOUNT, INNER_CITY_BUILDING_AMOUNT, CITY_WALL_BUILDING_ID, MAX_LEVEL
     };
     use kingdom_lord::models::building::BuildingUpgradeInfo;
     use kingdom_lord::models::building_kind::BuildingKind;
@@ -28,10 +28,12 @@ mod universal_component {
     use kingdom_lord::components::warehouse::{Warehouse, WarehouseStorage};
     use kingdom_lord::components::barn::{Barn, BarnStorage};
     use kingdom_lord::components::college::{College};
-    use kingdom_lord::components::barrack::{Barrack, BarrackLevelTrait, BarrackGetLevel, Troops, soldier_info, SoldierKind};
+    use kingdom_lord::components::barrack::{
+        Barrack, BarrackLevelTrait, BarrackGetLevel, Troops, soldier_info, SoldierKind
+    };
     use kingdom_lord::components::stable::{Stable, StableLevelTrait, StableGetLevel};
-    use kingdom_lord::components::city_wall::{CityWall,CityWallLevelTrait, CityWallGetLevel};
-    use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl};
+    use kingdom_lord::components::city_wall::{CityWall, CityWallLevelTrait, CityWallGetLevel};
+    use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl, LevelIntou64};
 
     #[storage]
     struct Storage {}
@@ -48,6 +50,57 @@ mod universal_component {
             info.building_kind.into()
         }
 
+        fn check_all_building_reaching_max_level(self: @ComponentState<TContractState>, is_ware_house: bool) -> bool {
+            let mut index: u64 = CITY_WALL_BUILDING_ID + 1;
+            let player = get_caller_address();
+            let max_count = INNER_CITY_BUILDING_AMOUNT + 1;
+            let world = self.get_contract().world();
+            let mut res = true;
+            loop {
+                if index == max_count {
+                    break;
+                }
+                let info: BuildingAreaInfo = get!(
+                    world, (player, index), (BuildingAreaInfo)
+                );
+                let building_kind: BuildingKind = info.building_kind.into();
+                match building_kind {
+                    BuildingKind::None => {},
+                    BuildingKind::WoodBuilding => {},
+                    BuildingKind::BrickBuilding => {},
+                    BuildingKind::SteelBuilding => {},
+                    BuildingKind::FoodBuilding => {},
+                    BuildingKind::CityHall => {},
+                    BuildingKind::Warehouse => {
+                        if is_ware_house{
+                            let warehouse = get!(world, (player, index), (Warehouse));
+                            let level:u64 = warehouse.level.into() ;
+                            if level != MAX_LEVEL {
+                                res = false;
+                                break;
+                            }
+                        }
+                    },
+                    BuildingKind::Barn => {
+                        if !is_ware_house{
+                            let barn = get!(world, (player, index), (Barn));
+                            let level:u64 = barn.level.into() ;
+                            if level != MAX_LEVEL {
+                                res = false;
+                                break;
+                            }
+                        }
+                    },
+                    BuildingKind::Barrack => {},
+                    BuildingKind::Stable => {},
+                    BuildingKind::College => {},
+                    BuildingKind::CityWall => {}
+                }
+                index += 1;
+            };
+            res
+        }
+
 
         fn is_next_level_valid(
             self: @ComponentState<TContractState>,
@@ -58,9 +111,7 @@ mod universal_component {
             let world = self.get_contract().world();
             let player = get_caller_address();
             match building_kind {
-                BuildingKind::None => {
-                    return next_level == 1_u64.into();
-                },
+                BuildingKind::None => { return next_level == 1_u64.into(); },
                 BuildingKind::WoodBuilding => {
                     let city_building = get!(world, (player, building_id), (CityBuilding));
                     return city_building.is_next_level_valid(next_level);
@@ -93,7 +144,7 @@ mod universal_component {
                     let barrack = get!(world, (player), (Barrack));
                     return barrack.is_next_level_valid(next_level);
                 },
-                BuildingKind::Stable =>{
+                BuildingKind::Stable => {
                     let stable = get!(world, (player), (Stable));
                     return stable.is_next_level_valid(next_level);
                 },
@@ -173,7 +224,7 @@ mod universal_component {
                     stable.level_up(value);
                     set!(world, (stable));
                 },
-                BuildingKind::College =>{
+                BuildingKind::College => {
                     let mut college = get!(world, (player), (College));
                     college.level_up(value);
                     set!(world, (college));
@@ -187,27 +238,25 @@ mod universal_component {
         }
 
         fn new_building(
-            self: @ComponentState<TContractState>,
-            building_id: u64,
-            building_kind: BuildingKind,
-        ){
+            self: @ComponentState<TContractState>, building_id: u64, building_kind: BuildingKind,
+        ) {
             let world = self.get_contract().world();
             let player = get_caller_address();
-            match building_kind{
+            match building_kind {
                 BuildingKind::None => panic!("None building could be found"),
                 BuildingKind::WoodBuilding => panic!("WoodBuilding not allow new"),
                 BuildingKind::BrickBuilding => panic!("BrickBuilding not allow new"),
                 BuildingKind::SteelBuilding => panic!("SteelBuilding not allow new"),
                 BuildingKind::FoodBuilding => panic!("FoodBuilding not allow new"),
                 BuildingKind::CityHall => {
-                    let city_hall = CityHall{
+                    let city_hall = CityHall {
                         player: player,
                         building_id: building_id,
                         level: 1_u64.into(),
                         bonus: 100,
                         population: 2,
                     };
-                    let building_area_info = BuildingAreaInfo{
+                    let building_area_info = BuildingAreaInfo {
                         player: player,
                         building_id: building_id,
                         building_kind: BuildingKind::CityHall.into(),
@@ -216,14 +265,10 @@ mod universal_component {
                     set!(world, (building_area_info));
                 },
                 BuildingKind::Warehouse => {
-                    let warehouse = Warehouse{
-                        player,
-                        building_id,
-                        level: 1_u64.into(),
-                        max_storage: 1200,
-                        population: 1,
+                    let warehouse = Warehouse {
+                        player, building_id, level: 1_u64.into(), max_storage: 1200, population: 1,
                     };
-                    let building_area_info = BuildingAreaInfo{
+                    let building_area_info = BuildingAreaInfo {
                         player: player,
                         building_id: building_id,
                         building_kind: BuildingKind::Warehouse.into(),
@@ -235,14 +280,10 @@ mod universal_component {
                     set!(world, (building_area_info));
                 },
                 BuildingKind::Barn => {
-                    let barn = Barn{
-                        player,
-                        building_id,
-                        level: 1_u64.into(),
-                        max_storage: 1200,
-                        population: 1,
+                    let barn = Barn {
+                        player, building_id, level: 1_u64.into(), max_storage: 1200, population: 1,
                     };
-                    let building_area_info = BuildingAreaInfo{
+                    let building_area_info = BuildingAreaInfo {
                         player: player,
                         building_id: building_id,
                         building_kind: BuildingKind::Barn.into(),
@@ -254,14 +295,10 @@ mod universal_component {
                     set!(world, (building_area_info));
                 },
                 BuildingKind::Barrack => {
-                    let barrack = Barrack{
-                        player,
-                        building_id,
-                        level: 1_u64.into(),
-                        bonus: 100,
-                        population: 4,
+                    let barrack = Barrack {
+                        player, building_id, level: 1_u64.into(), bonus: 100, population: 4,
                     };
-                    let building_area_info = BuildingAreaInfo{
+                    let building_area_info = BuildingAreaInfo {
                         player: player,
                         building_id: building_id,
                         building_kind: BuildingKind::Barrack.into(),
@@ -270,14 +307,10 @@ mod universal_component {
                     set!(world, (building_area_info));
                 },
                 BuildingKind::Stable => {
-                    let stable = Stable{
-                        player,
-                        building_id,
-                        level: 1_u64.into(),
-                        bonus: 100,
-                        population: 5,
+                    let stable = Stable {
+                        player, building_id, level: 1_u64.into(), bonus: 100, population: 5,
                     };
-                    let building_area_info = BuildingAreaInfo{
+                    let building_area_info = BuildingAreaInfo {
                         player: player,
                         building_id: building_id,
                         building_kind: BuildingKind::Stable.into(),
@@ -286,13 +319,10 @@ mod universal_component {
                     set!(world, (building_area_info));
                 },
                 BuildingKind::College => {
-                    let college = College{
-                        player,
-                        building_id,
-                        level: 1_u64.into(),
-                        population: 4,
+                    let college = College {
+                        player, building_id, level: 1_u64.into(), population: 4,
                     };
-                    let building_area_info = BuildingAreaInfo{
+                    let building_area_info = BuildingAreaInfo {
                         player: player,
                         building_id: building_id,
                         building_kind: BuildingKind::College.into(),
@@ -301,7 +331,7 @@ mod universal_component {
                     set!(world, (building_area_info));
                 },
                 BuildingKind::CityWall => {
-                    let city_wall = CityWall{
+                    let city_wall = CityWall {
                         player,
                         building_id: CITY_WALL_BUILDING_ID,
                         level: 1_u64.into(),
@@ -318,7 +348,9 @@ mod universal_component {
         ) -> u64 {
             let mut population: u64 = 0;
             let mut index: u64 = 0;
-            let max_count = OUTER_CITY_BUILDING_AMOUNT + INNER_CITY_BUILDING_AMOUNT;
+            let max_count = OUTER_CITY_BUILDING_AMOUNT
+                + INNER_CITY_BUILDING_AMOUNT
+                + 1; // 1 for city wall
             loop {
                 if index == max_count {
                     break;
@@ -354,9 +386,7 @@ mod universal_component {
                         population += city_building.population;
                     },
                     BuildingKind::CityHall => {
-                        let city_hall = get!(
-                            self.get_contract().world(), (player), (CityHall)
-                        );
+                        let city_hall = get!(self.get_contract().world(), (player), (CityHall));
                         population += city_hall.population;
                     },
                     BuildingKind::Warehouse => {
@@ -392,7 +422,8 @@ mod universal_component {
 
             population += troops.millitia * soldier_info(SoldierKind::Millitia).population;
             population += troops.guard * soldier_info(SoldierKind::Guard).population;
-            population += troops.heavy_infantry * soldier_info(SoldierKind::HeavyInfantry).population;
+            population += troops.heavy_infantry
+                * soldier_info(SoldierKind::HeavyInfantry).population;
             population += troops.scouts * soldier_info(SoldierKind::Scouts).population;
             population += troops.knights * soldier_info(SoldierKind::Knights).population;
             population += troops.heavy_knights * soldier_info(SoldierKind::HeavyKnights).population;

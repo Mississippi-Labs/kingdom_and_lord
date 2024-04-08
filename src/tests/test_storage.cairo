@@ -32,7 +32,7 @@ mod tests {
 
         let err = context
             .kingdom_lord_test
-            .start_upgrade_test(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
+            .start_upgrade_test(20, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(1000);
@@ -52,14 +52,14 @@ mod tests {
 
         let err = context
             .kingdom_lord_test
-            .start_upgrade_test(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
+            .start_upgrade_test(20, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(1000);
 
         context
             .kingdom_lord_test
-            .start_upgrade_test(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
+            .start_upgrade_test(20, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .unwrap();
         assert_resource(context, caller, 930, 960, 940, 980);
     }
@@ -77,14 +77,14 @@ mod tests {
 
         let err = context
             .kingdom_lord_test
-            .start_upgrade_test(18, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
+            .start_upgrade_test(20, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(100);
 
         context
             .kingdom_lord_test
-            .start_upgrade_test(18, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
+            .start_upgrade_test(20, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
             .unwrap();
 
         assert_resource(context, caller, 870, 840, 910, 960);
@@ -100,7 +100,7 @@ mod tests {
 
         context
             .kingdom_lord_test
-            .start_upgrade_test(18, 6, 2, 165, 205, 115, 50, 1, 2620, 1700, warehouse_level2_proof())
+            .start_upgrade_test(20, 6, 2, 165, 205, 115, 50, 1, 2620, 1700, warehouse_level2_proof())
             .expect('start upgrade level 2 failed');
 
         increase_time(2620);
@@ -125,14 +125,14 @@ mod tests {
 
         let err = context
             .kingdom_lord_test
-            .start_upgrade_test(18, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof())
+            .start_upgrade_test(20, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof())
             .unwrap_err();
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(100);
 
         context
             .kingdom_lord_test
-            .start_upgrade_test(18, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof())
+            .start_upgrade_test(20, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof())
             .expect('upgrade barn level 1');
 
         assert_resource(context, caller, 920, 900, 930, 980);
@@ -148,7 +148,7 @@ mod tests {
 
         context
             .kingdom_lord_test
-            .start_upgrade_test(18, 7, 2, 100, 130, 90, 25, 1, 2160, 1700, barn_level2_proof())
+            .start_upgrade_test(20, 7, 2, 100, 130, 90, 25, 1, 2160, 1700, barn_level2_proof())
             .expect('upgrade barn level 2 failed');
 
         increase_time(2160);

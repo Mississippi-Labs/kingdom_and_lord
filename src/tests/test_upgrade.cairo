@@ -160,15 +160,15 @@ mod tests {
             .expect('upgrading 3 works');
         context
             .kingdom_lord_test
-            .start_upgrade_test(18, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
+            .start_upgrade_test(20, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
             .expect('start 18 works');
         context
             .kingdom_lord_test
-            .start_upgrade_test(19, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
+            .start_upgrade_test(21, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
             .expect('start 19 works');
         let res = context
             .kingdom_lord_test
-            .start_upgrade_test(20, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof());
+            .start_upgrade_test(22, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof());
         assert!(res.unwrap_err() == Error::UpgradingListFull, "upgrade list full");
 
         assert_under_upgrading(context, caller, 1, 0, 100, 360, 1, false, false);
@@ -191,27 +191,27 @@ mod tests {
 
         context
             .kingdom_lord_test
-            .start_upgrade_test(20, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
+            .start_upgrade_test(22, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
             .expect('start 20 works');
 
         context
             .kingdom_lord_test
-            .start_upgrade_test(21, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
+            .start_upgrade_test(23, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
             .expect('start 21 works');
 
         context
             .kingdom_lord_test
-            .start_upgrade_test(22, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
+            .start_upgrade_test(24, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
             .expect('start 22 works');
 
         let res = context
             .kingdom_lord_test
-            .start_upgrade_test(23, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof());
+            .start_upgrade_test(25, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof());
         assert!(res.unwrap_err() == Error::UpgradingListFull, "upgrade list full");
 
         increase_time(260);
         context.kingdom_lord_test.finish_upgrade_test().expect('finish upgrading 3');
-        assert_under_upgrading(context, caller, 5, 18, 1140, 3640, 1, true, false);
+        assert_under_upgrading(context, caller, 5, 20, 1140, 3640, 1, true, false);
 
         increase_time(2500);
         context.kingdom_lord_test.finish_upgrade_test().expect('finish upgrading 18');

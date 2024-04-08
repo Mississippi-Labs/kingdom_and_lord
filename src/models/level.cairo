@@ -45,4 +45,9 @@ impl LevelInto of Into<u64, Level>{
         Level{ level: self }
     }
 }
+impl LevelIntou64 of Into<Level,u64>{
+    fn into(self: Level) -> u64{
+        self.level
+    }
+}
 

@@ -531,7 +531,20 @@ mod kingdom_lord_controller {
                 // panic!("invalid building kind");
                 return Result::Err(Error::UnknownedError('invalid building kind'));
             }
+            let is_new_building = curr_building_kind == BuildingKind::None;
+            if is_new_building && building_kind == BuildingKind::Warehouse{
+                let is_all_max_level = self.universal.check_all_building_reaching_max_level(true);
+                if !is_all_max_level {
+                    return Result::Err(Error::UnknownedError('all warehouse not max level'));
+                }
+            }
 
+            if is_new_building && building_kind == BuildingKind::Barn{
+                let is_all_max_level = self.universal.check_all_building_reaching_max_level(false);
+                if !is_all_max_level {
+                    return Result::Err(Error::UnknownedError('all barn not max level'));
+                }
+            }
             if !self.universal.is_next_level_valid(building_id, building_kind, next_level) {
                 // panic!("next level is not valid");
                 return Result::Err(Error::UnknownedError('next level is not valid'));
@@ -555,7 +568,6 @@ mod kingdom_lord_controller {
                 return Result::Err(Error::InvalidProof);
             }
 
-            let is_new_building = curr_building_kind == BuildingKind::None;
             let res = self
                 .city_hall
                 .start_upgrade(
