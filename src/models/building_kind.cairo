@@ -10,7 +10,8 @@ enum BuildingKind {
     Barn,
     Barrack,
     Stable,
-    College
+    College,
+    CityWall
 }
 
 impl IntoBuildingKind of Into<u64, BuildingKind> {
@@ -28,6 +29,7 @@ impl IntoBuildingKind of Into<u64, BuildingKind> {
             8 => BuildingKind::Barrack,
             9 => BuildingKind::Stable,
             10 => BuildingKind::College,
+            11 => BuildingKind::CityWall,
             _ => panic!("Invalid building id")
         }
     }
@@ -46,7 +48,8 @@ impl BuildingKindIntou64 of Into<BuildingKind, u64> {
             BuildingKind::Barn => 7,
             BuildingKind::Barrack => 8,
             BuildingKind::Stable => 9,
-            BuildingKind::College => 10
+            BuildingKind::College => 10,
+            BuildingKind::CityWall => 11
         }
     }
 }

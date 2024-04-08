@@ -24,6 +24,7 @@ mod components {
     mod barrack;
     mod college;
     mod stable;
+    mod city_wall;
 }
 
 mod helpers {

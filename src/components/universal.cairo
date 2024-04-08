@@ -19,7 +19,7 @@ mod universal_component {
     };
     use super::BuildingAreaInfo;
     use kingdom_lord::constants::{
-        OUTER_CITY_BUILDING_AMOUNT, INNER_CITY_BUILDING_AMOUNT
+        OUTER_CITY_BUILDING_AMOUNT, INNER_CITY_BUILDING_AMOUNT, CITY_WALL_BUILDING_ID
     };
     use kingdom_lord::models::building::BuildingUpgradeInfo;
     use kingdom_lord::models::building_kind::BuildingKind;
@@ -30,6 +30,7 @@ mod universal_component {
     use kingdom_lord::components::college::{College};
     use kingdom_lord::components::barrack::{Barrack, BarrackLevelTrait, BarrackGetLevel, Troops, soldier_info, SoldierKind};
     use kingdom_lord::components::stable::{Stable, StableLevelTrait, StableGetLevel};
+    use kingdom_lord::components::city_wall::{CityWall,CityWallLevelTrait, CityWallGetLevel};
     use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl};
 
     #[storage]
@@ -99,6 +100,10 @@ mod universal_component {
                 BuildingKind::College => {
                     let college = get!(world, (player), (College));
                     return college.is_next_level_valid(next_level);
+                },
+                BuildingKind::CityWall => {
+                    let city_wall = get!(world, (player), (CityWall));
+                    return city_wall.is_next_level_valid(next_level);
                 }
             }
         }
@@ -172,6 +177,11 @@ mod universal_component {
                     let mut college = get!(world, (player), (College));
                     college.level_up(value);
                     set!(world, (college));
+                },
+                BuildingKind::CityWall => {
+                    let mut city_wall = get!(world, (player), (CityWall));
+                    city_wall.level_up(value);
+                    set!(world, (city_wall))
                 }
             }
         }
@@ -289,6 +299,17 @@ mod universal_component {
                     };
                     set!(world, (college));
                     set!(world, (building_area_info));
+                },
+                BuildingKind::CityWall => {
+                    let city_wall = CityWall{
+                        player,
+                        building_id: CITY_WALL_BUILDING_ID,
+                        level: 1_u64.into(),
+                        population: 0,
+                        attack_power: 8,
+                        defense_power: 2
+                    };
+                    set!(world, (city_wall));
                 }
             }
         }
@@ -359,6 +380,10 @@ mod universal_component {
                     BuildingKind::College => {
                         let college = get!(self.get_contract().world(), (player), (College));
                         population += college.population;
+                    },
+                    BuildingKind::CityWall => {
+                        let city_wall = get!(self.get_contract().world(), (player), (CityWall));
+                        population += city_wall.population;
                     }
                 }
                 index += 1;

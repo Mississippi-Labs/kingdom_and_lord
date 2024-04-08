@@ -243,7 +243,7 @@ fn setup_world() -> TestContext {
             erc20_contract_address,
             200_u256,
             owner,
-            0x686c6d5767c7589e969d41aff9ff070fecd03c23aef65128668c36613659e49
+            0x608f06197fc3aab41e774567c8e4b7e8fa5dae821240eda6b39f22939315f8c
         );
     TestContext {
         world,

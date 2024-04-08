@@ -36,7 +36,7 @@ mod kingdom_lord_controller {
         WOOD_BUILDING_COUNT, BRICK_BUILDING_COUNT, STEEL_BUILDING_COUNT, FOOD_BUILDING_COUNT,
         BASE_GROW_RATE, INITIAL_MAX_STORAGE, WAITING_UPGRADING_COUNT, CONFIG_ID,
         BRICK_BUILDING_START_INDEX, STEEL_BUILDING_START_INDEX, FOOD_BUILDING_START_INDEX,
-        UNDER_TRAINING_COUNT
+        UNDER_TRAINING_COUNT, CITY_WALL_BUILDING_ID
     };
     use starknet::get_caller_address;
     use kingdom_lord::models::time::get_current_time;
@@ -366,6 +366,13 @@ mod kingdom_lord_controller {
                 }
                 index += 1
             };
+
+            // initialize city CityWall
+            set!(world,  (BuildingAreaInfo {
+                            player,
+                            building_id: CITY_WALL_BUILDING_ID,
+                            building_kind: BuildingKind::CityWall.into()
+                        }));
 
             // initialize upgrading list
             index = 0;
