@@ -114,6 +114,61 @@ mod tests {
 
     #[test]
     #[available_gas(300000000000)]
+    fn test_build_barn_fail_with_another_barn_not_max_level(){
+        // deploy world with models
+        let context = setup_world();
+
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
+        let caller = get_caller_address();
+
+        assert_resource(context, caller, 0, 0, 0, 0);
+        increase_time(100);
+
+        context
+            .kingdom_lord_test
+            .start_upgrade_test(20, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof())
+            .expect('upgrade barn level 1');
+
+        increase_time(1600);
+
+        context.kingdom_lord_test.finish_upgrade_test().expect('finish upgrade 0');
+
+        let err = context
+            .kingdom_lord_test
+            .start_upgrade_test(21, 7, 1, 80, 100, 70, 20, 1, 1600, 1200, barn_level1_proof()).unwrap_err();
+        assert(err == Error::StorageBuildingNotMaxLevel, 'storage building not max level');
+    }
+
+    #[test]
+    #[available_gas(300000000000)]
+    fn test_build_warehouse_fail_with_another_warehouse_not_max_level(){
+        // deploy world with models
+        let context = setup_world();
+
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
+        let caller = get_caller_address();
+
+        assert_resource(context, caller, 0, 0, 0, 0);
+        increase_time(100);
+
+        context
+            .kingdom_lord_test
+            .start_upgrade_test(20, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, warehouse_level1_proof())
+            .unwrap();
+
+
+        increase_time(2000);
+
+        context.kingdom_lord_test.finish_upgrade_test().expect('finish upgrade 0');
+
+        let err = context
+            .kingdom_lord_test
+            .start_upgrade_test(21, 6, 1, 130, 160, 90, 40, 1, 2000, 1200, barn_level1_proof()).unwrap_err();
+        assert(err == Error::StorageBuildingNotMaxLevel, 'storage building not max level');
+    }
+
+    #[test]
+    #[available_gas(300000000000)]
     fn test_build_barn() {
         // deploy world with models
         let context = setup_world();

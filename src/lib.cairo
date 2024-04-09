@@ -38,6 +38,7 @@ mod tests {
     mod test_storage;
     mod test_upgrade;
     mod test_city_hall;
+    mod test_city_wall;
     mod test_train;
     mod test_total_population;
     // mod test_pay_upgrade;

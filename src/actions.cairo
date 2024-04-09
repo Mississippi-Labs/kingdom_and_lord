@@ -9,6 +9,7 @@ mod kingdom_lord_controller {
         city_hall_component, UnderUpgrading, new_waiting_upgrading, CityHall, CityHallGetLevel,
         WaitingToUpgrade
     };
+    use kingdom_lord::components::city_wall::{CityWall};
     use kingdom_lord::components::city_building::{
         CityBuilding, new_city_building, CityBuildingGetLevelImpl
     };
@@ -137,13 +138,13 @@ mod kingdom_lord_controller {
             self._get_resource(player)
         }
         fn get_growth_rate(self: @ContractState, player: ContractAddress) -> (GrowthRate<Wood>, GrowthRate<Brick>, GrowthRate<Steel>, GrowthRate<Food>){
-            self._get_growth_rate(player)
+            self.outer_city.get_growth_rate(player)
         }
         fn get_under_upgrading(self: @ContractState, player: ContractAddress) -> UnderUpgrading{
-            self._get_under_upgrading(player)
+            self.city_hall.get_under_upgrading(player)
         }
         fn get_waiting_upgrading(self: @ContractState, player: ContractAddress) -> Array<WaitingToUpgrade>{
-            self._get_waiting_upgrading(player)
+            self.city_hall.get_waiting_upgrading(player)
         }
         fn get_buildings_levels(self: @ContractState, player: ContractAddress) -> Array<Level>{
             self._get_buildings_levels(player)
@@ -155,10 +156,17 @@ mod kingdom_lord_controller {
             self._get_waiting_to_train(player)
         }
         fn get_troops(self: @ContractState, player: ContractAddress) -> Troops{
-            self._get_troops(player)
+            self.barrack.get_troops(player)
         }
         fn get_total_population(self: @ContractState, player: ContractAddress) -> u64{
-            self._get_total_population(player)
+            self.universal.get_total_population(player)
+        }
+
+        fn get_city_wall_power(self: @ContractState, player: ContractAddress) -> (u64, u64){
+            let caller_address = get_caller_address();
+            let world = self.world_dispatcher.read();
+            let city_wall = get!(world, (caller_address), (CityWall));
+            (city_wall.attack_power, city_wall.defense_power)
         }
 
         // write function
@@ -453,10 +461,6 @@ mod kingdom_lord_controller {
             Result::Ok(())
         }
 
-        fn _get_total_population(self: @ContractState, player: ContractAddress) -> u64 {
-            self.universal.get_total_population(player)
-        }
-
         fn _get_resource(
             self: @ContractState, player: ContractAddress,
         ) -> (Resource<Wood>, Resource<Brick>, Resource<Steel>, Resource<Food>) {
@@ -489,11 +493,6 @@ mod kingdom_lord_controller {
             (wood_sum, brick_sum, steel_sum, food_sum)
         }
 
-        fn _get_growth_rate(
-            self: @ContractState, player: ContractAddress,
-        ) -> (GrowthRate<Wood>, GrowthRate<Brick>, GrowthRate<Steel>, GrowthRate<Food>) {
-            self.outer_city.get_growth_rate(player)
-        }
 
         fn _start_upgrade(
             ref self: ContractState,
@@ -535,14 +534,14 @@ mod kingdom_lord_controller {
             if is_new_building && building_kind == BuildingKind::Warehouse{
                 let is_all_max_level = self.universal.check_all_building_reaching_max_level(true);
                 if !is_all_max_level {
-                    return Result::Err(Error::UnknownedError('all warehouse not max level'));
+                    return Result::Err(Error::StorageBuildingNotMaxLevel);
                 }
             }
 
             if is_new_building && building_kind == BuildingKind::Barn{
                 let is_all_max_level = self.universal.check_all_building_reaching_max_level(false);
                 if !is_all_max_level {
-                    return Result::Err(Error::UnknownedError('all barn not max level'));
+                    return Result::Err(Error::StorageBuildingNotMaxLevel);
                 }
             }
             if !self.universal.is_next_level_valid(building_id, building_kind, next_level) {
@@ -668,18 +667,6 @@ mod kingdom_lord_controller {
         //     }
         // }
 
-        fn _get_under_upgrading(self: @ContractState, player: ContractAddress,) -> UnderUpgrading {
-            self.city_hall.get_under_upgrading(player)
-        }
-
-        fn _get_waiting_upgrading(
-            self: @ContractState, player: ContractAddress,
-        ) -> Array<WaitingToUpgrade> {
-            self.city_hall.get_waiting_upgrading(player)
-        }
-        fn _get_troops(self: @ContractState, player: ContractAddress) -> Troops {
-            self.barrack.get_troops(player)
-        }
 
         fn _start_training(ref self: ContractState, soldier_kind: u64) -> Result<u64, Error> {
             let caller_address = get_caller_address();

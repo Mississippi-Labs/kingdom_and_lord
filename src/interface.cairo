@@ -19,6 +19,7 @@ enum Error{
     TrainingListFull,
     NoTargetBuildingConstructed,
     TrainingPrerequirementNotMatch,
+    StorageBuildingNotMaxLevel
 }
 
 #[starknet::interface]
@@ -33,6 +34,7 @@ trait IKingdomLord<TState>{
     fn get_waiting_to_train(self: @TState, player: ContractAddress) -> Array<BarrackWaitingToTrain>;
     fn get_troops(self: @TState, player: ContractAddress) -> Troops;
     fn get_total_population(self: @TState, player: ContractAddress) -> u64;
+    fn get_city_wall_power(self: @TState, player: ContractAddress) -> (u64, u64);
 
     // write function
     fn spawn(ref self: TState) -> Result<(), Error>;

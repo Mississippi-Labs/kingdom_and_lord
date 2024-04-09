@@ -94,6 +94,7 @@ mod universal_component {
                     BuildingKind::Barrack => {},
                     BuildingKind::Stable => {},
                     BuildingKind::College => {},
+                    BuildingKind::Embassy => {},
                     BuildingKind::CityWall => {}
                 }
                 index += 1;
@@ -152,6 +153,7 @@ mod universal_component {
                     let college = get!(world, (player), (College));
                     return college.is_next_level_valid(next_level);
                 },
+                BuildingKind::Embassy => { false },
                 BuildingKind::CityWall => {
                     let city_wall = get!(world, (player), (CityWall));
                     return city_wall.is_next_level_valid(next_level);
@@ -229,6 +231,7 @@ mod universal_component {
                     college.level_up(value);
                     set!(world, (college));
                 },
+                BuildingKind::Embassy => {},
                 BuildingKind::CityWall => {
                     let mut city_wall = get!(world, (player), (CityWall));
                     city_wall.level_up(value);
@@ -330,6 +333,7 @@ mod universal_component {
                     set!(world, (college));
                     set!(world, (building_area_info));
                 },
+                BuildingKind::Embassy => {},
                 BuildingKind::CityWall => {
                     let city_wall = CityWall {
                         player,
@@ -411,6 +415,7 @@ mod universal_component {
                         let college = get!(self.get_contract().world(), (player), (College));
                         population += college.population;
                     },
+                    BuildingKind::Embassy => {},
                     BuildingKind::CityWall => {
                         let city_wall = get!(self.get_contract().world(), (player), (CityWall));
                         population += city_wall.population;
