@@ -60,4 +60,22 @@ mod tests {
         assert(attack_power == 16, 'attack power should be 16');
         assert(defense_power == 5, 'defense power should be 5');
     }
+
+
+    #[test]
+    #[available_gas(300000000000)]
+    #[should_panic]
+    fn test_invalid_building_id_city_wall(){
+        // deploy world with models
+        let context = setup_world();
+        let caller = get_caller_address();
+
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
+        increase_time(50);
+        let err = context
+            .kingdom_lord_test
+            .start_upgrade_test(20, 12, 1, 110, 160, 70, 60, 0, 2000, 8002, city_wall_level1_proof())
+            .unwrap_err();
+        assert(err == Error::ResourceNotEnough, 'not enough resource');
+    }
 }

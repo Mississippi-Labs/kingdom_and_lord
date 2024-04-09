@@ -33,6 +33,7 @@ mod universal_component {
     };
     use kingdom_lord::components::stable::{Stable, StableLevelTrait, StableGetLevel};
     use kingdom_lord::components::city_wall::{CityWall, CityWallLevelTrait, CityWallGetLevel};
+    use kingdom_lord::components::embassy::{Embassy, EmbassyLevelTrait, EmbassyGetLevel};
     use kingdom_lord::models::level::{LevelTrait, LevelUpTrait, Level, LevelExtentionTraitsImpl, LevelIntou64};
 
     #[storage]
@@ -153,8 +154,12 @@ mod universal_component {
                     let college = get!(world, (player), (College));
                     return college.is_next_level_valid(next_level);
                 },
-                BuildingKind::Embassy => { false },
+                BuildingKind::Embassy => { 
+                    let embassy = get!(world, (player), (Embassy));
+                    return embassy.is_next_level_valid(next_level);
+                 },
                 BuildingKind::CityWall => {
+                    assert(building_id == CITY_WALL_BUILDING_ID, 'City wall id is fixed 18');
                     let city_wall = get!(world, (player), (CityWall));
                     return city_wall.is_next_level_valid(next_level);
                 }
@@ -231,7 +236,11 @@ mod universal_component {
                     college.level_up(value);
                     set!(world, (college));
                 },
-                BuildingKind::Embassy => {},
+                BuildingKind::Embassy => {
+                    let mut embassy = get!(world, (player), (Embassy));
+                    embassy.level_up(value);
+                    set!(world, (embassy));
+                },
                 BuildingKind::CityWall => {
                     let mut city_wall = get!(world, (player), (CityWall));
                     city_wall.level_up(value);
@@ -333,7 +342,18 @@ mod universal_component {
                     set!(world, (college));
                     set!(world, (building_area_info));
                 },
-                BuildingKind::Embassy => {},
+                BuildingKind::Embassy => {
+                    let embassy = Embassy {
+                        player, building_id, level: 1_u64.into(), population: 3, ally_amount: 0
+                    };
+                    let building_area_info = BuildingAreaInfo {
+                        player: player,
+                        building_id: building_id,
+                        building_kind: BuildingKind::Embassy.into(),
+                    };
+                    set!(world, (embassy));
+                    set!(world, (building_area_info));
+                },
                 BuildingKind::CityWall => {
                     let city_wall = CityWall {
                         player,
@@ -415,7 +435,10 @@ mod universal_component {
                         let college = get!(self.get_contract().world(), (player), (College));
                         population += college.population;
                     },
-                    BuildingKind::Embassy => {},
+                    BuildingKind::Embassy => {
+                        let embassy = get!(self.get_contract().world(), (player), (Embassy));
+                        population += embassy.population;
+                    },
                     BuildingKind::CityWall => {
                         let city_wall = get!(self.get_contract().world(), (player), (CityWall));
                         population += city_wall.population;

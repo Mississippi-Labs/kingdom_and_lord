@@ -32,6 +32,7 @@ mod kingdom_lord_controller {
     use kingdom_lord::models::level::{Level, LevelExtentionTraitsImpl};
     use kingdom_lord::models::growth::GrowthRate;
     use kingdom_lord::models::building_kind::BuildingKind;
+    use kingdom_lord::components::embassy::{Embassy};
     use kingdom_lord::components::config::{Config, verify_proof};
     use kingdom_lord::constants::{
         WOOD_BUILDING_COUNT, BRICK_BUILDING_COUNT, STEEL_BUILDING_COUNT, FOOD_BUILDING_COUNT,
@@ -163,10 +164,15 @@ mod kingdom_lord_controller {
         }
 
         fn get_city_wall_power(self: @ContractState, player: ContractAddress) -> (u64, u64){
-            let caller_address = get_caller_address();
             let world = self.world_dispatcher.read();
-            let city_wall = get!(world, (caller_address), (CityWall));
+            let city_wall = get!(world, (player), (CityWall));
             (city_wall.attack_power, city_wall.defense_power)
+        }
+
+        fn get_ally_amount(self: @ContractState, player: ContractAddress) -> u64{
+            let world = self.world_dispatcher.read();
+            let embassy = get!(world, (player), (Embassy));
+            embassy.ally_amount
         }
 
         // write function

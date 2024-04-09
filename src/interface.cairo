@@ -35,6 +35,7 @@ trait IKingdomLord<TState>{
     fn get_troops(self: @TState, player: ContractAddress) -> Troops;
     fn get_total_population(self: @TState, player: ContractAddress) -> u64;
     fn get_city_wall_power(self: @TState, player: ContractAddress) -> (u64, u64);
+    fn get_ally_amount(self: @TState, player: ContractAddress) -> u64;
 
     // write function
     fn spawn(ref self: TState) -> Result<(), Error>;

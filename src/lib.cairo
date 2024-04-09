@@ -19,6 +19,7 @@ mod components {
     mod barn;
     mod city_hall;
     mod city_building;
+    mod embassy;
     mod universal;
     mod config;
     mod barrack;
@@ -40,6 +41,7 @@ mod tests {
     mod test_city_hall;
     mod test_city_wall;
     mod test_train;
+    mod test_embassy;
     mod test_total_population;
     // mod test_pay_upgrade;
     mod utils;
