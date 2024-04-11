@@ -9,6 +9,7 @@ mod kingdom_lord_controller {
         city_hall_component, UnderUpgrading, new_waiting_upgrading, CityHall, CityHallGetLevel,
         WaitingToUpgrade
     };
+    use kingdom_lord::components::city_hall::city_hall_component::{CityHallInternalTrait, CityHallInternalImpl};
     use kingdom_lord::components::city_wall::{CityWall};
     use kingdom_lord::components::city_building::{
         CityBuilding, new_city_building, CityBuildingGetLevelImpl
@@ -97,16 +98,6 @@ mod kingdom_lord_controller {
         BarrackEvent: barrack_component::Event,
         CollegeEvent: college_component::Event,
         StableEvent: stable_component::Event,
-        // custom
-        NewPlayerSpawnEvent: NewPlayerSpawnEvent,
-        StartUpgradeEvent: StartUpgradeEvent,
-        UpgradeNotEnoughResourceEvent: UpgradeNotEnoughResourceEvent,
-        UpgradeCompleteEvent: UpgradeCompleteEvent,
-        UpgradeNotFinishedEvent: UpgradeNotFinishedEvent,
-        AlreadySpawnedEvent: AlreadySpawnedEvent,
-        PayToFinishedUpgradeEvent: PayToFinishedUpgradeEvent,
-        StartTrainingEvent: StartTrainingEvent,
-        TrainingFinisedEvent: TrainingFinishedEvent,
     }
 
     impl KLBarnImpl = barn_component::BarnInternalImpl<ContractState>;
@@ -176,11 +167,11 @@ mod kingdom_lord_controller {
         }
 
         // write function
-        fn spawn(ref self: ContractState) -> Result<(), Error>{
+        fn spawn(self: @ContractState) -> Result<(), Error>{
             panic_on_err(self._spawn())
         }
         fn start_upgrade(
-                ref self: ContractState,
+                self: @ContractState,
                 building_id: u64,
                 building_kind: u64,
                 next_level: u64,
@@ -207,16 +198,16 @@ mod kingdom_lord_controller {
                 proof
             ))
             }
-        fn finish_upgrade(ref self: ContractState) -> Result<(), Error>{
+        fn finish_upgrade(self: @ContractState) -> Result<(), Error>{
             panic_on_err(self._finish_upgrade())
         }
         fn start_training(
-                ref self: ContractState,
+                self: @ContractState,
                 soldier_kind: u64,
             ) -> Result<u64, Error>{
             panic_on_err(self._start_training(soldier_kind))
             }
-        fn finish_training(ref self: ContractState, is_barrack: bool) -> Result<u64, Error>{
+        fn finish_training(self: @ContractState, is_barrack: bool) -> Result<u64, Error>{
             panic_on_err(self._finish_training(is_barrack))
         }
     }
@@ -225,11 +216,11 @@ mod kingdom_lord_controller {
     impl KingdomLordTestImpl of IKingdomLordTest<ContractState>{
 
         // write function
-        fn spawn_test(ref self: ContractState) -> Result<(), Error>{
+        fn spawn_test(self: @ContractState) -> Result<(), Error>{
             self._spawn()
         }
         fn start_upgrade_test(
-            ref self: ContractState,
+            self: @ContractState,
             building_id: u64,
             building_kind: u64,
             next_level: u64,
@@ -256,16 +247,13 @@ mod kingdom_lord_controller {
                 proof
             )
         }
-        fn finish_upgrade_test(ref self: ContractState) -> Result<(), Error>{
+        fn finish_upgrade_test(self: @ContractState) -> Result<(), Error>{
             self._finish_upgrade()
         }
-        fn start_training_test(
-            ref self: ContractState,
-            soldier_kind: u64,
-        ) -> Result<u64, Error>{
+        fn start_training_test(self: @ContractState, soldier_kind: u64) -> Result<u64, Error>{
             self._start_training(soldier_kind)
         }
-        fn finish_training_test(ref self: ContractState, is_barrack: bool) -> Result<u64, Error>{
+        fn finish_training_test(self: @ContractState, is_barrack: bool) -> Result<u64, Error>{
             self._finish_training(is_barrack)
         }
     }
@@ -279,16 +267,16 @@ mod kingdom_lord_controller {
             self.barn.add_food(mined_food);
         }
 
-        fn _spawn(ref self: ContractState) -> Result<(), Error> {
+        fn _spawn(self: @ContractState) -> Result<(), Error> {
             let world = self.world_dispatcher.read();
 
             let player = get_caller_address();
             let spawn_status = get!(world, (player), (SpawnStatus));
+            let time = get_current_time();
             if spawn_status.already_spawned {
-                self.emit(AlreadySpawnedEvent { player });
+                emit!(world, AlreadySpawnedEvent { player ,block: time});
                 return Result::Err(Error::AlreadySpawned);
             }
-            let time = get_current_time();
             set!(
                 world,
                 (
@@ -463,7 +451,7 @@ mod kingdom_lord_controller {
             });
 
             set!(world, (SpawnStatus { player, already_spawned: true }));
-            self.emit(NewPlayerSpawnEvent { player, time });
+            emit!(world, NewPlayerSpawnEvent { player, time });
             Result::Ok(())
         }
 
@@ -501,7 +489,7 @@ mod kingdom_lord_controller {
 
 
         fn _start_upgrade(
-            ref self: ContractState,
+            self: @ContractState,
             building_id: u64,
             building_kind: u64,
             next_level: u64,
@@ -515,6 +503,7 @@ mod kingdom_lord_controller {
             proof: Array<felt252>
         ) -> Result<u64, Error> {
             let caller_address = get_caller_address();
+            let world = self.world_dispatcher.read();
             let building_kind_num = building_kind;
             let data: Array<felt252> = array![
                 building_kind.into(),
@@ -561,7 +550,7 @@ mod kingdom_lord_controller {
             let req_food = req_food.into();
             let (wood, brick, steel, food) = self.get_resource(caller_address);
             if wood < req_wood || brick < req_brick || steel < req_steel || food < req_food {
-                self.emit(UpgradeNotEnoughResourceEvent { player: caller_address, building_id });
+                emit!(world, UpgradeNotEnoughResourceEvent { player: caller_address, building_id });
                 // panic!("resource not enough");
                 return Result::Err(Error::ResourceNotEnough);
             }
@@ -589,8 +578,7 @@ mod kingdom_lord_controller {
                     self.mine();
                     self.warehouse.remove_resource(req_wood, req_brick, req_steel);
                     self.barn.remove_food(req_food);
-                    self
-                        .emit(
+                    emit!(world, 
                             StartUpgradeEvent {
                                 player: caller_address,
                                 upgrade_id,
@@ -604,8 +592,9 @@ mod kingdom_lord_controller {
             }
         }
 
-        fn _finish_upgrade(ref self: ContractState) -> Result<(), Error> {
+        fn _finish_upgrade(self: @ContractState) -> Result<(), Error> {
             let res = self.city_hall.finish_upgrade();
+            let world = self.world_dispatcher.read();
             let player = get_caller_address();
             match res {
                 Result::Ok(finished_building_info) => {
@@ -626,8 +615,7 @@ mod kingdom_lord_controller {
                                 (finished_building_info.value, finished_building_info.population)
                             );
                     }
-                    self
-                        .emit(
+                    emit!(world, 
                             UpgradeCompleteEvent {
                                 player,
                                 upgrade_id: finished_building_info.upgrade_id,
@@ -637,7 +625,8 @@ mod kingdom_lord_controller {
                     Result::Ok(())
                 },
                 Result::Err(err) => {
-                    self.emit(UpgradeNotFinishedEvent { player });
+                    let block = get_current_time();
+                    emit!(world, UpgradeNotFinishedEvent { player , block});
                     Result::Err(err)
                 }
             }
@@ -674,7 +663,7 @@ mod kingdom_lord_controller {
         // }
 
 
-        fn _start_training(ref self: ContractState, soldier_kind: u64) -> Result<u64, Error> {
+        fn _start_training(self: @ContractState, soldier_kind: u64) -> Result<u64, Error> {
             let caller_address = get_caller_address();
             let soldier_kind_num = soldier_kind;
             let soldier_kind: SoldierKind = soldier_kind.into();
@@ -702,8 +691,8 @@ mod kingdom_lord_controller {
             };
             match res {
                 Result::Ok(training_id) => {
-                    self
-                        .emit(
+                    let world = self.world_dispatcher.read();
+                    emit!(world,
                             StartTrainingEvent {
                                 player: caller_address,
                                 training_id: training_id,
@@ -717,7 +706,7 @@ mod kingdom_lord_controller {
         }
 
         fn _finish_training(
-            ref self: ContractState, is_barrack: bool,
+            self: @ContractState, is_barrack: bool,
         ) -> Result<u64, Error> {
             let res = if is_barrack{
                 self.barrack.finish_training()
@@ -728,9 +717,10 @@ mod kingdom_lord_controller {
                 Result::Ok(training_id) => {
                     self.mine();
                     let player = get_caller_address();
-                    self.emit(TrainingFinishedEvent { player, training_id });
+                    let world = self.world_dispatcher.read();
+                    emit!(world, TrainingFinishedEvent { player, training_id });
                 },
-                Result::Err(err) => {}
+                Result::Err(_) => {}
             }
             res
         }

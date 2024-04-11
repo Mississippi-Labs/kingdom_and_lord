@@ -36,10 +36,9 @@ mod tests {
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(50);
 
-        let res = context
+        context
             .kingdom_lord_test
-            .start_upgrade_test(18, 12, 1, 110, 160, 70, 60, 0, 2000, 8002, city_wall_level1_proof());
-        let upgrade_id = res.unwrap();
+            .start_upgrade_test(18, 12, 1, 110, 160, 70, 60, 0, 2000, 8002, city_wall_level1_proof()).expect('upgrade city wall');
 
         increase_time(2000);
 
@@ -52,7 +51,6 @@ mod tests {
             .kingdom_lord_test
             .start_upgrade_test(18, 12, 2, 140, 205, 90, 75, 0, 2620, 16005, city_wall_level2_proof())
             .expect('start upgrade level 2 ');
-        let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
 
         increase_time(2620);
         context.kingdom_lord_test.finish_upgrade_test().unwrap();
@@ -68,7 +66,6 @@ mod tests {
     fn test_invalid_building_id_city_wall(){
         // deploy world with models
         let context = setup_world();
-        let caller = get_caller_address();
 
         context.kingdom_lord_test.spawn_test().expect('spawn works');
         increase_time(50);

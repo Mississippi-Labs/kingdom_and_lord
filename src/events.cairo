@@ -1,55 +1,58 @@
-
 use starknet::ContractAddress;
 use kingdom_lord::models::level::Level;
 
-#[derive(Drop, starknet::Event)]
-struct NewPlayerSpawnEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct NewPlayerSpawnEvent {
     #[key]
     player: ContractAddress,
     time: u64
 }
 
-#[derive(Drop, starknet::Event)]
-struct StartUpgradeEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct StartUpgradeEvent {
     #[key]
     player: ContractAddress,
     #[key]
     building_id: u64,
     upgrade_id: u64,
-    level: Level, 
+    level: Level,
 }
 
-#[derive(Drop, starknet::Event)]
-struct UpgradeNotEnoughResourceEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct UpgradeNotEnoughResourceEvent {
     #[key]
     player: ContractAddress,
-    #[key]
     building_id: u64,
 }
-
-#[derive(Drop, starknet::Event)]
-struct UpgradeCompleteEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct UpgradeCompleteEvent {
     #[key]
     player: ContractAddress,
     upgrade_id: u64,
     building_next: bool
 }
-
-#[derive(Drop, starknet::Event)]
-struct UpgradeNotFinishedEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct UpgradeNotFinishedEvent {
     #[key]
     player: ContractAddress,
+    block: u64,
 }
-
-#[derive(Drop, starknet::Event)]
-struct AlreadySpawnedEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct AlreadySpawnedEvent {
     #[key]
-    player: ContractAddress
+    player: ContractAddress,
+    block: u64
 }
 
-
-#[derive(Drop, starknet::Event)]
-struct PayToFinishedUpgradeEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct PayToFinishedUpgradeEvent {
     #[key]
     player: ContractAddress,
     upgrade_id: u64,
@@ -58,19 +61,18 @@ struct PayToFinishedUpgradeEvent{
     level: Level
 }
 
-
-#[derive(Drop, starknet::Event)]
-struct StartTrainingEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct StartTrainingEvent {
     #[key]
     player: ContractAddress,
     training_id: u64,
-    soldier_kind: u64, 
+    soldier_kind: u64,
 }
 
-
-
-#[derive(Drop, starknet::Event)]
-struct TrainingFinishedEvent{
+#[derive(Model, Copy, Drop, Serde)]
+#[dojo::event]
+struct TrainingFinishedEvent {
     #[key]
     player: ContractAddress,
     training_id: u64,

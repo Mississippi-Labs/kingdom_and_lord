@@ -4,7 +4,6 @@ use super::city_building::{CityBuilding, CityBuildingLevelImpl};
 use kingdom_lord::models::level::Level;
 use kingdom_lord::models::building::{BuildingUpgradeResource};
 use kingdom_lord::models::level::{LevelTrait, LevelUpTrait};
-use kingdom_lord::helpers::contract_addr::FmtContractAddr;
 
 #[derive(Model, Drop, Copy, Serde, Debug)]
 struct UnderUpgrading {
@@ -142,7 +141,7 @@ mod city_hall_component {
 
 
         fn start_upgrade(
-            ref self: ComponentState<TContractState>,
+            self: @ComponentState<TContractState>,
             building_id: u64,
             building_kind: u64,
             next_level: Level,
@@ -216,7 +215,7 @@ mod city_hall_component {
         }
 
         fn finish_upgrade(
-            ref self: ComponentState<TContractState>
+            self: @ComponentState<TContractState>
         ) -> Result<FinishedBuildingInfo, Error> {
             let world = self.get_contract().world();
             let current_time = get_current_time();
@@ -268,7 +267,7 @@ mod city_hall_component {
         }
 
         fn pay_to_finish_upgrade(
-            ref self: ComponentState<TContractState>, upgrade_id: u64
+            self: @ComponentState<TContractState>, upgrade_id: u64
         ) -> Result<UnderUpgrading, Error> {
             let world = self.get_contract().world();
             let current_time = get_current_time();

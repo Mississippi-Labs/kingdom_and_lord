@@ -42,21 +42,21 @@ struct TestContext {
     erc20_address: ContractAddress
 }
 
-fn NAME() -> felt252 {
-    'test'
-}
-
-fn SYMBOL() -> felt252 {
-    'test'
-}
-
-// fn NAME() -> ByteArray {
-//     "NAME"
+// fn NAME() -> felt252 {
+//     'test'
 // }
 
-// fn SYMBOL() -> ByteArray {
-//     "SYMBOL"
+// fn SYMBOL() -> felt252 {
+//     'test'
 // }
+
+fn NAME() -> ByteArray {
+    "NAME"
+}
+
+fn SYMBOL() -> ByteArray {
+    "SYMBOL"
+}
 
 const SUPPLY: u256 = 2000000;
 

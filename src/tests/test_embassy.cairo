@@ -35,10 +35,9 @@ mod tests {
         assert(err == Error::ResourceNotEnough, 'not enough resource');
         increase_time(50);
 
-        let res = context
+        context
             .kingdom_lord_test
-            .start_upgrade_test(20, 11, 1, 180, 130, 150, 80, 3, 2000, 0,  embassy_level1_proof());
-        let upgrade_id = res.unwrap();
+            .start_upgrade_test(20, 11, 1, 180, 130, 150, 80, 3, 2000, 0,  embassy_level1_proof()).expect('start upgrade embassy');
 
         increase_time(2000);
 
@@ -46,10 +45,9 @@ mod tests {
         let ally_amount = context.kingdom_lord.get_ally_amount(caller);
         assert(ally_amount == 0, 'ally amount  should be 0');
 
-        let res = context
+       context
             .kingdom_lord_test
-            .start_upgrade_test(20, 11, 2, 230, 165, 190, 100, 2, 2620, 0,  embassy_level2_proof());
-        let upgrade_id = res.unwrap();
+            .start_upgrade_test(20, 11, 2, 230, 165, 190, 100, 2, 2620, 0,  embassy_level2_proof()).expect('start upgrade embassy 2');
 
         increase_time(2620);
 
@@ -57,10 +55,9 @@ mod tests {
         let ally_amount = context.kingdom_lord.get_ally_amount(caller);
         assert(ally_amount == 0, 'ally amount  should be 0');
 
-        let res = context
+        context
             .kingdom_lord_test
-            .start_upgrade_test(20,11, 3, 295, 215, 245, 130, 2, 3340, 9,  embassy_level3_proof());
-        let upgrade_id = res.unwrap();
+            .start_upgrade_test(20,11, 3, 295, 215, 245, 130, 2, 3340, 9,  embassy_level3_proof()).expect('finish upgrde embassy');
 
         increase_time(3340);
 

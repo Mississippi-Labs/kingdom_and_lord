@@ -38,9 +38,9 @@ trait IKingdomLord<TState>{
     fn get_ally_amount(self: @TState, player: ContractAddress) -> u64;
 
     // write function
-    fn spawn(ref self: TState) -> Result<(), Error>;
+    fn spawn(self: @TState) -> Result<(), Error>;
     fn start_upgrade(
-            ref self: TState,
+            self: @TState,
             building_id: u64,
             building_kind: u64,
             next_level: u64,
@@ -53,12 +53,12 @@ trait IKingdomLord<TState>{
             value: u64,
             proof: Array<felt252>
         ) -> Result<u64, Error>;
-    fn finish_upgrade(ref self: TState) -> Result<(), Error>;
+    fn finish_upgrade(self: @TState) -> Result<(), Error>;
     fn start_training(
-            ref self: TState,
+            self: @TState,
             soldier_kind: u64,
         ) -> Result<u64, Error>;
-    fn finish_training(ref self: TState, is_barrack: bool) -> Result<u64, Error>;
+    fn finish_training(self: @TState, is_barrack: bool) -> Result<u64, Error>;
     // fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
 }
 
@@ -72,9 +72,9 @@ trait IKingdomLordAdmin<TState>{
 
 #[starknet::interface]
 trait IKingdomLordTest<ContractState>{
-        fn spawn_test(ref self: ContractState) -> Result<(), Error>;
+        fn spawn_test(self: @ContractState) -> Result<(), Error>;
         fn start_upgrade_test(
-            ref self: ContractState,
+            self: @ContractState,
             building_id: u64,
             building_kind: u64,
             next_level: u64,
@@ -87,10 +87,10 @@ trait IKingdomLordTest<ContractState>{
             value: u64,
             proof: Array<felt252>
         ) -> Result<u64, Error>;
-        fn finish_upgrade_test(ref self: ContractState) -> Result<(), Error>;
+        fn finish_upgrade_test(self: @ContractState) -> Result<(), Error>;
         fn start_training_test(
-            ref self: ContractState,
+            self: @ContractState,
             soldier_kind: u64,
         ) -> Result<u64, Error>;
-        fn finish_training_test(ref self: ContractState, is_barrack: bool) -> Result<u64, Error>;
+        fn finish_training_test(self: @ContractState, is_barrack: bool) -> Result<u64, Error>;
 }
