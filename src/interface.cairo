@@ -19,7 +19,10 @@ enum Error{
     TrainingListFull,
     NoTargetBuildingConstructed,
     TrainingPrerequirementNotMatch,
-    StorageBuildingNotMaxLevel
+    StorageBuildingNotMaxLevel,
+    CityConfirmAlreadyExist,
+    CityConfirmNotStarted,
+    CityAlreadyCreated
 }
 
 #[starknet::interface]

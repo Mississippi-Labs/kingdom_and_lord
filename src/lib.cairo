@@ -17,6 +17,7 @@ mod components {
     mod outer_city;
     mod warehouse;
     mod barn;
+    mod battle;
     mod city_hall;
     mod city_building;
     mod embassy;
@@ -26,6 +27,7 @@ mod components {
     mod college;
     mod stable;
     mod city_wall;
+    mod globe;
 }
 
 mod helpers {
