@@ -1,6 +1,6 @@
 use super::resource::{Wood, Brick, Steel, Food};
 use core::traits::{Add, Into};
-
+use core::fmt::{Debug, Formatter, Error};
 trait Growth<T, R> {
     fn get_growth_rate(self: @T) -> GrowthRate<R>;
 }

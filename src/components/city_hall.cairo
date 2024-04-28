@@ -198,8 +198,8 @@ mod city_hall_component {
                         upgrade.required_time = required_time;
                         upgrade.is_planned = true;
                         upgrade.is_new_building = is_new_building;
-                        upgrading.value = value;
-                        upgrading.population = population;
+                        upgrade.value = value;
+                        upgrade.population = population;
 
                         set!(world, (upgrade));
                         res = Result::Ok(index);
@@ -253,7 +253,6 @@ mod city_hall_component {
                     upgrading.current_upgrade_id = next_upgrade_id; 
 
                     finished_building_info.building_next = true;
-                     
                     next_upgrade.is_planned = false;
                     set!(world, (next_upgrade));
                 }

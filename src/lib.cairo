@@ -45,6 +45,7 @@ mod tests {
     mod test_embassy;
     mod test_total_population;
     // mod test_pay_upgrade;
+    mod test_growth_rate;
     mod utils;
     mod upgrade_info;
 }
