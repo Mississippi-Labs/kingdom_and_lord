@@ -4,6 +4,7 @@ use kingdom_lord::models::growth::{GrowthRate};
 use kingdom_lord::models::level::Level;
 use kingdom_lord::components::city_hall::city_hall_component::{UnderUpgrading, WaitingToUpgrade};
 use kingdom_lord::components::barrack::{BarrackUnderTraining, Troops, BarrackWaitingToTrain};
+use kingdom_lord::components::globe::{globe_component, CityConfirm};
 use starknet::ContractAddress;
 
 #[derive(Debug, Serde, Drop, Copy, PartialEq)]
@@ -65,6 +66,31 @@ trait IKingdomLord<TState>{
         ) -> Result<u64, Error>;
     fn finish_training(self: @TState, is_barrack: bool) -> Result<u64, Error>;
     // fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
+
+    fn create_city_confirm(
+        self: @TState
+    ) -> Result<CityConfirm, Error>;
+
+    fn create_city_reveal(self: @TState) -> Result<(), Error>;
+
+    fn create_ambush(
+        self: @TState,
+        ambush_hash: felt252,
+        millitia: u64,
+        guard: u64,
+        heavy_infantry: u64,
+        scouts: u64,
+        knights: u64,
+        heavy_knights: u64
+    ) -> Result<(), Error>;
+    fn reveal_ambush(
+        self: @TState,
+        hash: felt252,
+        x: u64,
+        y: u64,
+        time: u64,
+        nonce: u64
+    ) -> Result<bool, Error>;
 }
 
 #[starknet::interface]
@@ -98,4 +124,29 @@ trait IKingdomLordTest<ContractState>{
             soldier_kind: u64,
         ) -> Result<u64, Error>;
         fn finish_training_test(self: @ContractState, is_barrack: bool) -> Result<u64, Error>;
+        
+        fn create_city_confirm_test(
+            self: @ContractState
+        ) -> Result<CityConfirm, Error>;
+
+        fn create_city_reveal_test(self: @ContractState) -> Result<(), Error>;
+
+        fn create_ambush_test(
+            self: @ContractState,
+            ambush_hash: felt252,
+            millitia: u64,
+            guard: u64,
+            heavy_infantry: u64,
+            scouts: u64,
+            knights: u64,
+            heavy_knights: u64
+        ) -> Result<(), Error>;
+        fn reveal_ambush_test(
+            self: @ContractState,
+            hash: felt252,
+            x: u64,
+            y: u64,
+            time: u64,
+            nonce: u64
+        ) -> Result<bool, Error>;
 }

@@ -21,6 +21,7 @@ mod kingdom_lord_controller {
     };
     use kingdom_lord::components::barrack::barrack_component::BarrackInternalImpl;
     use kingdom_lord::components::universal::universal_component::UniversalInternalImpl;
+    use kingdom_lord::components::globe::{globe_component, CityConfirm};
     use kingdom_lord::models::building::{BuildingUpgradeResource, BuildingUpgradeInfo};
     use kingdom_lord::events::{
         NewPlayerSpawnEvent, StartUpgradeEvent, UpgradeNotEnoughResourceEvent, UpgradeCompleteEvent,
@@ -57,6 +58,7 @@ mod kingdom_lord_controller {
     component!(path: barrack_component, storage: barrack, event: BarrackEvent);
     component!(path: college_component, storage: college, event: CollegeEvent);
     component!(path: stable_component, storage: stable, event: StableEvent);
+    component!(path: globe_component, storage: globe, event: GlobeEvent);
     
 
     #[derive(Model, Serde, Drop)]
@@ -84,6 +86,8 @@ mod kingdom_lord_controller {
         college: college_component::Storage,
         #[substorage(v0)]
         stable: stable_component::Storage,
+        #[substorage(v0)]
+        globe: globe_component::Storage,
     }
 
 
@@ -98,6 +102,7 @@ mod kingdom_lord_controller {
         BarrackEvent: barrack_component::Event,
         CollegeEvent: college_component::Event,
         StableEvent: stable_component::Event,
+        GlobeEvent: globe_component::Event,
     }
 
     impl KLBarnImpl = barn_component::BarnInternalImpl<ContractState>;
@@ -113,6 +118,8 @@ mod kingdom_lord_controller {
     impl KLCollegeImpl = college_component::CollegeInternalImpl<ContractState>;
 
     impl KLStableImpl = stable_component::StableInternalImpl<ContractState>;
+
+    impl KLGlobeImpl = globe_component::GlobeInternalImpl<ContractState>;
 
     fn panic_on_err<T>(res: Result<T, Error>) -> Result<T, Error>{
         match res {
@@ -210,6 +217,53 @@ mod kingdom_lord_controller {
         fn finish_training(self: @ContractState, is_barrack: bool) -> Result<u64, Error>{
             panic_on_err(self._finish_training(is_barrack))
         }
+
+        fn create_city_confirm(
+            self: @ContractState
+        ) -> Result<CityConfirm, Error>{
+            panic_on_err(self._create_city_confirm())
+        }
+    
+        fn create_city_reveal(self: @ContractState) -> Result<(), Error>{
+            panic_on_err(self._create_city_reveal())
+        }
+    
+        fn create_ambush(
+            self: @ContractState,
+            ambush_hash: felt252,
+            millitia: u64,
+            guard: u64,
+            heavy_infantry: u64,
+            scouts: u64,
+            knights: u64,
+            heavy_knights: u64
+        ) -> Result<(), Error>{
+            panic_on_err(self._create_ambush_test(
+                ambush_hash,
+                millitia,
+                guard,
+                heavy_infantry,
+                scouts,
+                knights,
+                heavy_knights
+            ))
+        }
+        fn reveal_ambush(
+            self: @ContractState,
+            hash: felt252,
+            x: u64,
+            y: u64,
+            time: u64,
+            nonce: u64
+        ) -> Result<bool, Error>{
+            panic_on_err(self._reveal_ambush_test(
+                hash,
+                x,
+                y,
+                time,
+                nonce
+            ))
+        }
     }
 
     #[abi(embed_v0)]
@@ -256,6 +310,54 @@ mod kingdom_lord_controller {
         fn finish_training_test(self: @ContractState, is_barrack: bool) -> Result<u64, Error>{
             self._finish_training(is_barrack)
         }
+
+        fn create_city_confirm_test(
+            self: @ContractState
+        ) -> Result<CityConfirm, Error>{
+            self._create_city_confirm()
+        }
+
+        fn create_city_reveal_test(self: @ContractState) -> Result<(), Error>{
+            self._create_city_reveal()
+        }
+
+        fn create_ambush_test(
+            self: @ContractState,
+            ambush_hash: felt252,
+            millitia: u64,
+            guard: u64,
+            heavy_infantry: u64,
+            scouts: u64,
+            knights: u64,
+            heavy_knights: u64
+        ) -> Result<(), Error>{
+            self._create_ambush_test(
+                ambush_hash,
+                millitia,
+                guard,
+                heavy_infantry,
+                scouts,
+                knights,
+                heavy_knights
+            )
+        }
+        fn reveal_ambush_test(
+            self: @ContractState,
+            hash: felt252,
+            x: u64,
+            y: u64,
+            time: u64,
+            nonce: u64
+        ) -> Result<bool, Error>{
+            self._reveal_ambush_test(
+                hash,
+                x,
+                y,
+                time,
+                nonce
+            )
+        }
+
     }
 
 
@@ -752,6 +854,37 @@ mod kingdom_lord_controller {
             let city_hall = get!(world, (player), (CityHall));
             res.append(city_hall.get_level());
             res
+        }
+
+        fn _create_city_confirm(self: @ContractState) -> Result<CityConfirm, Error>{
+            self.globe.create_city_confirm()
+        }
+
+        fn _create_city_reveal(self: @ContractState) -> Result<(), Error>{
+            self.globe.create_city_reveal()
+        }
+
+        fn _create_ambush_test(
+            self: @ContractState,
+            ambush_hash: felt252,
+            millitia: u64,
+            guard: u64,
+            heavy_infantry: u64,
+            scouts: u64,
+            knights: u64,
+            heavy_knights: u64
+        ) -> Result<(), Error>{
+            Result::Ok(())
+        }
+        fn _reveal_ambush_test(
+            self: @ContractState,
+            hash: felt252,
+            x: u64,
+            y: u64,
+            time: u64,
+            nonce: u64
+        ) -> Result<bool, Error>{
+            Result::Ok(true)
         }
     }
 }
