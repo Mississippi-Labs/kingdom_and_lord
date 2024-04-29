@@ -49,7 +49,7 @@ mod globe_component {
             let world = self.get_contract().world();
 
             let confirm = get!(world, (player), CityConfirm);
-            if confirm.player.is_zero() {
+            if confirm.block == 0 {
                 let time = get_current_time();
                 let confirm = CityConfirm { player, block: time };
                 set!(world, (confirm));
@@ -64,7 +64,7 @@ mod globe_component {
             let world = self.get_contract().world();
 
             let confirm = get!(world, (player), CityConfirm);
-            if confirm.player.is_zero() {
+            if confirm.block == 0  {
                 return Result::Err(Error::CityConfirmNotStarted);
             }
             let city = get!(world, (player), City);
@@ -78,6 +78,11 @@ mod globe_component {
             let suf = target_block_u % 340282366920938463463374607431768211456;
             let x: u64 = (pre % 99 + 1).try_into().expect('mod of 99');
             let y: u64 = (suf % 99 + 1).try_into().expect('mod of 99');
+
+            let city_location = get!(world, (x, y), CityLocation);
+            if city_location.player.is_zero(){
+                return Result::Err(Error::CityPositionAlreadyTaken);
+            }
             let city = City { player, x, y };
             let city_location = CityLocation { x, y, player };
             set!(world, (city_location));

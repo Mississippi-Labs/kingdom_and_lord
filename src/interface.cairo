@@ -22,7 +22,9 @@ enum Error{
     StorageBuildingNotMaxLevel,
     CityConfirmAlreadyExist,
     CityConfirmNotStarted,
-    CityAlreadyCreated
+    CityAlreadyCreated,
+    CityPositionAlreadyTaken,
+    NotEnoughSoldier
 }
 
 #[starknet::interface]
