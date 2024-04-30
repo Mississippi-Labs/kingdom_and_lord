@@ -29,8 +29,9 @@ mod universal_component {
     use kingdom_lord::components::barn::{Barn, BarnStorage};
     use kingdom_lord::components::college::{College};
     use kingdom_lord::components::barrack::{
-        Barrack, BarrackLevelTrait, BarrackGetLevel, Troops, soldier_info, SoldierKind
+        Barrack, BarrackLevelTrait, BarrackGetLevel, Troops
     };
+    use kingdom_lord::models::army::{SoldierKind, soldier_info, ArmyGroupExtensionImpl};
     use kingdom_lord::components::stable::{Stable, StableLevelTrait, StableGetLevel};
     use kingdom_lord::components::city_wall::{CityWall, CityWallLevelTrait, CityWallGetLevel};
     use kingdom_lord::components::embassy::{Embassy, EmbassyLevelTrait, EmbassyGetLevel};
@@ -448,13 +449,7 @@ mod universal_component {
             };
             let troops = get!(self.get_contract().world(), (player), (Troops));
 
-            population += troops.millitia * soldier_info(SoldierKind::Millitia).population;
-            population += troops.guard * soldier_info(SoldierKind::Guard).population;
-            population += troops.heavy_infantry
-                * soldier_info(SoldierKind::HeavyInfantry).population;
-            population += troops.scouts * soldier_info(SoldierKind::Scouts).population;
-            population += troops.knights * soldier_info(SoldierKind::Knights).population;
-            population += troops.heavy_knights * soldier_info(SoldierKind::HeavyKnights).population;
+            population += troops.army.total_population();
 
             population
         }

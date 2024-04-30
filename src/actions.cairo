@@ -16,9 +16,10 @@ mod kingdom_lord_controller {
     };
     use kingdom_lord::components::universal::{universal_component, BuildingAreaInfo};
     use kingdom_lord::components::barrack::{
-        barrack_component, Barrack, Troops, BarrackUnderTraining, SoldierKind, new_wait_to_train,
-        soldier_info, BarrackWaitingToTrain
+        barrack_component, Barrack, Troops, BarrackUnderTraining, new_wait_to_train,
+        BarrackWaitingToTrain
     };
+    use kingdom_lord::models::army::{SoldierKind, soldier_info, ArmyGroup};
     use kingdom_lord::components::barrack::barrack_component::BarrackInternalImpl;
     use kingdom_lord::components::universal::universal_component::UniversalInternalImpl;
     use kingdom_lord::components::globe::{globe_component, CityConfirm};
@@ -510,12 +511,14 @@ mod kingdom_lord_controller {
                 world,
                 (Troops {
                     player,
-                    millitia: 0,
-                    guard: 0,
-                    heavy_infantry: 0,
-                    scouts: 0,
-                    knights: 0,
-                    heavy_knights: 0
+                    army: ArmyGroup{
+                        millitia: 0,
+                        guard: 0,
+                        heavy_infantry: 0,
+                        scouts: 0,
+                        knights: 0,
+                        heavy_knights: 0
+                    }
                 })
             );
 

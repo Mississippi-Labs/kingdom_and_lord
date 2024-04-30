@@ -76,9 +76,10 @@ mod stable_component{
     };
     use super::{StableLevelTrait, StableGetLevel, Stable, StableUnderTraining, StableWaitingToTrain};
     use kingdom_lord::constants::{UNDER_TRAINING_COUNT};
-    use kingdom_lord::components::barrack::{Troops,SoldierKind};
+    use kingdom_lord::components::barrack::{Troops};
     use kingdom_lord::interface::Error;
     use kingdom_lord::models::time::get_current_time;
+    use kingdom_lord::models::army::{SoldierKind};
 
     #[storage]
     struct Storage {}
@@ -187,22 +188,22 @@ mod stable_component{
                 let origin_training_id = training.current_training_id;
                 match soldier_kind{
                     SoldierKind::Millitia => {
-                        troops.millitia += 1;
+                        troops.army.millitia += 1;
                     },
                     SoldierKind::Guard => {
-                        troops.guard += 1;
+                        troops.army.guard += 1;
                     },
                     SoldierKind::HeavyInfantry => {
-                        troops.heavy_infantry += 1;
+                        troops.army.heavy_infantry += 1;
                     },
                     SoldierKind::Scouts => {
-                        troops.scouts += 1;
+                        troops.army.scouts += 1;
                     },
                     SoldierKind::Knights => {
-                        troops.knights += 1;
+                        troops.army.knights += 1;
                     },
                     SoldierKind::HeavyKnights => {
-                        troops.heavy_knights += 1;
+                        troops.army.heavy_knights += 1;
                     }
                 }
 

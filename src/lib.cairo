@@ -5,6 +5,7 @@ mod events;
 mod admin;
 
 mod models {
+    mod army;
     mod resource;
     mod building;
     mod level;

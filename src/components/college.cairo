@@ -54,7 +54,8 @@ mod college_component {
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use kingdom_lord::components::barrack::{Barrack, SoldierKind};
+    use kingdom_lord::components::barrack::{Barrack};
+    use kingdom_lord::models::army::SoldierKind;
     use kingdom_lord::components::stable::Stable;
     use super::{College, CollegeImpl};
 

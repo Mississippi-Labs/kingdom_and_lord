@@ -96,23 +96,23 @@ fn assert_troop(
 ) {
     let troop = context.kingdom_lord.get_troops(player);
     assert_eq!(
-        troop.millitia, millitia, "millititia should be {} but got {}", troop.millitia, millitia
+        troop.army.millitia, millitia, "millititia should be {} but got {}", troop.army.millitia, millitia
     );
-    assert_eq!(troop.guard, guard, "guard should be {} but got {}", troop.guard, guard);
+    assert_eq!(troop.army.guard, guard, "guard should be {} but got {}", troop.army.guard, guard);
     assert_eq!(
-        troop.heavy_infantry,
+        troop.army.heavy_infantry,
         heavy_infantry,
         "heavy_infantry should be {} but got {}",
-        troop.heavy_infantry,
+        troop.army.heavy_infantry,
         heavy_infantry
     );
-    assert_eq!(troop.scouts, scouts, "scouts should be {} but got {}", troop.scouts, scouts);
-    assert_eq!(troop.knights, knights, "knights should be {} but got {}", troop.knights, knights);
+    assert_eq!(troop.army.scouts, scouts, "scouts should be {} but got {}", troop.army.scouts, scouts);
+    assert_eq!(troop.army.knights, knights, "knights should be {} but got {}", troop.army.knights, knights);
     assert_eq!(
-        troop.heavy_knights,
+        troop.army.heavy_knights,
         heavy_knights,
         "heavy_knights should be {} but got {}",
-        troop.heavy_knights,
+        troop.army.heavy_knights,
         heavy_knights
     );
 }
