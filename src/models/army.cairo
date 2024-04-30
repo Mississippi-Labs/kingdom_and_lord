@@ -234,4 +234,62 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
                 + *self.knights * soldier_info(SoldierKind::Knights).defense_power 
                 + *self.heavy_knights * soldier_info(SoldierKind::HeavyKnights).defense_power
     }
+
+    fn die(ref self: ArmyGroup) {
+        self.millitia = 0;
+        self.guard = 0;
+        self.heavy_infantry = 0;
+        self.scouts = 0;
+        self.knights = 0;
+        self.heavy_knights = 0;
+    }
+
+    fn fight(
+        ref self: ArmyGroup,
+        ref defender: ArmyGroup
+    ) -> bool{
+        let attack_force = self.attack_force;
+        let defense_force = defender.defense_force;
+        if attack_force > defense_force {
+            
+        } else {
+            self.die();
+            // FIXME
+            let dead_rate = (attack_force / defense_force);
+
+            defender.millitia = defender.millitia *  attack_force / defense_force;
+            defender.guard = defender.guard *  attack_force / defense_force;
+            defender.heavy_infantry = defender.heavy_infantry *  attack_force / defense_force;
+            defender.scouts = defender.scouts *  attack_force / defense_force;
+            defender.knights = defender.knights *  attack_force / defense_force;
+            defender.heavy_knights = defender.heavy_knights *  attack_force / defense_force;
+            false
+        }
+        
+    }
+
+    fn rob(
+        ref self: ArmyGroup,
+        ref defender: ArmyGroup
+    ) -> bool{
+        
+    }
+
+    fn speed(self: @ArmyGroup) -> u64{
+        if self.guard > 0 {
+            return soldier_info(SoldierKind::Guard).movement_speed;
+        } else if self.millitia > 0 {
+            return soldier_info(SoldierKind::Millitia).movement_speed;
+        } else if self.heavy_infantry > 0 {
+            return soldier_info(SoldierKind::HeavyInfantry).movement_speed;
+        } else if self.heavy_knights > 0 {
+            return soldier_info(SoldierKind::HeavyKnights).movement_speed;
+        } else if self.knights > 0 {
+            return soldier_info(SoldierKind::Knights).movement_speed;
+        } else if self.scouts > 0 {
+            return soldier_info(SoldierKind::Scouts).movement_speed;
+        } else {
+            return 0;
+        }
+    }
 }

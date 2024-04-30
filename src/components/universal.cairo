@@ -31,7 +31,7 @@ mod universal_component {
     use kingdom_lord::components::barrack::{
         Barrack, BarrackLevelTrait, BarrackGetLevel, Troops
     };
-    use kingdom_lord::models::army::{SoldierKind, soldier_info, ArmyGroupExtensionImpl};
+    use kingdom_lord::models::army::{SoldierKind, ArmyGroupExtensionImpl};
     use kingdom_lord::components::stable::{Stable, StableLevelTrait, StableGetLevel};
     use kingdom_lord::components::city_wall::{CityWall, CityWallLevelTrait, CityWallGetLevel};
     use kingdom_lord::components::embassy::{Embassy, EmbassyLevelTrait, EmbassyGetLevel};
