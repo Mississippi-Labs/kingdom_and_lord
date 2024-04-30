@@ -66,13 +66,13 @@ mod globe_component {
         TContractState, +HasComponent<TContractState>, +IWorldProvider<TContractState>
     > of GlobeInternalTrait<TContractState> {
 
-        fn get_city_location(self: @ComponentState<TContractState>, player: ContractAddress) -> (u64, u64){
+        fn get_village_location(self: @ComponentState<TContractState>, player: ContractAddress) -> (u64, u64){
             let world = self.get_contract().world();
             let city = get!(world, (player), City);
             (city.x, city.y)
         }
 
-        fn create_city_confirm(
+        fn create_village_confirm(
             self: @ComponentState<TContractState>
         ) -> Result<CityConfirm, Error> {
             let player = get_caller_address();
@@ -89,7 +89,7 @@ mod globe_component {
             }
         }
 
-        fn create_city_reveal(self: @ComponentState<TContractState>) -> Result<(), Error>{
+        fn create_village_reveal(self: @ComponentState<TContractState>) -> Result<(), Error>{
             let player = get_caller_address();
             let world = self.get_contract().world();
 

@@ -173,8 +173,8 @@ mod kingdom_lord_controller {
             embassy.ally_amount
         }
 
-        fn get_city_location(self: @ContractState, player: ContractAddress) -> (u64, u64){
-            self.globe.get_city_location(player)
+        fn get_village_location(self: @ContractState, player: ContractAddress) -> (u64, u64){
+            self.globe.get_village_location(player)
         }
 
         // write function
@@ -222,14 +222,14 @@ mod kingdom_lord_controller {
             panic_on_err(self._finish_training(is_barrack))
         }
 
-        fn create_city_confirm(
+        fn create_village_confirm(
             self: @ContractState
         ) -> Result<CityConfirm, Error>{
-            panic_on_err(self._create_city_confirm())
+            panic_on_err(self._create_village_confirm())
         }
     
-        fn create_city_reveal(self: @ContractState) -> Result<(), Error>{
-            panic_on_err(self._create_city_reveal())
+        fn create_village_reveal(self: @ContractState) -> Result<(), Error>{
+            panic_on_err(self._create_village_reveal())
         }
     
         fn create_ambush(
@@ -315,14 +315,14 @@ mod kingdom_lord_controller {
             self._finish_training(is_barrack)
         }
 
-        fn create_city_confirm_test(
+        fn create_village_confirm_test(
             self: @ContractState
         ) -> Result<CityConfirm, Error>{
-            self._create_city_confirm()
+            self._create_village_confirm()
         }
 
-        fn create_city_reveal_test(self: @ContractState) -> Result<(), Error>{
-            self._create_city_reveal()
+        fn create_village_reveal_test(self: @ContractState) -> Result<(), Error>{
+            self._create_village_reveal()
         }
 
         fn create_ambush_test(
@@ -860,12 +860,12 @@ mod kingdom_lord_controller {
             res
         }
 
-        fn _create_city_confirm(self: @ContractState) -> Result<CityConfirm, Error>{
-            self.globe.create_city_confirm()
+        fn _create_village_confirm(self: @ContractState) -> Result<CityConfirm, Error>{
+            self.globe.create_village_confirm()
         }
 
-        fn _create_city_reveal(self: @ContractState) -> Result<(), Error>{
-            self.globe.create_city_reveal()
+        fn _create_village_reveal(self: @ContractState) -> Result<(), Error>{
+            self.globe.create_village_reveal()
         }
 
         fn _create_ambush_test(

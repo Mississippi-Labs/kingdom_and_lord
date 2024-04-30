@@ -31,15 +31,15 @@ mod tests {
 
         context.kingdom_lord_test.spawn_test().expect('spawn works');
         
-        let city_confirm = context.kingdom_lord_test.create_city_confirm_test().expect('create city confirm should work');
+        let city_confirm = context.kingdom_lord_test.create_village_confirm_test().expect('create city confirm should work');
         assert!(city_confirm.block == 10, "block number should be 0");
         assert!(city_confirm.player == caller, "caller should be caller");
         increase_time(11);
         set_block_timestamp(1714457224);
         set_transaction_hash(0x07427f928837d4e0f7bfe798548c2ec0ebbbb16ee7531a2d1c66a978dd441f0c);
-        context.kingdom_lord_test.create_city_reveal_test().expect('create city reveal should work');
+        context.kingdom_lord_test.create_village_reveal_test().expect('create city reveal should work');
 
-        let (x, y) = context.kingdom_lord.get_city_location(caller);
+        let (x, y) = context.kingdom_lord.get_village_location(caller);
 
         assert!(x == 1, "x should be 73 but got {}", x);
         assert!(y == 92, "y should be 75 but got {}", y);
@@ -55,11 +55,11 @@ mod tests {
 
         context.kingdom_lord_test.spawn_test().expect('spawn works');
         
-        let city_confirm = context.kingdom_lord_test.create_city_confirm_test().expect('create city confirm should work');
+        let city_confirm = context.kingdom_lord_test.create_village_confirm_test().expect('create city confirm should work');
         assert!(city_confirm.block == 10, "block number should be 0");
         assert!(city_confirm.player == caller, "caller should be caller");
 
-        let res = context.kingdom_lord_test.create_city_reveal_test().unwrap_err();
+        let res = context.kingdom_lord_test.create_village_reveal_test().unwrap_err();
         assert!(res == Error::CityConfirmNotStarted)
 
 

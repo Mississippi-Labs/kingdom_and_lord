@@ -42,7 +42,7 @@ trait IKingdomLord<TState>{
     fn get_total_population(self: @TState, player: ContractAddress) -> u64;
     fn get_city_wall_power(self: @TState, player: ContractAddress) -> (u64, u64);
     fn get_ally_amount(self: @TState, player: ContractAddress) -> u64;
-    fn get_city_location(self: @TState, player: ContractAddress) -> (u64, u64);
+    fn get_village_location(self: @TState, player: ContractAddress) -> (u64, u64);
 
     // write function
     fn spawn(self: @TState) -> Result<(), Error>;
@@ -68,11 +68,11 @@ trait IKingdomLord<TState>{
     fn finish_training(self: @TState, is_barrack: bool) -> Result<u64, Error>;
     // fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
 
-    fn create_city_confirm(
+    fn create_village_confirm(
         self: @TState
     ) -> Result<CityConfirm, Error>;
 
-    fn create_city_reveal(self: @TState) -> Result<(), Error>;
+    fn create_village_reveal(self: @TState) -> Result<(), Error>;
 
     fn create_ambush(
         self: @TState,
@@ -126,11 +126,11 @@ trait IKingdomLordTest<ContractState>{
         ) -> Result<u64, Error>;
         fn finish_training_test(self: @ContractState, is_barrack: bool) -> Result<u64, Error>;
         
-        fn create_city_confirm_test(
+        fn create_village_confirm_test(
             self: @ContractState
         ) -> Result<CityConfirm, Error>;
 
-        fn create_city_reveal_test(self: @ContractState) -> Result<(), Error>;
+        fn create_village_reveal_test(self: @ContractState) -> Result<(), Error>;
 
         fn create_ambush_test(
             self: @ContractState,
