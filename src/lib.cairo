@@ -46,6 +46,7 @@ mod tests {
     mod test_total_population;
     // mod test_pay_upgrade;
     mod test_growth_rate;
+    mod test_create_city;
     mod utils;
     mod upgrade_info;
 }

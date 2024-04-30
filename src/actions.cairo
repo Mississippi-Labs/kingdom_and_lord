@@ -173,6 +173,10 @@ mod kingdom_lord_controller {
             embassy.ally_amount
         }
 
+        fn get_city_location(self: @ContractState, player: ContractAddress) -> (u64, u64){
+            self.globe.get_city_location(player)
+        }
+
         // write function
         fn spawn(self: @ContractState) -> Result<(), Error>{
             panic_on_err(self._spawn())
