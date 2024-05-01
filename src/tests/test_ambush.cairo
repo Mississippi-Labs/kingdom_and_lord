@@ -4,7 +4,7 @@ mod tests {
     use kingdom_lord::interface::IKingdomLordDispatcherTrait;
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::get_caller_address;
-    use starknet::testing::{set_caller_address, set_block_timestamp};
+    use starknet::testing::{set_caller_address, set_block_timestamp, set_contract_address, set_transaction_hash};
 
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
@@ -12,18 +12,12 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{setup_world, increase_time};
-    use kingdom_lord::tests::upgrade_proof::{
-        cityhall_level1_proof, cityhall_level2_proof, warehouse_level2_proof, barn_level1_proof,
-        barn_level2_proof, warehouse_level1_proof
-    };
+    use starknet::contract_address_const;
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl, IKingdomLordTest,IKingdomLordLibraryDispatcherImpl, Error
     };
     use kingdom_lord::models::building_kind::BuildingKind;
-
-    fn initialize_city_army(context: TestContext, player1: ContractAddress, player2: ContractAddress){
-
-    }
+    use kingdom_lord::tests::utils::{full_level_barrack, full_level_stable};
 
     #[test]
     #[available_gas(300000000000)]
@@ -31,43 +25,34 @@ mod tests {
         // deploy world with models
         let context = setup_world();
 
+        let player1 = contract_address_const::<'PLAYER1'>();
+        let player2 = contract_address_const::<'PLAYER2'>();
+
+        increase_time(10);
+    
+        set_contract_address(player1);
+        set_caller_address(player1);
         context.kingdom_lord_test.spawn_test().expect('spawn works');
-        let caller = get_caller_address();
-        let err = context
-            .kingdom_lord_test
-            .start_upgrade_test(20, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof())
-            .unwrap_err();
-        assert(err == Error::ResourceNotEnough, 'not enough resource');
-        increase_time(50);
+        context.kingdom_lord_test.create_village_confirm_test().expect('create city confirm should work');
+        increase_time(11);
+        set_block_timestamp(1415457224);
+        set_transaction_hash(0x07427f928837d4e0f7bfe798548c2ec0ebbbb16ee7531a2d1c66a978dd441f0c);
+        context.kingdom_lord_test.create_village_reveal_test().expect('create city reveal should work');
+        let (x1, y1) = context.kingdom_lord.get_village_location(player1);
+        assert!(x1 == 76, "x should be 76 but got {}", x1);
+        assert!(y1 == 90, "y should be 90 but got {}", y1);
 
-        let res = context
-            .kingdom_lord_test
-            .start_upgrade_test(20, 5, 1, 70, 40, 60, 20, 2, 2500, 100, cityhall_level1_proof());
-        let upgrade_id = res.unwrap();
-        assert(upgrade_id == 1, 'first upgrade id is 1');
-
-        let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
-        assert(
-            under_upgrade.building_kind == BuildingKind::CityHall.into(),
-            'under_upgrade should be 1'
-        );
-        assert(under_upgrade.current_upgrade_id == 1, 'upgrade id should be 1');
-
-        increase_time(2500);
-
-        // city hall should be level up
-        context.kingdom_lord_test.finish_upgrade_test().unwrap();
-        context
-            .kingdom_lord_test
-            .start_upgrade_test(20, 5, 2, 90, 50, 75, 25, 1, 2620, 104, cityhall_level2_proof())
-            .expect('start upgrade level 2 ');
-        let under_upgrade = context.kingdom_lord.get_under_upgrading(caller);
-
-        // 2620 - 2620 * 104 //10000 + 2550
-        // let compute: u64 = 3220_u64 - 3220_u64 * 104_u64 /10000_u64 + 2670_u64;
-        assert(under_upgrade.end_time == 5144, 'end block should be 5144');
-
-        increase_time(2620);
-        context.kingdom_lord_test.finish_upgrade_test().unwrap();
+        increase_time(10);
+        set_contract_address(player2);
+        set_caller_address(player2);
+        context.kingdom_lord_test.spawn_test().expect('spawn works');
+        context.kingdom_lord_test.create_village_confirm_test().expect('create city confirm should work');
+        increase_time(11);
+        set_block_timestamp(1814323223);
+        set_transaction_hash(0x07427f928837d410f7bf1798548c2ec0ebbbb16ee7531a2d1c66a928dd443f0c);
+        context.kingdom_lord_test.create_village_reveal_test().expect('create city reveal should work');
+        let (x2, y2) = context.kingdom_lord.get_village_location(player2);
+        assert!(x2 == 53, "x should be 36 but got {}", x2);
+        assert!(y2 == 90, "y should be 99 but got {}", y2);
     }
 }

@@ -49,10 +49,11 @@ fn get_position_temp(block_number: u64)  -> (u64, u64){
     let timestamp: u256  = get_block_timestamp().try_into().expect('work');
     let n = tx_hash + timestamp;
     // 2**126 = 340282366920938463463374607431768211456
-    let pre = n / 340282366920938463463374607431768211456;
+    let pre = n / 1024;
     let suf = n % 340282366920938463463374607431768211456;
     let x: u64 = (pre % 99 + 1).try_into().expect('mod of 99');
     let y: u64 = (suf % 99 + 1).try_into().expect('mod of 99');
+
     (x, y)
 }
 
