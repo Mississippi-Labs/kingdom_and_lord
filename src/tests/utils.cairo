@@ -13,6 +13,8 @@ use kingdom_lord::interface::{
 };
 use openzeppelin::token::erc20::interface::IERC20DispatcherImpl;
 use kingdom_lord::actions::kingdom_lord_controller::world_dispatcherContractMemberStateTrait;
+use kingdom_lord::tests::upgrade_func::{level1_barrack, level2_barrack, level3_barrack, level4_barrack, level5_barrack, level6_barrack, level7_barrack, level8_barrack, level9_barrack, level10_barrack, level11_barrack, level12_barrack,level13_barrack, level14_barrack, level15_barrack, level16_barrack, level17_barrack, level18_barrack, level19_barrack, level20_barrack};
+use kingdom_lord::tests::upgrade_func::{level1_stable, level2_stable, level3_stable, level4_stable, level5_stable, level6_stable, level7_stable, level8_stable, level9_stable, level10_stable, level11_stable, level12_stable, level13_stable, level14_stable, level15_stable, level16_stable, level17_stable, level18_stable, level19_stable, level20_stable};
 use kingdom_lord::admin::kingdom_lord_admin;
 use kingdom_lord::components::outer_city::OuterCityTraitDispatcher;
 use kingdom_lord::tests::upgrade_proof::{barrack_level1_proof, stable_level1_proof, barrack_level2_proof, stable_level2_proof};
@@ -120,6 +122,52 @@ fn assert_troop(
 fn increase_time(time: u64) {
     let current_time = get_current_time();
     set_block_number(current_time + time);
+}
+
+fn full_level_barrack(context: TestContext, position: u64, player: ContractAddress ){
+    level1_barrack(context, position, player);
+    level2_barrack(context, position, player);
+    level3_barrack(context, position, player);
+    level4_barrack(context, position, player);
+    level5_barrack(context, position, player);
+    level6_barrack(context, position, player);
+    level7_barrack(context, position, player);
+    level8_barrack(context, position, player);
+    level9_barrack(context, position, player);
+    level10_barrack(context, position, player);
+    level11_barrack(context, position, player);
+    level12_barrack(context, position, player);
+    level13_barrack(context, position, player);
+    level14_barrack(context, position, player);
+    level15_barrack(context, position, player);
+    level16_barrack(context, position, player);
+    level17_barrack(context, position, player);
+    level18_barrack(context, position, player);
+    level19_barrack(context, position, player);
+    level20_barrack(context, position, player);
+}
+
+fn full_level_stable(context: TestContext, position: u64, player: ContractAddress ){
+    level1_stable(context, position, player);
+    level2_stable(context, position, player);
+    level3_stable(context, position, player);
+    level4_stable(context, position, player);
+    level5_stable(context, position, player);
+    level6_stable(context, position, player);
+    level7_stable(context, position, player);
+    level8_stable(context, position, player);
+    level9_stable(context, position, player);
+    level10_stable(context, position, player);
+    level11_stable(context, position, player);
+    level12_stable(context, position, player);
+    level13_stable(context, position, player);
+    level14_stable(context, position, player);
+    level15_stable(context, position, player);
+    level16_stable(context, position, player);
+    level17_stable(context, position, player);
+    level18_stable(context, position, player);
+    level19_stable(context, position, player);
+    level20_stable(context, position, player);
 }
 
 
