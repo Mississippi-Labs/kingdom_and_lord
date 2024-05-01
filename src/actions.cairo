@@ -23,6 +23,7 @@ mod kingdom_lord_controller {
     use kingdom_lord::components::barrack::barrack_component::BarrackInternalImpl;
     use kingdom_lord::components::universal::universal_component::UniversalInternalImpl;
     use kingdom_lord::components::globe::{globe_component, VillageConfirm};
+    use kingdom_lord::components::battle::{battle_component, AmbushInfo};
     use kingdom_lord::models::building::{BuildingUpgradeResource, BuildingUpgradeInfo};
     use kingdom_lord::events::{
         NewPlayerSpawnEvent, StartUpgradeEvent, UpgradeNotEnoughResourceEvent, UpgradeCompleteEvent,
@@ -60,6 +61,7 @@ mod kingdom_lord_controller {
     component!(path: college_component, storage: college, event: CollegeEvent);
     component!(path: stable_component, storage: stable, event: StableEvent);
     component!(path: globe_component, storage: globe, event: GlobeEvent);
+    component!(path: battle_component, storage: battle, event: BattleEvent);
     
 
     #[derive(Model, Serde, Drop)]
@@ -89,6 +91,8 @@ mod kingdom_lord_controller {
         stable: stable_component::Storage,
         #[substorage(v0)]
         globe: globe_component::Storage,
+        #[substorage(v0)]
+        battle: battle_component::Storage,
     }
 
 
@@ -104,6 +108,7 @@ mod kingdom_lord_controller {
         CollegeEvent: college_component::Event,
         StableEvent: stable_component::Event,
         GlobeEvent: globe_component::Event,
+        BattleEvent: battle_component::Event,
     }
 
     impl KLBarnImpl = barn_component::BarnInternalImpl<ContractState>;
@@ -121,6 +126,8 @@ mod kingdom_lord_controller {
     impl KLStableImpl = stable_component::StableInternalImpl<ContractState>;
 
     impl KLGlobeImpl = globe_component::GlobeInternalImpl<ContractState>;
+
+    impl KLBattleImpl = battle_component::BattleInternalImpl<ContractState>;
 
     fn panic_on_err<T>(res: Result<T, Error>) -> Result<T, Error>{
         match res {

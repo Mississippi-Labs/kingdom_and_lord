@@ -276,6 +276,17 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
         
     }
 
+    fn merge_army(self: @ArmyGroup,other: @ArmyGroup) -> ArmyGroup{
+        ArmyGroup{
+            millitia: *self.millitia + *other.millitia,
+            guard: *self.guard + *other.guard,
+            heavy_infantry: *self.heavy_infantry + *other.heavy_infantry,
+            scouts: *self.scouts + *other.scouts,
+            knights: *self.knights + *other.knights,
+            heavy_knights: *self.heavy_knights + *other.heavy_knights
+        }
+    }
+
 
     fn speed(self: @ArmyGroup) -> u64{
         if *self.guard > 0 {

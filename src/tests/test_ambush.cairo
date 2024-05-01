@@ -17,7 +17,8 @@ mod tests {
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl, IKingdomLordTest,IKingdomLordLibraryDispatcherImpl, Error
     };
     use kingdom_lord::models::building_kind::BuildingKind;
-    use kingdom_lord::tests::utils::{full_level_barrack, full_level_stable};
+    use kingdom_lord::tests::upgrade_func::{level1_barrack, level1_stable};
+    use kingdom_lord::tests::utils::{full_level_barrack, full_level_stable, train_millitia, train_scouts};
 
     #[test]
     #[available_gas(300000000000)]
@@ -41,6 +42,9 @@ mod tests {
         let (x1, y1) = context.kingdom_lord.get_village_location(player1);
         assert!(x1 == 76, "x should be 76 but got {}", x1);
         assert!(y1 == 90, "y should be 90 but got {}", y1);
+        level1_barrack(context, 21, player1);
+
+        
 
         increase_time(10);
         set_contract_address(player2);
@@ -54,5 +58,7 @@ mod tests {
         let (x2, y2) = context.kingdom_lord.get_village_location(player2);
         assert!(x2 == 53, "x should be 36 but got {}", x2);
         assert!(y2 == 90, "y should be 99 but got {}", y2);
+
+
     }
 }
