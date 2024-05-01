@@ -156,7 +156,7 @@ struct ArmyGroup {
 
 #[generate_trait]
 impl ArmyGroupExtensionImpl of ArmyGroupExtension {
-    fn is_enough_solider(
+    fn is_not_enough_solider(
         self: @ArmyGroup,
         millitia: u64,
         guard: u64,
@@ -182,7 +182,7 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
         knights: u64,
         heavy_knights: u64
     ) -> Result<ArmyGroup, ()> {
-        if self.is_enough_solider(millitia, guard, heavy_infantry, scouts, knights, heavy_knights) {
+        if self.is_not_enough_solider(millitia, guard, heavy_infantry, scouts, knights, heavy_knights) {
             return Result::Err(());
         }
         self.millitia -= millitia;

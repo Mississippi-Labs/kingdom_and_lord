@@ -25,7 +25,8 @@ enum Error{
     VillageConfirmNotStarted,
     VillageAlreadyCreated,
     VillagePositionAlreadyTaken,
-    NotEnoughSoldier
+    NotEnoughSoldier,
+    InvalidReveal
 }
 
 #[starknet::interface]

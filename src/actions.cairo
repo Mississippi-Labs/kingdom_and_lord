@@ -888,7 +888,7 @@ mod kingdom_lord_controller {
             knights: u64,
             heavy_knights: u64
         ) -> Result<(), Error>{
-            Result::Ok(())
+            self.battle.create_ambush(ambush_hash, millitia, guard, heavy_infantry, scouts, knights, heavy_knights)
         }
         fn _reveal_ambush_test(
             self: @ContractState,
