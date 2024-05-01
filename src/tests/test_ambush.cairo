@@ -11,7 +11,7 @@ mod tests {
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{setup_world, increase_time};
+    use kingdom_lord::tests::utils::{setup_world, increase_time, construct_barrack, level2_barrack, construct_stable, level2_stable};
     use kingdom_lord::tests::upgrade_info::{
         cityhall_level1_proof, cityhall_level2_proof, warehouse_level2_proof, barn_level1_proof,
         barn_level2_proof, warehouse_level1_proof
@@ -21,8 +21,8 @@ mod tests {
     };
     use kingdom_lord::models::building_kind::BuildingKind;
 
-    fn initialize_two_city(){
-        
+    fn initialize_city_army(context: TestContext, player1: ContractAddress, player2: ContractAddress){
+
     }
 
     #[test]

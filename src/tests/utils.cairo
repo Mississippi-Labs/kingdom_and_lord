@@ -123,8 +123,8 @@ fn increase_time(time: u64) {
 }
 
 
-fn construct_barrack(context: TestContext) {
-    increase_time(100);
+fn construct_barrack(context: TestContext, player: ContractAddress) {
+    set_caller_address(player);
     context
         .kingdom_lord_test
         .start_upgrade_test(
@@ -146,7 +146,8 @@ fn construct_barrack(context: TestContext) {
     res.expect('construct barrack');
 }
 
-fn level2_barrack(context: TestContext){
+fn level2_barrack(context: TestContext, player: ContractAddress){
+    set_caller_address(player);
     context
         .kingdom_lord_test
         .start_upgrade_test(
@@ -159,7 +160,8 @@ fn level2_barrack(context: TestContext){
     res.expect('construct barrack');
 }
 
-fn construct_stable(context: TestContext){
+fn construct_stable(context: TestContext, player: ContractAddress){
+    set_caller_address(player);
     increase_time(100);
     context
         .kingdom_lord_test
@@ -174,7 +176,8 @@ fn construct_stable(context: TestContext){
     res.expect('construct stable');
 }
 
-fn level2_stable(context: TestContext){
+fn level2_stable(context: TestContext, player: ContractAddress){
+    set_caller_address(player);
     context
         .kingdom_lord_test
         .start_upgrade_test(

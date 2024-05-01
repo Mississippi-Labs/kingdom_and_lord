@@ -1,7 +1,7 @@
 use kingdom_lord::models::level::{LevelTrait, Level, LevelUpTrait};
 use starknet::{ContractAddress, get_block_timestamp, get_block_number, get_tx_info};
 #[derive(Model, Copy, Drop, Serde)]
-struct City {
+struct PlayerVillage {
     #[key]
     player: ContractAddress,
     x: u64,
@@ -10,7 +10,7 @@ struct City {
 
 
 #[derive(Model, Copy, Drop, Serde)]
-struct CityLocation {
+struct VillageLocation {
     #[key]
     x: u64,
     #[key]
@@ -19,7 +19,7 @@ struct CityLocation {
 }
 
 #[derive(Model, Copy, Drop, Serde)]
-struct CityConfirm {
+struct VillageConfirm {
     #[key]
     player: ContractAddress,
     block: u64
@@ -54,7 +54,7 @@ mod globe_component {
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use super::{CityConfirm, CityLocation, City, get_position_temp};
+    use super::{VillageConfirm, VillageLocation, PlayerVillage, get_position_temp};
     use kingdom_lord::models::time::get_current_time;
     use kingdom_lord::interface::Error;
 
@@ -68,24 +68,24 @@ mod globe_component {
 
         fn get_village_location(self: @ComponentState<TContractState>, player: ContractAddress) -> (u64, u64){
             let world = self.get_contract().world();
-            let city = get!(world, (player), City);
-            (city.x, city.y)
+            let village = get!(world, (player), PlayerVillage);
+            (village.x, village.y)
         }
 
         fn create_village_confirm(
             self: @ComponentState<TContractState>
-        ) -> Result<CityConfirm, Error> {
+        ) -> Result<VillageConfirm, Error> {
             let player = get_caller_address();
             let world = self.get_contract().world();
 
-            let confirm = get!(world, (player), CityConfirm);
+            let confirm = get!(world, (player), VillageConfirm);
             if confirm.block == 0 {
                 let time = get_current_time();
-                let confirm = CityConfirm { player, block: time };
+                let confirm = VillageConfirm { player, block: time };
                 set!(world, (confirm));
                 return Result::Ok(confirm);
             } else {
-                return Result::Err(Error::CityConfirmAlreadyExist);
+                return Result::Err(Error::VillageConfirmAlreadyExist);
             }
         }
 
@@ -93,26 +93,26 @@ mod globe_component {
             let player = get_caller_address();
             let world = self.get_contract().world();
 
-            let confirm = get!(world, (player), CityConfirm);
+            let confirm = get!(world, (player), VillageConfirm);
             let current_time = get_current_time();
             if confirm.block == 0  || current_time - confirm.block  == 0{
-                return Result::Err(Error::CityConfirmNotStarted);
+                return Result::Err(Error::VillageConfirmNotStarted);
             }
-            let city = get!(world, (player), City);
-            if city.x != 0 || city.y != 0 {
+            let village = get!(world, (player), PlayerVillage);
+            if village.x != 0 || village.y != 0 {
                 return Result::Err(Error::CityAlreadyCreated);
             }
 
             let (x, y)  = get_position_temp(confirm.block);
 
-            let city_location = get!(world, (x, y), CityLocation);
-            if !city_location.player.is_zero(){
+            let village_location = get!(world, (x, y), VillageLocation);
+            if !village_location.player.is_zero(){
                 return Result::Err(Error::CityPositionAlreadyTaken);
             }
-            let city = City { player, x, y };
-            let city_location = CityLocation { x, y, player };
-            set!(world, (city_location));
-            set!(world, (city));
+            let village = PlayerVillage { player, x, y };
+            let village_location = VillageLocation { x, y, player };
+            set!(world, (village_location));
+            set!(world, (village));
             Result::Ok(())
         }
     }

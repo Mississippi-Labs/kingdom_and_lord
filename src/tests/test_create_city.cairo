@@ -60,7 +60,7 @@ mod tests {
         assert!(city_confirm.player == caller, "caller should be caller");
 
         let res = context.kingdom_lord_test.create_village_reveal_test().unwrap_err();
-        assert!(res == Error::CityConfirmNotStarted)
+        assert!(res == Error::VillageConfirmNotStarted)
 
 
     }

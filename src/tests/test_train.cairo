@@ -26,8 +26,9 @@ mod tests {
         let context = setup_world();
 
         context.kingdom_lord_test.spawn_test().expect('spawn works');
-
-        construct_barrack(context);
+        let player = get_caller_address();
+        increase_time(100);
+        construct_barrack(context, player);
         let caller = get_caller_address();
 
         assert_resource(context, caller, 1000, 1000, 1000, 1000);
@@ -75,8 +76,9 @@ mod tests {
         let context = setup_world();
 
         context.kingdom_lord_test.spawn_test().expect('spawn works');
-
-        construct_stable(context);
+        let player = get_caller_address();
+        increase_time(100);
+        construct_stable(context, player);
         let caller = get_caller_address();
 
         assert_resource(context, caller, 1000, 1000, 1000, 1000);
@@ -135,7 +137,9 @@ mod tests {
         let context = setup_world();
 
         context.kingdom_lord_test.spawn_test().expect('spawn works');
-        construct_barrack(context);
+        let player = get_caller_address();
+        increase_time(100);
+        construct_barrack(context, player);
         let err = context.kingdom_lord_test.start_training_test(1).unwrap_err();
         assert(err == Error::TrainingPrerequirementNotMatch, 'college level not enough');
     }
@@ -155,9 +159,10 @@ mod tests {
     #[available_gas(300000000000)]
     fn test_stable_training_no_college() {
         let context = setup_world();
-
+        let player = get_caller_address();
         context.kingdom_lord_test.spawn_test().expect('spawn works');
-        construct_stable(context);
+        increase_time(100);
+        construct_stable(context, player);
         let err = context.kingdom_lord_test.start_training_test(4).unwrap_err();
         assert(err == Error::TrainingPrerequirementNotMatch, 'college level not enough');
     }

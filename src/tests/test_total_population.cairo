@@ -36,17 +36,17 @@ mod tests {
         assert_resource(context, caller, 0, 0, 0, 0);
         
         assert_population(context, caller, 0);
-
-        construct_barrack(context);
+        increase_time(100);
+        construct_barrack(context, caller);
         assert_population(context, caller, 4);
 
-        construct_stable(context);
+        construct_stable(context, caller);
         assert_population(context, caller, 9);
 
-        level2_barrack(context);
+        level2_barrack(context, caller);
         assert_population(context, caller, 11);
 
-        level2_stable(context);
+        level2_stable(context, caller);
         assert_population(context, caller, 14);
     
 

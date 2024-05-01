@@ -22,7 +22,7 @@ mod kingdom_lord_controller {
     use kingdom_lord::models::army::{SoldierKind, soldier_info, ArmyGroup};
     use kingdom_lord::components::barrack::barrack_component::BarrackInternalImpl;
     use kingdom_lord::components::universal::universal_component::UniversalInternalImpl;
-    use kingdom_lord::components::globe::{globe_component, CityConfirm};
+    use kingdom_lord::components::globe::{globe_component, VillageConfirm};
     use kingdom_lord::models::building::{BuildingUpgradeResource, BuildingUpgradeInfo};
     use kingdom_lord::events::{
         NewPlayerSpawnEvent, StartUpgradeEvent, UpgradeNotEnoughResourceEvent, UpgradeCompleteEvent,
@@ -225,7 +225,7 @@ mod kingdom_lord_controller {
 
         fn create_village_confirm(
             self: @ContractState
-        ) -> Result<CityConfirm, Error>{
+        ) -> Result<VillageConfirm, Error>{
             panic_on_err(self._create_village_confirm())
         }
     
@@ -318,7 +318,7 @@ mod kingdom_lord_controller {
 
         fn create_village_confirm_test(
             self: @ContractState
-        ) -> Result<CityConfirm, Error>{
+        ) -> Result<VillageConfirm, Error>{
             self._create_village_confirm()
         }
 
@@ -863,7 +863,7 @@ mod kingdom_lord_controller {
             res
         }
 
-        fn _create_village_confirm(self: @ContractState) -> Result<CityConfirm, Error>{
+        fn _create_village_confirm(self: @ContractState) -> Result<VillageConfirm, Error>{
             self.globe.create_village_confirm()
         }
 

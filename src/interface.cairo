@@ -4,7 +4,7 @@ use kingdom_lord::models::growth::{GrowthRate};
 use kingdom_lord::models::level::Level;
 use kingdom_lord::components::city_hall::city_hall_component::{UnderUpgrading, WaitingToUpgrade};
 use kingdom_lord::components::barrack::{BarrackUnderTraining, Troops, BarrackWaitingToTrain};
-use kingdom_lord::components::globe::{globe_component, CityConfirm};
+use kingdom_lord::components::globe::{globe_component, VillageConfirm};
 use starknet::ContractAddress;
 
 #[derive(Debug, Serde, Drop, Copy, PartialEq)]
@@ -21,8 +21,8 @@ enum Error{
     NoTargetBuildingConstructed,
     TrainingPrerequirementNotMatch,
     StorageBuildingNotMaxLevel,
-    CityConfirmAlreadyExist,
-    CityConfirmNotStarted,
+    VillageConfirmAlreadyExist,
+    VillageConfirmNotStarted,
     CityAlreadyCreated,
     CityPositionAlreadyTaken,
     NotEnoughSoldier
@@ -70,7 +70,7 @@ trait IKingdomLord<TState>{
 
     fn create_village_confirm(
         self: @TState
-    ) -> Result<CityConfirm, Error>;
+    ) -> Result<VillageConfirm, Error>;
 
     fn create_village_reveal(self: @TState) -> Result<(), Error>;
 
@@ -128,7 +128,7 @@ trait IKingdomLordTest<ContractState>{
         
         fn create_village_confirm_test(
             self: @ContractState
-        ) -> Result<CityConfirm, Error>;
+        ) -> Result<VillageConfirm, Error>;
 
         fn create_village_reveal_test(self: @ContractState) -> Result<(), Error>;
 
