@@ -15,7 +15,15 @@ struct VillageLocation {
     x: u64,
     #[key]
     y: u64,
-    player: ContractAddress,
+    kind: LocationKind,
+}
+
+#[derive(Introspect, Copy, Drop, Serde, PartialEq)]
+enum LocationKind{
+    Nothing: felt252,
+    Village: felt252,
+    Army: felt252,
+    Block: felt252,
 }
 
 #[derive(Model, Copy, Drop, Serde)]
@@ -54,7 +62,7 @@ mod globe_component {
     use dojo::world::{
         IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait
     };
-    use super::{VillageConfirm, VillageLocation, PlayerVillage, get_position_temp};
+    use super::{VillageConfirm, VillageLocation, PlayerVillage, get_position_temp, LocationKind};
     use kingdom_lord::models::time::get_current_time;
     use kingdom_lord::interface::Error;
 
@@ -100,17 +108,18 @@ mod globe_component {
             }
             let village = get!(world, (player), PlayerVillage);
             if village.x != 0 || village.y != 0 {
-                return Result::Err(Error::CityAlreadyCreated);
+                return Result::Err(Error::VillageAlreadyCreated);
             }
 
             let (x, y)  = get_position_temp(confirm.block);
 
             let village_location = get!(world, (x, y), VillageLocation);
-            if !village_location.player.is_zero(){
-                return Result::Err(Error::CityPositionAlreadyTaken);
+            if village_location.kind != LocationKind::Nothing(0) {
+                return Result::Err(Error::VillagePositionAlreadyTaken);
             }
             let village = PlayerVillage { player, x, y };
-            let village_location = VillageLocation { x, y, player };
+            let player_felt252: felt252 = player.into();
+            let village_location = VillageLocation { x, y, kind: LocationKind::Village(player_felt252) };
             set!(world, (village_location));
             set!(world, (village));
             Result::Ok(())

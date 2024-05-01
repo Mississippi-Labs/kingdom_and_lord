@@ -15,7 +15,7 @@ use openzeppelin::token::erc20::interface::IERC20DispatcherImpl;
 use kingdom_lord::actions::kingdom_lord_controller::world_dispatcherContractMemberStateTrait;
 use kingdom_lord::admin::kingdom_lord_admin;
 use kingdom_lord::components::outer_city::OuterCityTraitDispatcher;
-use kingdom_lord::tests::upgrade_info::{barrack_level1_proof, stable_level1_proof, barrack_level2_proof, stable_level2_proof};
+use kingdom_lord::tests::upgrade_proof::{barrack_level1_proof, stable_level1_proof, barrack_level2_proof, stable_level2_proof};
 use starknet::contract_address_const;
 use openzeppelin::presets::erc20::ERC20;
 use openzeppelin::token::erc20::interface::IERC20Dispatcher;
@@ -122,73 +122,6 @@ fn increase_time(time: u64) {
     set_block_number(current_time + time);
 }
 
-
-fn construct_barrack(context: TestContext, player: ContractAddress) {
-    set_caller_address(player);
-    context
-        .kingdom_lord_test
-        .start_upgrade_test(
-            21,
-            8,
-            1,
-            210,
-            140,
-            260,
-            120,
-            4,
-            2000,
-            100,
-            barrack_level1_proof()
-        )
-        .expect('start construct barrack');
-    increase_time(2000);
-    let res = context.kingdom_lord_test.finish_upgrade_test();
-    res.expect('construct barrack');
-}
-
-fn level2_barrack(context: TestContext, player: ContractAddress){
-    set_caller_address(player);
-    context
-        .kingdom_lord_test
-        .start_upgrade_test(
-            21,8, 2, 270, 180, 335, 155, 2, 2620, 90,
-            barrack_level2_proof()
-        )
-        .expect('start construct barrack');
-    increase_time(2620);
-    let res = context.kingdom_lord_test.finish_upgrade_test();
-    res.expect('construct barrack');
-}
-
-fn construct_stable(context: TestContext, player: ContractAddress){
-    set_caller_address(player);
-    increase_time(100);
-    context
-        .kingdom_lord_test
-        .start_upgrade_test(
-            20,
-            9, 1, 260, 140, 220, 100, 5, 2200, 100,
-            stable_level1_proof()
-        )
-        .expect('start construct stable');
-    increase_time(2200);
-    let res = context.kingdom_lord_test.finish_upgrade_test();
-    res.expect('construct stable');
-}
-
-fn level2_stable(context: TestContext, player: ContractAddress){
-    set_caller_address(player);
-    context
-        .kingdom_lord_test
-        .start_upgrade_test(
-            20,9, 2, 335, 180, 280, 130, 3, 2850, 90,
-            stable_level2_proof()
-        )
-        .expect('start construct stable');
-    increase_time(2850);
-    let res = context.kingdom_lord_test.finish_upgrade_test();
-    res.expect('construct stable');
-}
 
 fn train_millitia(context: TestContext){
     context.kingdom_lord_test.start_training_test(0).expect('train millitia');

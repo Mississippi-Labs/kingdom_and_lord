@@ -23,8 +23,8 @@ enum Error{
     StorageBuildingNotMaxLevel,
     VillageConfirmAlreadyExist,
     VillageConfirmNotStarted,
-    CityAlreadyCreated,
-    CityPositionAlreadyTaken,
+    VillageAlreadyCreated,
+    VillagePositionAlreadyTaken,
     NotEnoughSoldier
 }
 

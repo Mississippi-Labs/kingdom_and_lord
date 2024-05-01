@@ -14,7 +14,7 @@ mod tests {
     use kingdom_lord::tests::utils::{
         setup_world, assert_resource, increase_time, 
     };
-    use kingdom_lord::tests::upgrade_info::{cityhall_level1_proof, cityhall_level2_proof, warehouse_level2_proof, barn_level1_proof, barn_level2_proof, warehouse_level1_proof};
+    use kingdom_lord::tests::upgrade_proof::{cityhall_level1_proof, cityhall_level2_proof, warehouse_level2_proof, barn_level1_proof, barn_level2_proof, warehouse_level1_proof};
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl,IKingdomLordTest, IKingdomLordLibraryDispatcherImpl, Error
     };

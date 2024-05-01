@@ -299,7 +299,7 @@ console.log("proof: ", proof)
 
 
 
-function write (data, name) {
+function write_upgrade_proof (data, name) {
   const content = data.map((d) => {
     const hash_value = hash_posei(d)
     const proof = tree.getProof(hash_value)
@@ -313,22 +313,118 @@ function write (data, name) {
   return content.join("\n")
 }
 
-function write_all(){
-  const wood_content = write(wood, "wood")
-  const brick_content = write(brick, "brick")
-  const steel_content = write(steel, "steel")
-  const food_content = write(food, "food")
-  const cityhall_content = write(cityhall, "cityhall")
-  const warehouse_content = write(warehouse, "warehouse")
-  const barn_content = write(barn, "barn")
-  const barrack_content = write(barracks, "barrack")
-  const stable_content = write(stable, "stable")
-  const college_content = write(college, "college")
-  const embassy_content = write(embassy, "embassy")
-  const city_wall_content = write(city_wall, "city_wall")
+function write_all_upgrade_proof(){
+  const wood_content = write_upgrade_proof(wood, "wood")
+  const brick_content = write_upgrade_proof(brick, "brick")
+  const steel_content = write_upgrade_proof(steel, "steel")
+  const food_content = write_upgrade_proof(food, "food")
+  const cityhall_content = write_upgrade_proof(cityhall, "cityhall")
+  const warehouse_content = write_upgrade_proof(warehouse, "warehouse")
+  const barn_content = write_upgrade_proof(barn, "barn")
+  const barrack_content = write_upgrade_proof(barracks, "barrack")
+  const stable_content = write_upgrade_proof(stable, "stable")
+  const college_content = write_upgrade_proof(college, "college")
+  const embassy_content = write_upgrade_proof(embassy, "embassy")
+  const city_wall_content = write_upgrade_proof(city_wall, "city_wall")
 
   const content = `${wood_content}\n${brick_content}\n${steel_content}\n${food_content}\n${cityhall_content}\n${warehouse_content}\n${barn_content}\n${barrack_content}\n${stable_content}\n${college_content}\n${embassy_content}\n${city_wall_content}`
-  fs.writeFileSync('./src/tests/upgrade_info.cairo', content);
+  fs.writeFileSync('./src/tests/upgrade_proof.cairo', content);
 }
 
-write_all()
+write_all_upgrade_proof()
+
+
+function write_upgrade_function (data, name) {
+  const content = data.map((d) => {
+    const content = `fn level${d[1]}_${name}(context: TestContext, position: u64, player: ContractAddress){
+    set_caller_address(player);
+    context
+        .kingdom_lord_test
+        .start_upgrade_test(
+            position, ${d[0]}, ${d[1]}, ${d[2]}, ${d[3]}, ${d[4]}, ${d[5]}, ${d[6]}, ${d[7]}, ${d[8]},
+            ${name}_level${d[1]}_proof()
+        )
+        .expect('construct ${name} level ${d[1]}');
+    increase_time(${d[7]});
+    let res = context.kingdom_lord_test.finish_upgrade_test();
+    res.expect('${name} level ${d[1]} done');
+}`
+    return content
+  })
+  return content.join("\n")
+}
+
+function write_use_proof_header(data, name){
+  const content = data.map((d) => {
+    const hash_value = hash_posei(d)
+    const proof = tree.getProof(hash_value)
+    const content = `use kingdom_lord::tests::upgrade_proof::${name}_level${d[1]}_proof;`
+    return content
+  })
+  return content.join("\n")
+}
+
+function write_all_upgrade(){
+  const wood_content = write_upgrade_function(wood, "wood")
+  const brick_content = write_upgrade_function(brick, "brick")
+  const steel_content = write_upgrade_function(steel, "steel")
+  const food_content = write_upgrade_function(food, "food")
+  const cityhall_content = write_upgrade_function(cityhall, "cityhall")
+  const warehouse_content = write_upgrade_function(warehouse, "warehouse")
+  const barn_content = write_upgrade_function(barn, "barn")
+  const barrack_content = write_upgrade_function(barracks, "barrack")
+  const stable_content = write_upgrade_function(stable, "stable")
+  const college_content = write_upgrade_function(college, "college")
+  const embassy_content = write_upgrade_function(embassy, "embassy")
+  const city_wall_content = write_upgrade_function(city_wall, "city_wall")
+
+  const wood_header = write_use_proof_header(wood, "wood")
+  const brick_header = write_use_proof_header(brick, "brick")
+  const steel_header = write_use_proof_header(steel, "steel")
+  const food_header = write_use_proof_header(food, "food")
+  const cityhall_header = write_use_proof_header(cityhall, "cityhall")
+  const warehouse_header = write_use_proof_header(warehouse, "warehouse")
+  const barn_header = write_use_proof_header(barn, "barn")
+  const barrack_header = write_use_proof_header(barracks, "barrack")
+  const stable_header = write_use_proof_header(stable, "stable")
+  const college_header = write_use_proof_header(college, "college")
+  const embassy_header = write_use_proof_header(embassy, "embassy")
+  const city_wall_header = write_use_proof_header(city_wall, "city_wall")
+
+  const header = `use kingdom_lord::tests::utils::{increase_time, TestContext};
+use starknet::ContractAddress;
+use starknet::testing::set_caller_address;
+use kingdom_lord::interface::{
+    IKingdomLordDispatcher, IKingdomLordAdminDispatcher, IKingdomLordAdmin,IKingdomLordTestDispatcherImpl, 
+    IKingdomLordLibraryDispatcherImpl, IKingdomLordAdminDispatcherImpl, IKingdomLordDispatcherTrait, IKingdomLordTestDispatcher
+};`
+
+  const content = `${header}
+${wood_header}
+${brick_header}
+${steel_header}
+${food_header}
+${cityhall_header}
+${warehouse_header}
+${barn_header}
+${barrack_header}
+${stable_header}
+${college_header}
+${embassy_header}
+${city_wall_header}
+${wood_content}
+${brick_content}
+${steel_content}
+${food_content}
+${cityhall_content}
+${warehouse_content}
+${barn_content}
+${barrack_content}
+${stable_content}
+${college_content}
+${embassy_content}
+${city_wall_content}`
+  fs.writeFileSync('./src/tests/upgrade_func.cairo', content);
+}
+
+write_all_upgrade()

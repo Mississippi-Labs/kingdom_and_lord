@@ -11,12 +11,12 @@ mod tests {
 
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-    use kingdom_lord::tests::utils::{
-        setup_world, assert_troop, assert_resource, construct_barrack, increase_time, construct_stable
-    };
-    use kingdom_lord::tests::upgrade_info::{cityhall_level2_proof, cityhall_level1_proof};
+    use kingdom_lord::tests::utils::{setup_world, assert_troop, assert_resource, increase_time};
+    use kingdom_lord::tests::upgrade_func::{level1_barrack, level1_stable};
+    use kingdom_lord::tests::upgrade_proof::{cityhall_level2_proof, cityhall_level1_proof};
     use kingdom_lord::interface::{
-        IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl, IKingdomLordTest,IKingdomLordLibraryDispatcherImpl, Error
+        IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl, IKingdomLordTest,
+        IKingdomLordLibraryDispatcherImpl, Error
     };
 
     #[test]
@@ -28,7 +28,7 @@ mod tests {
         context.kingdom_lord_test.spawn_test().expect('spawn works');
         let player = get_caller_address();
         increase_time(100);
-        construct_barrack(context, player);
+        level1_barrack(context, 21, player);
         let caller = get_caller_address();
 
         assert_resource(context, caller, 1000, 1000, 1000, 1000);
@@ -66,7 +66,7 @@ mod tests {
 
         increase_time(1400);
         context.kingdom_lord_test.finish_training_test(true).unwrap();
-        assert_troop(context, caller,3, 0, 0, 0, 0, 0);
+        assert_troop(context, caller, 3, 0, 0, 0, 0, 0);
     }
 
     #[test]
@@ -78,7 +78,7 @@ mod tests {
         context.kingdom_lord_test.spawn_test().expect('spawn works');
         let player = get_caller_address();
         increase_time(100);
-        construct_stable(context, player);
+        level1_stable(context, 20, player);
         let caller = get_caller_address();
 
         assert_resource(context, caller, 1000, 1000, 1000, 1000);
@@ -116,7 +116,7 @@ mod tests {
 
         increase_time(1400);
         context.kingdom_lord_test.finish_training_test(false).unwrap();
-        assert_troop(context, caller,0, 0, 0, 3, 0, 0);
+        assert_troop(context, caller, 0, 0, 0, 3, 0, 0);
     }
 
 
@@ -139,7 +139,7 @@ mod tests {
         context.kingdom_lord_test.spawn_test().expect('spawn works');
         let player = get_caller_address();
         increase_time(100);
-        construct_barrack(context, player);
+        level1_barrack(context, 21, player);
         let err = context.kingdom_lord_test.start_training_test(1).unwrap_err();
         assert(err == Error::TrainingPrerequirementNotMatch, 'college level not enough');
     }
@@ -162,7 +162,7 @@ mod tests {
         let player = get_caller_address();
         context.kingdom_lord_test.spawn_test().expect('spawn works');
         increase_time(100);
-        construct_stable(context, player);
+        level1_stable(context, 20, player);
         let err = context.kingdom_lord_test.start_training_test(4).unwrap_err();
         assert(err == Error::TrainingPrerequirementNotMatch, 'college level not enough');
     }

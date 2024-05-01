@@ -12,8 +12,9 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{
-        setup_world, assert_resource, increase_time, construct_stable, construct_barrack, TestContext, level2_stable, level2_barrack, train_millitia, train_scouts
+        setup_world, assert_resource, increase_time, TestContext,  train_millitia, train_scouts
     };
+    use kingdom_lord::tests::upgrade_func::{level1_barrack, level2_barrack, level1_stable, level2_stable };
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl, IKingdomLordTest,IKingdomLordLibraryDispatcherImpl, Error
     };
@@ -37,16 +38,16 @@ mod tests {
         
         assert_population(context, caller, 0);
         increase_time(100);
-        construct_barrack(context, caller);
+        level1_barrack(context, 21, caller);
         assert_population(context, caller, 4);
 
-        construct_stable(context, caller);
+        level1_stable(context, 20, caller);
         assert_population(context, caller, 9);
 
-        level2_barrack(context, caller);
+        level2_barrack(context, 21, caller);
         assert_population(context, caller, 11);
 
-        level2_stable(context, caller);
+        level2_stable(context, 20,caller);
         assert_population(context, caller, 14);
     
 

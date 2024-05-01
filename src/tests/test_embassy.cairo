@@ -12,7 +12,7 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{setup_world, increase_time};
-    use kingdom_lord::tests::upgrade_info::{embassy_level1_proof, embassy_level2_proof, embassy_level3_proof};
+    use kingdom_lord::tests::upgrade_proof::{embassy_level1_proof, embassy_level2_proof, embassy_level3_proof};
     use kingdom_lord::interface::{
         IKingdomLord, IKingdomLordDispatcher, IKingdomLordTestDispatcherImpl, IKingdomLordTest,IKingdomLordLibraryDispatcherImpl, Error
     };

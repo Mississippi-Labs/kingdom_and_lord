@@ -49,7 +49,8 @@ mod tests {
     mod test_growth_rate;
     mod test_create_city;
     mod utils;
-    mod upgrade_info;
+    mod upgrade_proof;
+    mod upgrade_func;
 }
 
 mod merkle{

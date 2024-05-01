@@ -12,7 +12,7 @@ mod tests {
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
     use kingdom_lord::tests::utils::{setup_world, increase_time, TestContext};
-    use kingdom_lord::tests::upgrade_info::{
+    use kingdom_lord::tests::upgrade_proof::{
         cityhall_level1_proof, cityhall_level2_proof, warehouse_level2_proof, barn_level1_proof,
         barn_level2_proof, warehouse_level1_proof, wood_level1_proof
     };
