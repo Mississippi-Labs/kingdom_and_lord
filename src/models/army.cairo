@@ -275,15 +275,16 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
         }
     }
 
-    fn merge_army(self: @ArmyGroup,other: @ArmyGroup) -> ArmyGroup{
-        ArmyGroup{
-            millitia: *self.millitia + *other.millitia,
-            guard: *self.guard + *other.guard,
-            heavy_infantry: *self.heavy_infantry + *other.heavy_infantry,
-            scouts: *self.scouts + *other.scouts,
-            knights: *self.knights + *other.knights,
-            heavy_knights: *self.heavy_knights + *other.heavy_knights
-        }
+    fn merge_army(ref self: ArmyGroup, ref other: ArmyGroup){
+        self.millitia += other.millitia;
+        self.guard += other.guard;
+        self.heavy_infantry += other.heavy_infantry;
+        self.scouts += other.scouts;
+        self.knights += other.knights;
+        self.heavy_knights += other.heavy_knights;
+
+        other.die()
+
     }
 
 

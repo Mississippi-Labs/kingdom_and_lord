@@ -125,7 +125,7 @@ mod battle_component {
 
                     ambush_info.is_revealed = true;
                     let mut self_troops = get!(world, (player), Troops);
-                    self_troops.army = ambush_info.army.merge_army(@self_troops.army);
+                    self_troops.army.merge_army(ref ambush_info.army);
 
                     set!(world, (enemy_troops));
                     set!(world, (self_troops));

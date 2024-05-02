@@ -270,7 +270,7 @@ mod kingdom_lord_controller {
             target_x: u64,
             target_y: u64,
             is_robbed: bool
-        ) -> Result<bool, Error>{
+        ) -> Result<(), Error>{
             panic_on_err(self._reveal_attack(
                 hash,
                 x,
@@ -389,7 +389,7 @@ mod kingdom_lord_controller {
             target_x: u64,
             target_y: u64,
             is_robbed: bool
-        ) -> Result<bool, Error>{
+        ) -> Result<(), Error>{
             self._reveal_attack(hash, x, y, time, nonce, target_x, target_y, is_robbed)
         }
     
@@ -935,8 +935,8 @@ mod kingdom_lord_controller {
             target_x: u64,
             target_y: u64,
             is_robbed: bool
-        ) -> Result<bool, Error>{
-            Result::Ok(true)
+        ) -> Result<(), Error>{
+            self.battle.reveal_attack(hash, x, y, time, nonce, target_x, target_y, is_robbed)
         }
 
         fn _reveal_hide(
@@ -948,7 +948,7 @@ mod kingdom_lord_controller {
             origin_nonce: u64,
             new_hash: felt252,
         )-> Result<(), Error>{
-            Result::Ok(())
+            self.battle.reveal_hide(origin_hash, origin_x, origin_y, origin_time, origin_nonce, new_hash)
         }
     }
 }

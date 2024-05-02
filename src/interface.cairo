@@ -97,7 +97,7 @@ trait IKingdomLord<ContractState>{
         target_x: u64,
         target_y: u64,
         is_robbed: bool
-    ) -> Result<bool, Error>;
+    ) -> Result<(), Error>;
 
     fn reveal_hide(
         self: @ContractState,
@@ -169,7 +169,7 @@ trait IKingdomLordTest<ContractState>{
             target_x: u64,
             target_y: u64,
             is_robbed: bool
-        ) -> Result<bool, Error>;
+        ) -> Result<(), Error>;
     
         fn reveal_hide_test(
             self: @ContractState,
