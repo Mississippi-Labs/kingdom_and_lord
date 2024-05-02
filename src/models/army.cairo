@@ -273,7 +273,6 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
             defender.damage(defense_force, attack_force);
             false
         }
-        
     }
 
     fn merge_army(self: @ArmyGroup,other: @ArmyGroup) -> ArmyGroup{

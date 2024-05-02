@@ -23,7 +23,7 @@ mod battle_component {
     use kingdom_lord::interface::Error;
     use kingdom_lord::components::barrack::{Troops};
     use kingdom_lord::models::army::{ArmyGroup, ArmyGroupExtensionImpl, soldier_info, SoldierKind};
-    use kingdom_lord::components::globe::{GlobeLocation};
+    use kingdom_lord::components::globe::{GlobeLocation, LocationKind};
 
     #[storage]
     struct Storage {}
@@ -112,13 +112,31 @@ mod battle_component {
                 return Result::Err(Error::InvalidReveal);
             };
             let world = self.get_contract().world();
-            let ambush_info = get!(world, (hash), AmbushInfo);
+            let mut ambush_info = get!(world, (hash), AmbushInfo);
+            let player = get_caller_address();
+            assert!(ambush_info.player == player, "You can only use your own ambush");
 
             let target_enemy_village = get!(world, (target_x, target_y), GlobeLocation);
 
+            match target_enemy_village.kind{
+                LocationKind::Village(enemy_player) =>{
+                    let mut enemy_troops = get!(world, (enemy_player), Troops);
+                    ambush_info.army.fight(ref enemy_troops.army);
 
-            Result::Ok(())
+                    ambush_info.is_revealed = true;
+                    let mut self_troops = get!(world, (player), Troops);
+                    self_troops.army = ambush_info.army.merge_army(@self_troops.army);
+
+                    set!(world, (enemy_troops));
+                    set!(world, (self_troops));
+                    set!(world, (ambush_info));
+                    return Result::Ok(());
+                },
+                _ => {return Result::Err(Error::LocationNotVillage);}
+            }
+
         }
+
 
         fn reveal_hide(
             self: @ComponentState<TContractState>,

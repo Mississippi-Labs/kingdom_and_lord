@@ -25,30 +25,31 @@ enum Error{
     VillageConfirmNotStarted,
     VillageAlreadyCreated,
     VillagePositionAlreadyTaken,
+    LocationNotVillage,
     NotEnoughSoldier,
     InvalidReveal
 }
 
 #[starknet::interface]
-trait IKingdomLord<TState>{
+trait IKingdomLord<ContractState>{
     // read function
-    fn get_resource(self: @TState, player: ContractAddress) -> (Resource<Wood>, Resource<Brick>, Resource<Steel>, Resource<Food>);
-    fn get_growth_rate(self: @TState, player: ContractAddress) -> (GrowthRate<Wood>, GrowthRate<Brick>, GrowthRate<Steel>, GrowthRate<Food>);
-    fn get_under_upgrading(self: @TState, player: ContractAddress) -> UnderUpgrading;
-    fn get_waiting_upgrading(self: @TState, player: ContractAddress) -> Array<WaitingToUpgrade>;
-    fn get_buildings_levels(self: @TState, player: ContractAddress) -> Array<Level>;
-    fn get_under_training(self: @TState, player: ContractAddress) -> BarrackUnderTraining;
-    fn get_waiting_to_train(self: @TState, player: ContractAddress) -> Array<BarrackWaitingToTrain>;
-    fn get_troops(self: @TState, player: ContractAddress) -> Troops;
-    fn get_total_population(self: @TState, player: ContractAddress) -> u64;
-    fn get_city_wall_power(self: @TState, player: ContractAddress) -> (u64, u64);
-    fn get_ally_amount(self: @TState, player: ContractAddress) -> u64;
-    fn get_village_location(self: @TState, player: ContractAddress) -> (u64, u64);
+    fn get_resource(self: @ContractState, player: ContractAddress) -> (Resource<Wood>, Resource<Brick>, Resource<Steel>, Resource<Food>);
+    fn get_growth_rate(self: @ContractState, player: ContractAddress) -> (GrowthRate<Wood>, GrowthRate<Brick>, GrowthRate<Steel>, GrowthRate<Food>);
+    fn get_under_upgrading(self: @ContractState, player: ContractAddress) -> UnderUpgrading;
+    fn get_waiting_upgrading(self: @ContractState, player: ContractAddress) -> Array<WaitingToUpgrade>;
+    fn get_buildings_levels(self: @ContractState, player: ContractAddress) -> Array<Level>;
+    fn get_under_training(self: @ContractState, player: ContractAddress) -> BarrackUnderTraining;
+    fn get_waiting_to_train(self: @ContractState, player: ContractAddress) -> Array<BarrackWaitingToTrain>;
+    fn get_troops(self: @ContractState, player: ContractAddress) -> Troops;
+    fn get_total_population(self: @ContractState, player: ContractAddress) -> u64;
+    fn get_city_wall_power(self: @ContractState, player: ContractAddress) -> (u64, u64);
+    fn get_ally_amount(self: @ContractState, player: ContractAddress) -> u64;
+    fn get_village_location(self: @ContractState, player: ContractAddress) -> (u64, u64);
 
     // write function
-    fn spawn(self: @TState) -> Result<(), Error>;
+    fn spawn(self: @ContractState) -> Result<(), Error>;
     fn start_upgrade(
-            self: @TState,
+            self: @ContractState,
             building_id: u64,
             building_kind: u64,
             next_level: u64,
@@ -61,22 +62,22 @@ trait IKingdomLord<TState>{
             value: u64,
             proof: Array<felt252>
         ) -> Result<u64, Error>;
-    fn finish_upgrade(self: @TState) -> Result<(), Error>;
+    fn finish_upgrade(self: @ContractState) -> Result<(), Error>;
     fn start_training(
-            self: @TState,
+            self: @ContractState,
             soldier_kind: u64,
         ) -> Result<u64, Error>;
-    fn finish_training(self: @TState, is_barrack: bool) -> Result<u64, Error>;
-    // fn pay_to_finish_upgrade(ref self: TState, upgrade_id: u64) -> Result<(), Error>;
+    fn finish_training(self: @ContractState, is_barrack: bool) -> Result<u64, Error>;
+    // fn pay_to_finish_upgrade(ref self: ContractState, upgrade_id: u64) -> Result<(), Error>;
 
     fn create_village_confirm(
-        self: @TState
+        self: @ContractState
     ) -> Result<VillageConfirm, Error>;
 
-    fn create_village_reveal(self: @TState) -> Result<(), Error>;
+    fn create_village_reveal(self: @ContractState) -> Result<(), Error>;
 
     fn create_ambush(
-        self: @TState,
+        self: @ContractState,
         ambush_hash: felt252,
         millitia: u64,
         guard: u64,
@@ -85,21 +86,35 @@ trait IKingdomLord<TState>{
         knights: u64,
         heavy_knights: u64
     ) -> Result<(), Error>;
-    fn reveal_ambush(
-        self: @TState,
+
+    fn reveal_attack(
+        self: @ContractState,
         hash: felt252,
         x: u64,
         y: u64,
         time: u64,
-        nonce: u64
+        nonce: u64,
+        target_x: u64,
+        target_y: u64,
+        is_robbed: bool
     ) -> Result<bool, Error>;
+
+    fn reveal_hide(
+        self: @ContractState,
+        origin_hash: felt252,
+        origin_x: u64,
+        origin_y: u64,
+        origin_time: u64,
+        origin_nonce: u64,
+        new_hash: felt252,
+    )-> Result<(), Error>;
 }
 
 #[starknet::interface]
-trait IKingdomLordAdmin<TState>{
-    fn set_config(self: @TState, erc20_addr: ContractAddress, amount: u256, receiver: ContractAddress, level_root_merkle: felt252) ;
-    // fn set_barn_max_storage(self: @TState, addr: ContractAddress, max_storage: u64);
-    // fn set_warehouse_max_storage(self: @TState, addr: ContractAddress, max_storage: u64);
+trait IKingdomLordAdmin<ContractState>{
+    fn set_config(self: @ContractState, erc20_addr: ContractAddress, amount: u256, receiver: ContractAddress, level_root_merkle: felt252) ;
+    // fn set_barn_max_storage(self: @ContractState, addr: ContractAddress, max_storage: u64);
+    // fn set_warehouse_max_storage(self: @ContractState, addr: ContractAddress, max_storage: u64);
 
 }
 
@@ -143,12 +158,26 @@ trait IKingdomLordTest<ContractState>{
             knights: u64,
             heavy_knights: u64
         ) -> Result<(), Error>;
-        fn reveal_ambush_test(
+  
+        fn reveal_attack_test(
             self: @ContractState,
             hash: felt252,
             x: u64,
             y: u64,
             time: u64,
-            nonce: u64
+            nonce: u64,
+            target_x: u64,
+            target_y: u64,
+            is_robbed: bool
         ) -> Result<bool, Error>;
+    
+        fn reveal_hide_test(
+            self: @ContractState,
+            origin_hash: felt252,
+            origin_x: u64,
+            origin_y: u64,
+            origin_time: u64,
+            origin_nonce: u64,
+            new_hash: felt252,
+        )-> Result<(), Error>;
 }

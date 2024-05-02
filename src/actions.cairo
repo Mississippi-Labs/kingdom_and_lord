@@ -250,7 +250,7 @@ mod kingdom_lord_controller {
             knights: u64,
             heavy_knights: u64
         ) -> Result<(), Error>{
-            panic_on_err(self._create_ambush_test(
+            panic_on_err(self._create_ambush(
                 ambush_hash,
                 millitia,
                 guard,
@@ -260,20 +260,45 @@ mod kingdom_lord_controller {
                 heavy_knights
             ))
         }
-        fn reveal_ambush(
+        fn reveal_attack(
             self: @ContractState,
             hash: felt252,
             x: u64,
             y: u64,
             time: u64,
-            nonce: u64
+            nonce: u64,
+            target_x: u64,
+            target_y: u64,
+            is_robbed: bool
         ) -> Result<bool, Error>{
-            panic_on_err(self._reveal_ambush_test(
+            panic_on_err(self._reveal_attack(
                 hash,
                 x,
                 y,
                 time,
-                nonce
+                nonce,
+                target_x,
+                target_y,
+                is_robbed
+            ))
+        }
+
+        fn reveal_hide(
+            self: @ContractState,
+            origin_hash: felt252,
+            origin_x: u64,
+            origin_y: u64,
+            origin_time: u64,
+            origin_nonce: u64,
+            new_hash: felt252,
+        )-> Result<(), Error>{
+            panic_on_err(self._reveal_hide(
+                origin_hash,
+                origin_x,
+                origin_y,
+                origin_time,
+                origin_nonce,
+                new_hash
             ))
         }
     }
@@ -343,7 +368,7 @@ mod kingdom_lord_controller {
             knights: u64,
             heavy_knights: u64
         ) -> Result<(), Error>{
-            self._create_ambush_test(
+            self._create_ambush(
                 ambush_hash,
                 millitia,
                 guard,
@@ -353,21 +378,31 @@ mod kingdom_lord_controller {
                 heavy_knights
             )
         }
-        fn reveal_ambush_test(
+
+        fn reveal_attack_test(
             self: @ContractState,
             hash: felt252,
             x: u64,
             y: u64,
             time: u64,
-            nonce: u64
+            nonce: u64,
+            target_x: u64,
+            target_y: u64,
+            is_robbed: bool
         ) -> Result<bool, Error>{
-            self._reveal_ambush_test(
-                hash,
-                x,
-                y,
-                time,
-                nonce
-            )
+            self._reveal_attack(hash, x, y, time, nonce, target_x, target_y, is_robbed)
+        }
+    
+        fn reveal_hide_test(
+            self: @ContractState,
+            origin_hash: felt252,
+            origin_x: u64,
+            origin_y: u64,
+            origin_time: u64,
+            origin_nonce: u64,
+            new_hash: felt252,
+        )-> Result<(), Error>{
+            self._reveal_hide(origin_hash, origin_x, origin_y, origin_time, origin_nonce, new_hash)
         }
 
     }
@@ -878,7 +913,7 @@ mod kingdom_lord_controller {
             self.globe.create_village_reveal()
         }
 
-        fn _create_ambush_test(
+        fn _create_ambush(
             self: @ContractState,
             ambush_hash: felt252,
             millitia: u64,
@@ -890,15 +925,30 @@ mod kingdom_lord_controller {
         ) -> Result<(), Error>{
             self.battle.create_ambush(ambush_hash, millitia, guard, heavy_infantry, scouts, knights, heavy_knights)
         }
-        fn _reveal_ambush_test(
+        fn _reveal_attack(
             self: @ContractState,
             hash: felt252,
             x: u64,
             y: u64,
             time: u64,
-            nonce: u64
+            nonce: u64,
+            target_x: u64,
+            target_y: u64,
+            is_robbed: bool
         ) -> Result<bool, Error>{
             Result::Ok(true)
+        }
+
+        fn _reveal_hide(
+            self: @ContractState,
+            origin_hash: felt252,
+            origin_x: u64,
+            origin_y: u64,
+            origin_time: u64,
+            origin_nonce: u64,
+            new_hash: felt252,
+        )-> Result<(), Error>{
+            Result::Ok(())
         }
     }
 }
