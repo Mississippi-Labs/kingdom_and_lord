@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use core::result::ResultTrait;
+    use kingdom_lord::interface::IKingdomLordTestDispatcherTrait;
+use core::result::ResultTrait;
     use kingdom_lord::interface::IKingdomLordDispatcherTrait;
     use starknet::class_hash::Felt252TryIntoClassHash;
     use starknet::get_caller_address;
@@ -99,5 +100,17 @@ mod tests {
         train_scouts(context);
         train_scouts(context);
         assert_troop(context, player2, 10,0,0,10,0,0);
+
+        let ambush_data = array![
+            10,0,0,10,0,0,75, 90, 100000, 1
+        ];
+        let ambush_hash = core::poseidon::poseidon_hash_span(ambush_data.span());
+
+        context.kingdom_lord_test.create_ambush_test(ambush_hash,10, 0,0,10,0,0).expect('create ambush succeed');
+        assert_troop(context, player2, 0,0,0,0,0,0);
+        context.kingdom_lord_test.reveal_attack_test(ambush_hash, 75, 90, 100000, 1, 76,90, false).expect('reveal attack succeed');
+
+        assert_troop(context, player2, 0,0,0,0,0,0);
+        assert_troop(context, player1, 7,0,0,7,0,0);
     }
 }
