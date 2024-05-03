@@ -18,9 +18,9 @@ jobs:
       - run: cp /home/runner/.config/.dojo/bin/sozo /usr/local/bin/sozo
       - run: sozo build
       - run: sozo test
-      - run: sozo --profile ${{ env.TARGET_NAME }} migrate
-      - uses: actions/upload-artifact@v4
-        with:
-          name: manifest.json
-          path: target/${{ env.TARGET_NAME }}/manifest.json
-      - run: bash scripts/default_auth.sh
+      # - run: sozo --profile ${{ env.TARGET_NAME }} migrate
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: manifest.json
+      #     path: target/${{ env.TARGET_NAME }}/manifest.json
+      # - run: bash scripts/default_auth.sh
