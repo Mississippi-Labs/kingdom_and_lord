@@ -250,6 +250,7 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
 
         let sqrt_self_force: u64 = fast_sqrt(self_force.into(), 10).try_into().expect('sqrt_self_force');
         let sqrt_other_force:u64  = fast_sqrt(other_force.into(), 10).try_into().expect('sqrt_other_force');
+        println!("self force {}, other_force {}, sqrt self {} , sqrt other {}", self_force, other_force,sqrt_self_force, sqrt_other_force);
         // FIXME
         self.millitia = self.millitia *  other_force / self_force  * sqrt_other_force / sqrt_self_force ;
         self.guard = self.guard *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
@@ -313,5 +314,34 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
         } else {
             return 0;
         }
+    }
+}
+
+
+#[cfg(test)]
+mod army_test{
+    use super::{ArmyGroup, ArmyGroupExtensionImpl};
+
+    #[test]
+    fn test_fight_damage(){
+        let mut army1 = ArmyGroup{
+            millitia: 10,
+            guard: 0,
+            heavy_infantry: 0,
+            scouts: 10,
+            knights: 0,
+            heavy_knights: 0
+        };
+
+        let mut army2 = ArmyGroup{
+            millitia: 8,
+            guard: 0,
+            heavy_infantry: 0,
+            scouts: 8,
+            knights: 0,
+            heavy_knights: 0
+        };
+
+        army1.fight(ref army2);
     }
 }

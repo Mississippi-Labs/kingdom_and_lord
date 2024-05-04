@@ -70,7 +70,19 @@ mod battle_component {
 
         fn is_valid_move(self: @ComponentState<TContractState>, x: u64, y: u64, target_x: u64, target_y: u64, army: ArmyGroup, start_time: u64, end_time:u64) -> bool {
             let speed = army.speed();
-            let distance = (target_x - x) + (target_y - y);
+            
+            let distance_x = if target_x >= x{
+                target_x - x
+            } else{
+                x - target_x
+            };
+            let distance_y = if target_y >= y{
+                target_y - y
+            } else{
+                y - target_y
+            };
+            let distance = distance_x + distance_y;
+            println!("x {} y{} {} {} {} {}", x, y, target_x, target_y, start_time, end_time);
             let available_distance = speed * (end_time - start_time);
             if distance > available_distance {
                 false

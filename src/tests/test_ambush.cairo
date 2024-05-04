@@ -108,9 +108,10 @@ use core::result::ResultTrait;
 
         context.kingdom_lord_test.create_ambush_test(ambush_hash,10, 0,0,10,0,0).expect('create ambush succeed');
         assert_troop(context, player2, 0,0,0,0,0,0);
+        increase_time(100000);
         context.kingdom_lord_test.reveal_attack_test(ambush_hash, 75, 90, 100000, 1, 76,90, false).expect('reveal attack succeed');
 
         assert_troop(context, player2, 0,0,0,0,0,0);
-        assert_troop(context, player1, 7,0,0,7,0,0);
+        assert_troop(context, player1, 6,0,0,6,0,0);
     }
 }
