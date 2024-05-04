@@ -10,10 +10,10 @@ sierra-replace-ids = true
 dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
 openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.10.0" }
 # starknet = "2.5.4"
-# alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "01a7690dc25d19a086f525b8ce66aa505c8e7527"}
+alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", tag= "cairo-v2.5.4"}
 
 [[target.dojo]]
-# build-external-contracts = ["openzeppelin::presets::erc20::ERC20"]
+build-external-contracts = ["openzeppelin::presets::erc20::ERC20"]
 
 [tool.dojo]
 initializer_class_hash = "0xbeef"

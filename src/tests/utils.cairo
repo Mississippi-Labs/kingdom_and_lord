@@ -8,16 +8,30 @@ use kingdom_lord::components::city_building::city_building;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use kingdom_lord::actions::{kingdom_lord_controller};
 use kingdom_lord::interface::{
-    IKingdomLordDispatcher, IKingdomLordAdminDispatcher, IKingdomLordAdmin,IKingdomLordTestDispatcherImpl, 
-    IKingdomLordLibraryDispatcherImpl, IKingdomLordAdminDispatcherImpl, IKingdomLordDispatcherTrait, IKingdomLordTestDispatcher
+    IKingdomLordDispatcher, IKingdomLordAdminDispatcher, IKingdomLordAdmin,
+    IKingdomLordTestDispatcherImpl, IKingdomLordLibraryDispatcherImpl,
+    IKingdomLordAdminDispatcherImpl, IKingdomLordDispatcherTrait, IKingdomLordTestDispatcher
 };
 use openzeppelin::token::erc20::interface::IERC20DispatcherImpl;
 use kingdom_lord::actions::kingdom_lord_controller::world_dispatcherContractMemberStateTrait;
-use kingdom_lord::tests::upgrade_func::{level1_barrack, level2_barrack, level3_barrack, level4_barrack, level5_barrack, level6_barrack, level7_barrack, level8_barrack, level9_barrack, level10_barrack, level11_barrack, level12_barrack,level13_barrack, level14_barrack, level15_barrack, level16_barrack, level17_barrack, level18_barrack, level19_barrack, level20_barrack};
-use kingdom_lord::tests::upgrade_func::{level1_stable, level2_stable, level3_stable, level4_stable, level5_stable, level6_stable, level7_stable, level8_stable, level9_stable, level10_stable, level11_stable, level12_stable, level13_stable, level14_stable, level15_stable, level16_stable, level17_stable, level18_stable, level19_stable, level20_stable};
+use kingdom_lord::tests::upgrade_func::{
+    level1_barrack, level2_barrack, level3_barrack, level4_barrack, level5_barrack, level6_barrack,
+    level7_barrack, level8_barrack, level9_barrack, level10_barrack, level11_barrack,
+    level12_barrack, level13_barrack, level14_barrack, level15_barrack, level16_barrack,
+    level17_barrack, level18_barrack, level19_barrack, level20_barrack
+};
+use kingdom_lord::tests::upgrade_func::{
+    level1_stable, level2_stable, level3_stable, level4_stable, level5_stable, level6_stable,
+    level7_stable, level8_stable, level9_stable, level10_stable, level11_stable, level12_stable,
+    level13_stable, level14_stable, level15_stable, level16_stable, level17_stable, level18_stable,
+    level19_stable, level20_stable
+};
+use kingdom_lord::models::army::ArmyGroup;
 use kingdom_lord::admin::kingdom_lord_admin;
 use kingdom_lord::components::outer_city::OuterCityTraitDispatcher;
-use kingdom_lord::tests::upgrade_proof::{barrack_level1_proof, stable_level1_proof, barrack_level2_proof, stable_level2_proof};
+use kingdom_lord::tests::upgrade_proof::{
+    barrack_level1_proof, stable_level1_proof, barrack_level2_proof, stable_level2_proof
+};
 use starknet::contract_address_const;
 use openzeppelin::presets::erc20::ERC20;
 use openzeppelin::token::erc20::interface::IERC20Dispatcher;
@@ -86,6 +100,45 @@ fn assert_resource(
     assert_eq!(actual_food, food, "resource food should be {} but got {}", food, actual_food);
 }
 
+fn assert_armygroup(
+    army: ArmyGroup,
+    millitia: u64,
+    guard: u64,
+    heavy_infantry: u64,
+    scouts: u64,
+    knights: u64,
+    heavy_knights: u64
+) {
+    assert_eq!(
+        army.millitia,
+        millitia,
+        "millititia should be {} but got {}",
+        army.millitia,
+        millitia
+    );
+    assert_eq!(army.guard, guard, "guard should be {} but got {}", army.guard, guard);
+    assert_eq!(
+        army.heavy_infantry,
+        heavy_infantry,
+        "heavy_infantry should be {} but got {}",
+        army.heavy_infantry,
+        heavy_infantry
+    );
+    assert_eq!(
+        army.scouts, scouts, "scouts should be {} but got {}", army.scouts, scouts
+    );
+    assert_eq!(
+        army.knights, knights, "knights should be {} but got {}", army.knights, knights
+    );
+    assert_eq!(
+        army.heavy_knights,
+        heavy_knights,
+        "heavy_knights should be {} but got {}",
+        army.heavy_knights,
+        heavy_knights
+    );
+}
+
 fn assert_troop(
     context: TestContext,
     player: ContractAddress,
@@ -97,26 +150,7 @@ fn assert_troop(
     heavy_knights: u64
 ) {
     let troop = context.kingdom_lord.get_troops(player);
-    assert_eq!(
-        troop.army.millitia, millitia, "millititia should be {} but got {}", troop.army.millitia, millitia
-    );
-    assert_eq!(troop.army.guard, guard, "guard should be {} but got {}", troop.army.guard, guard);
-    assert_eq!(
-        troop.army.heavy_infantry,
-        heavy_infantry,
-        "heavy_infantry should be {} but got {}",
-        troop.army.heavy_infantry,
-        heavy_infantry
-    );
-    assert_eq!(troop.army.scouts, scouts, "scouts should be {} but got {}", troop.army.scouts, scouts);
-    assert_eq!(troop.army.knights, knights, "knights should be {} but got {}", troop.army.knights, knights);
-    assert_eq!(
-        troop.army.heavy_knights,
-        heavy_knights,
-        "heavy_knights should be {} but got {}",
-        troop.army.heavy_knights,
-        heavy_knights
-    );
+    assert_armygroup(troop.army, millitia, guard, heavy_infantry, scouts, knights, heavy_knights);
 }
 
 fn increase_time(time: u64) {
@@ -124,7 +158,7 @@ fn increase_time(time: u64) {
     set_block_number(current_time + time);
 }
 
-fn full_level_barrack(context: TestContext, position: u64, player: ContractAddress ){
+fn full_level_barrack(context: TestContext, position: u64, player: ContractAddress) {
     level1_barrack(context, position, player);
     level2_barrack(context, position, player);
     level3_barrack(context, position, player);
@@ -147,7 +181,7 @@ fn full_level_barrack(context: TestContext, position: u64, player: ContractAddre
     level20_barrack(context, position, player);
 }
 
-fn full_level_stable(context: TestContext, position: u64, player: ContractAddress ){
+fn full_level_stable(context: TestContext, position: u64, player: ContractAddress) {
     level1_stable(context, position, player);
     level2_stable(context, position, player);
     level3_stable(context, position, player);
@@ -171,13 +205,13 @@ fn full_level_stable(context: TestContext, position: u64, player: ContractAddres
 }
 
 
-fn train_millitia(context: TestContext){
+fn train_millitia(context: TestContext) {
     context.kingdom_lord_test.start_training_test(0).expect('train millitia');
     increase_time(1600);
     context.kingdom_lord_test.finish_training_test(true).expect('finish training millitia');
 }
 
-fn train_scouts(context: TestContext){
+fn train_scouts(context: TestContext) {
     context.kingdom_lord_test.start_training_test(3).expect('train scouts');
     increase_time(1600);
     context.kingdom_lord_test.finish_training_test(false).expect('finish training scouts');
@@ -233,7 +267,7 @@ fn setup_world() -> TestContext {
         world,
         contract_address,
         kingdom_lord: IKingdomLordDispatcher { contract_address },
-        kingdom_lord_test: IKingdomLordTestDispatcher{ contract_address},
+        kingdom_lord_test: IKingdomLordTestDispatcher { contract_address },
         kingdom_lord_admin: admin_dispatcher,
         erc20_dispatcher,
         erc20_address: erc20_contract_address
