@@ -145,7 +145,7 @@ fn soldier_info(soldier_kind: SoldierKind) -> SoldierInfo{
 }
 
 
-#[derive(Introspect, Copy, Drop, Serde)]
+#[derive(Introspect, Copy, Drop, Serde, Debug)]
 struct ArmyGroup {
     millitia: u64,
     guard: u64,
@@ -250,7 +250,7 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
 
         let sqrt_self_force: u64 = fast_sqrt(self_force.into(), 10).try_into().expect('sqrt_self_force');
         let sqrt_other_force:u64  = fast_sqrt(other_force.into(), 10).try_into().expect('sqrt_other_force');
-        println!("self force {}, other_force {}, sqrt self {} , sqrt other {}", self_force, other_force,sqrt_self_force, sqrt_other_force);
+
         // FIXME
         self.millitia = self.millitia *  other_force / self_force  * sqrt_other_force / sqrt_self_force ;
         self.guard = self.guard *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
@@ -260,10 +260,57 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
         self.heavy_knights = self.heavy_knights *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
     }
 
-    fn rob_damege(ref self: ArmyGroup, robed_group: ArmyGroup) -> bool{
+    fn rob_damege(ref self: ArmyGroup, ref robed_group: ArmyGroup) -> bool{
         let self_force = self.attack_force();
         let defense_force = robed_group.defense_force();
-        true
+        let sqrt_self_force: u64 = fast_sqrt(self_force.into(), 10).try_into().expect('sqrt_self_force');
+        let sqrt_defense_force:u64  = fast_sqrt(defense_force.into(), 10).try_into().expect('sqrt_other_force');
+        if defense_force > self_force {
+            let p = self_force *100 / defense_force * sqrt_self_force* 100 / sqrt_defense_force;
+            robed_group.millitia = robed_group.millitia * 10000 / (10000 + p);
+            robed_group.guard = robed_group.guard * 10000 / (10000 + p);
+            robed_group.heavy_infantry = robed_group.heavy_infantry * 10000 / (10000 + p);
+            robed_group.scouts = robed_group.scouts * 10000 / (10000 + p);
+            robed_group.knights = robed_group.knights * 10000 / (10000 + p);
+            robed_group.heavy_knights = robed_group.heavy_knights * 10000 / (10000 + p);
+
+            self.millitia = self.millitia * p/ (10000 + p);
+            self.guard = self.guard * p/ (10000 + p);
+            self.heavy_infantry = self.heavy_infantry * p/ (10000 + p);
+            self.scouts = self.scouts * p/ (10000 + p);
+            self.knights = self.knights * p/ (10000 + p);
+            self.heavy_knights = self.heavy_knights * p/ (10000 + p);
+            false
+        } else {
+            let p = defense_force *100 / self_force * sqrt_defense_force* 100 / sqrt_self_force;
+            self.millitia = self.millitia * 10000 / (10000 + p); 
+            self.guard = self.guard * 10000 / (10000 + p);
+            self.heavy_infantry = self.heavy_infantry * 10000 / (10000 + p);
+            self.scouts = self.scouts * 10000 / (10000 + p);
+            self.knights = self.knights * 10000 / (10000 + p);
+            self.heavy_knights = self.heavy_knights * 10000 / (10000 + p);
+
+            robed_group.millitia = robed_group.millitia * p/ (10000 + p);
+            robed_group.guard = robed_group.guard * p/ (10000 + p);
+            robed_group.heavy_infantry = robed_group.heavy_infantry * p/ (10000 + p);
+            robed_group.scouts = robed_group.scouts * p/ (10000 + p);
+            robed_group.knights = robed_group.knights * p/ (10000 + p);
+            robed_group.heavy_knights = robed_group.heavy_knights * p/ (10000 + p);
+
+            true
+        }
+    }
+
+    fn rob(ref self: ArmyGroup, ref robed_group: ArmyGroup) -> bool{
+        let self_force = self.attack_force();
+        let defense_force = robed_group.defense_force();
+        if self_force > defense_force {
+            self.rob_damege(ref robed_group);
+            true
+        } else {
+            self.rob_damege(ref robed_group);
+            false
+        }
     }
 
     /// return true if attacker win
@@ -321,6 +368,7 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
 #[cfg(test)]
 mod army_test{
     use super::{ArmyGroup, ArmyGroupExtensionImpl};
+    use kingdom_lord::tests::utils::assert_armygroup;
 
     #[test]
     fn test_fight_damage(){
@@ -342,6 +390,35 @@ mod army_test{
             heavy_knights: 0
         };
 
-        army1.fight(ref army2);
+        let res = army1.fight(ref army2);
+        assert!(!res, "army1 should lose");
+        assert_armygroup(army1, 0, 0, 0 , 0,0,0);
+        assert_armygroup(army2, 6, 0,0, 6,0,0)
+    }
+
+    #[test]
+    fn test_rob_damage(){
+        let mut army1 = ArmyGroup{
+            millitia: 10,
+            guard: 0,
+            heavy_infantry: 0,
+            scouts: 10,
+            knights: 0,
+            heavy_knights: 0
+        };
+
+        let mut army2 = ArmyGroup{
+            millitia: 8,
+            guard: 0,
+            heavy_infantry: 0,
+            scouts: 8,
+            knights: 0,
+            heavy_knights: 0
+        };
+
+        let res = army1.rob(ref army2);
+        assert!(!res, "army1 should lose");
+        assert_armygroup(army1, 4, 0, 0, 4, 0, 0);
+        assert_armygroup(army2, 4, 0, 0, 4, 0, 0);
     }
 }
