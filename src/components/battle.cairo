@@ -8,7 +8,9 @@ struct AmbushInfo {
     player: ContractAddress,
     army: ArmyGroup,
     created_time: u64,
-    is_revealed: bool
+    start_x: u64,
+    start_y: u64,
+    is_revealed: bool,
 }
 
 
@@ -23,7 +25,7 @@ mod battle_component {
     use kingdom_lord::interface::Error;
     use kingdom_lord::components::barrack::{Troops};
     use kingdom_lord::models::army::{ArmyGroup, ArmyGroupExtensionImpl, soldier_info, SoldierKind};
-    use kingdom_lord::components::globe::{GlobeLocation, LocationKind};
+    use kingdom_lord::components::globe::{GlobeLocation, LocationKind, PlayerVillage};
 
     #[storage]
     struct Storage {}
@@ -46,6 +48,7 @@ mod battle_component {
             let world = self.get_contract().world();
             let current = get_current_time();
             let mut troops = get!(world, (player), Troops);
+            let village = get!(world, (player), PlayerVillage);
             match troops.army.split_group(millitia, guard, heavy_infantry, scouts, knights, heavy_knights){
                 Result::Err(_) => Result::Err(Error::NotEnoughSoldier),
                 Result::Ok(new_group) => {
@@ -54,6 +57,8 @@ mod battle_component {
                         player,
                         army: new_group,
                         created_time: current,
+                        start_x: village.x,
+                        start_y: village.y,
                         is_revealed: false
                     };
                     set!(world, (troops));
@@ -157,20 +162,20 @@ mod battle_component {
         fn reveal_hide(
             self: @ComponentState<TContractState>,
             origin_hash: felt252,
-            origin_x: u64,
-            origin_y: u64,
+            origin_target_x: u64,
+            origin_target_y: u64,
             origin_time: u64,
             origin_nonce: u64,
             new_hash: felt252,
         ) -> Result<(), Error> {
             let is_valid_reveal = self
-                .reveal_ambush(origin_hash, origin_x, origin_y, origin_time, origin_nonce);
+                .reveal_ambush(origin_hash, origin_target_x, origin_target_y, origin_time, origin_nonce);
             if !is_valid_reveal {
                 return Result::Err(Error::InvalidReveal);
             }
             let world = self.get_contract().world();
             let mut ambush_info = get!(world, (origin_hash), AmbushInfo);
-            if !self.is_valid_move(x, y, target_x, target_y, ambush_info.army, time, get_current_time())  {
+            if !self.is_valid_move(ambush_info.start_x, ambush_info.start_y, origin_target_x, origin_target_y, ambush_info.army, ambush_info.created_time, get_current_time())  {
                 return Result::Err(Error::InvalidMove);
             }
             ambush_info.is_revealed = true;
@@ -179,6 +184,8 @@ mod battle_component {
                 player: ambush_info.player,
                 army: ambush_info.army,
                 created_time: get_current_time(),
+                start_x: origin_target_x,
+                start_y: origin_target_y,
                 is_revealed: false
             };
             set!(world, (ambush_info));

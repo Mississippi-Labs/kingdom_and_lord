@@ -1,4 +1,5 @@
-
+use core::traits::TryInto;
+use alexandria_math::fast_root::fast_sqrt;
 
 #[derive(Copy, Drop, Serde)]
 struct SoldierInfo{
@@ -244,16 +245,24 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
         self.heavy_knights = 0;
     }
 
-    fn damage(ref self: ArmyGroup, self_force: u64 , other_force: u64){
+    fn fight_damage(ref self: ArmyGroup, self_force: u64 , other_force: u64){
         assert!(self_force > other_force, "damage otherwise die");
 
+        let sqrt_self_force: u64 = fast_sqrt(self_force.into(), 10).try_into().expect('sqrt_self_force');
+        let sqrt_other_force:u64  = fast_sqrt(other_force.into(), 10).try_into().expect('sqrt_other_force');
         // FIXME
-        self.millitia = self.millitia *  other_force / self_force;
-        self.guard = self.guard *  other_force / self_force;
-        self.heavy_infantry = self.heavy_infantry *  other_force / self_force;
-        self.scouts = self.scouts *  other_force / self_force;
-        self.knights = self.knights *  other_force / self_force;
-        self.heavy_knights = self.heavy_knights *  other_force / self_force;
+        self.millitia = self.millitia *  other_force / self_force  * sqrt_other_force / sqrt_self_force ;
+        self.guard = self.guard *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
+        self.heavy_infantry = self.heavy_infantry *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
+        self.scouts = self.scouts *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
+        self.knights = self.knights *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
+        self.heavy_knights = self.heavy_knights *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
+    }
+
+    fn rob_damege(ref self: ArmyGroup, robed_group: ArmyGroup) -> bool{
+        let self_force = self.attack_force();
+        let defense_force = robed_group.defense_force();
+        true
     }
 
     /// return true if attacker win
@@ -265,12 +274,12 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
         let attack_force = self.attack_force();
         let defense_force = defender.defense_force();
         if attack_force > defense_force {
-            self.damage(attack_force, defense_force);
+            self.fight_damage(attack_force, defense_force);
             defender.die();
             true
         } else {
             self.die();
-            defender.damage(defense_force, attack_force);
+            defender.fight_damage(defense_force, attack_force);
             false
         }
     }
