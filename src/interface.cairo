@@ -27,7 +27,8 @@ enum Error{
     VillagePositionAlreadyTaken,
     LocationNotVillage,
     NotEnoughSoldier,
-    InvalidReveal
+    InvalidReveal,
+    InvalidMove
 }
 
 #[starknet::interface]

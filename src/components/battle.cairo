@@ -63,6 +63,18 @@ mod battle_component {
             }
         }
 
+        fn is_valid_move(self: @ComponentState<TContractState>, x: u64, y: u64, target_x: u64, target_y: u64, army: ArmyGroup, start_time: u64, end_time:u64) -> bool {
+            let speed = army.speed();
+            let distance = (target_x - x) + (target_y - y);
+            let available_distance = speed * (end_time - start_time);
+            if distance > available_distance {
+                false
+            } else {
+                true
+            }
+
+        }
+
         fn reveal_ambush(
             self: @ComponentState<TContractState>,
             hash: felt252,
@@ -113,6 +125,10 @@ mod battle_component {
             };
             let world = self.get_contract().world();
             let mut ambush_info = get!(world, (hash), AmbushInfo);
+            if !self.is_valid_move(x, y, target_x, target_y, ambush_info.army, time, get_current_time())  {
+                return Result::Err(Error::InvalidMove);
+            }
+
             let player = get_caller_address();
             assert!(ambush_info.player == player, "You can only use your own ambush");
 
@@ -154,6 +170,9 @@ mod battle_component {
             }
             let world = self.get_contract().world();
             let mut ambush_info = get!(world, (origin_hash), AmbushInfo);
+            if !self.is_valid_move(x, y, target_x, target_y, ambush_info.army, time, get_current_time())  {
+                return Result::Err(Error::InvalidMove);
+            }
             ambush_info.is_revealed = true;
             let new_ambush_info = AmbushInfo {
                 ambush_hash: new_hash,
