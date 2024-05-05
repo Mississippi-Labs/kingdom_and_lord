@@ -133,7 +133,6 @@ mod battle_component {
             nonce: u64,
             target_x: u64,
             target_y: u64,
-            is_robbed: bool
         ) -> Result<(), Error> {
             let is_valid_reveal = self.reveal_ambush(hash, x, y, time, nonce);
             if !is_valid_reveal {
@@ -169,6 +168,50 @@ mod battle_component {
 
         }
 
+        fn reveal_rob(
+            self: @ComponentState<TContractState>,
+            hash: felt252,
+            x: u64,
+            y: u64,
+            time: u64,
+            nonce: u64,
+            target_x: u64,
+            target_y: u64,
+        ) -> Result<(ContractAddress, ContractAddress, u64), Error> {
+            let is_valid_reveal = self.reveal_ambush(hash, x, y, time, nonce);
+            if !is_valid_reveal {
+                return Result::Err(Error::InvalidReveal);
+            };
+            let world = self.get_contract().world();
+            let mut ambush_info = get!(world, (hash), AmbushInfo);
+            if !self.is_valid_move(x, y, target_x, target_y, ambush_info.army, time, get_current_time())  {
+                return Result::Err(Error::InvalidMove);
+            }
+
+            let player = get_caller_address();
+            assert!(ambush_info.player == player, "You can only use your own ambush");
+
+            let target_enemy_village = get!(world, (target_x, target_y), GlobeLocation);
+
+            match target_enemy_village.kind{
+                LocationKind::Village(robbed_player) =>{
+                    let mut enemy_troops = get!(world, (robbed_player), Troops);
+                    ambush_info.army.rob(ref enemy_troops.army);
+
+                    let load_capacity = ambush_info.army.load_capacity();
+                    ambush_info.is_revealed = true;
+                    let mut self_troops = get!(world, (player), Troops);
+                    self_troops.army.merge_army(ref ambush_info.army);
+
+                    set!(world, (enemy_troops));
+                    set!(world, (self_troops));
+                    set!(world, (ambush_info));
+                    return Result::Ok((robbed_player, player, load_capacity));
+                },
+                _ => {return Result::Err(Error::LocationNotVillage);}
+            }
+
+        }
 
         fn reveal_hide(
             self: @ComponentState<TContractState>,

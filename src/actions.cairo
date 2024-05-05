@@ -410,10 +410,10 @@ mod kingdom_lord_controller {
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn mine(self: @ContractState) {
-            let (mined_wood, mined_brick, mined_steel, mined_food) = self.outer_city.mine();
-            self.warehouse.add_resource(mined_wood, mined_brick, mined_steel);
-            self.barn.add_food(mined_food);
+        fn mine(self: @ContractState, player: ContractAddress) {
+            let (mined_wood, mined_brick, mined_steel, mined_food) = self.outer_city.mine(player);
+            self.warehouse.add_resource(player,mined_wood, mined_brick, mined_steel);
+            self.barn.add_food(player, mined_food);
         }
 
         fn _spawn(self: @ContractState) -> Result<(), Error> {
@@ -726,9 +726,9 @@ mod kingdom_lord_controller {
                 );
             match res {
                 Result::Ok(upgrade_id) => {
-                    self.mine();
-                    self.warehouse.remove_resource(req_wood, req_brick, req_steel);
-                    self.barn.remove_food(req_food);
+                    self.mine(caller_address);
+                    self.warehouse.remove_resource(caller_address, req_wood, req_brick, req_steel);
+                    self.barn.remove_food(caller_address, req_food);
                     emit!(world, 
                             StartUpgradeEvent {
                                 player: caller_address,
@@ -749,7 +749,7 @@ mod kingdom_lord_controller {
             let player = get_caller_address();
             match res {
                 Result::Ok(finished_building_info) => {
-                    self.mine();
+                    self.mine(player);
                     if finished_building_info.is_new_building {
                         self
                             .universal
@@ -831,9 +831,9 @@ mod kingdom_lord_controller {
                 return Result::Err(Error::TrainingPrerequirementNotMatch);
             }
 
-            self.mine();
-            self.warehouse.remove_resource(req_wood, req_brick, req_steel);
-            self.barn.remove_food(req_food);
+            self.mine(caller_address);
+            self.warehouse.remove_resource(caller_address, req_wood, req_brick, req_steel);
+            self.barn.remove_food(caller_address, req_food);
 
             let res = if soldier_kind_num < 3{
                 self.barrack.start_training(soldier_kind, soldier_info.required_time)
@@ -866,8 +866,8 @@ mod kingdom_lord_controller {
             };
             match res {
                 Result::Ok(training_id) => {
-                    self.mine();
                     let player = get_caller_address();
+                    self.mine(player);
                     let world = self.world_dispatcher.read();
                     emit!(world, TrainingFinishedEvent { player, training_id });
                 },
@@ -936,7 +936,31 @@ mod kingdom_lord_controller {
             target_y: u64,
             is_robbed: bool
         ) -> Result<(), Error>{
-            self.battle.reveal_attack(hash, x, y, time, nonce, target_x, target_y, is_robbed)
+            if is_robbed{
+                match self.battle.reveal_rob(hash, x, y, time, nonce, target_x, target_y){
+                    Result::Ok((robbed_player, player, load_capacity)) => {
+                        self.mine(robbed_player);
+                        let (wood, brick, steel, food) = self._get_resource(get_caller_address());
+                        let total: u64 = wood.into() + brick.into() + steel.into() + food.into();
+
+                        let robbed_wood = wood.into() * load_capacity / total;
+                        let robbed_brick = brick.into() * load_capacity / total;
+                        let robbed_steel = steel.into() * load_capacity / total;
+                        let robbed_food = food.into() * load_capacity / total;
+                        self.warehouse.remove_resource(robbed_player, robbed_wood.into(), robbed_brick.into(), robbed_steel.into());
+                        self.barn.remove_food(robbed_player, robbed_food.into());
+
+                        self.mine(player);
+                        self.warehouse.add_resource(player, robbed_wood.into(), robbed_brick.into(), robbed_steel.into());
+                        self.barn.add_food(player, robbed_food.into());
+
+                        Result::Ok(())
+                    },
+                    Result::Err(e) => Result::Err(e)
+                }
+            } else {
+                self.battle.reveal_attack(hash, x, y, time, nonce, target_x, target_y)
+            }
         }
 
         fn _reveal_hide(

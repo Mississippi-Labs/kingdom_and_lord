@@ -52,13 +52,4 @@ mod kingdom_lord_admin {
         }
     }
 
-    #[generate_trait]
-    impl InternalImpl of InternalTrait {
-        fn mine(self: @ContractState) {
-            let (mined_wood, mined_brick, mined_steel, mined_food) = self.outer_city.mine();
-            self.warehouse.add_resource(mined_wood, mined_brick, mined_steel);
-            self.barn.add_food(mined_food);
-        }
-
-    }
 }

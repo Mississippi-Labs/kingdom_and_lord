@@ -140,23 +140,22 @@ mod outer_city_component {
         }
 
         fn mine(
-            self: @ComponentState<TContractState>
+            self: @ComponentState<TContractState>, player: ContractAddress,
         ) -> (Resource<Wood>, Resource<Brick>, Resource<Steel>, Resource<Food>) {
             let world = self.get_contract().world();
-            let caller = get_caller_address();
-            let mut outer_city = get!(world, caller, (OuterCity));
+            let mut outer_city = get!(world, player, (OuterCity));
             let current_block_time = get_current_time();
             let wood = self
-                .get_wood_building(caller)
+                .get_wood_building(player)
                 .mine(outer_city.last_mined_time, current_block_time);
             let brick = self
-                .get_brick_building(caller)
+                .get_brick_building(player)
                 .mine(outer_city.last_mined_time, current_block_time);
             let steel = self
-                .get_steel_building(caller)
+                .get_steel_building(player)
                 .mine(outer_city.last_mined_time, current_block_time);
             let food = self
-                .get_food_building(caller)
+                .get_food_building(player)
                 .mine(outer_city.last_mined_time, current_block_time);
             outer_city.last_mined_time = current_block_time;
             set!(world, (outer_city));

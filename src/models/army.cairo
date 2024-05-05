@@ -260,6 +260,15 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
         self.heavy_knights = self.heavy_knights *  other_force / self_force * sqrt_other_force / sqrt_self_force ;
     }
 
+    fn load_capacity(self: @ArmyGroup) -> u64{
+        *self.millitia * 20
+            + *self.guard * 20
+            + *self.heavy_infantry * 20
+            + *self.scouts * 20
+            + *self.knights * 20
+            + *self.heavy_knights * 20
+    }
+
     fn rob_damege(ref self: ArmyGroup, ref robed_group: ArmyGroup) -> bool{
         let self_force = self.attack_force();
         let defense_force = robed_group.defense_force();
@@ -302,15 +311,7 @@ impl ArmyGroupExtensionImpl of ArmyGroupExtension {
     }
 
     fn rob(ref self: ArmyGroup, ref robed_group: ArmyGroup) -> bool{
-        let self_force = self.attack_force();
-        let defense_force = robed_group.defense_force();
-        if self_force > defense_force {
-            self.rob_damege(ref robed_group);
-            true
-        } else {
-            self.rob_damege(ref robed_group);
-            false
-        }
+        self.rob_damege(ref robed_group)
     }
 
     /// return true if attacker win

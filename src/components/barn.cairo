@@ -39,8 +39,13 @@ impl BarnTraitImpl of BarnStorageExtension{
     }
 
     fn remove_food(ref self: BarnStorage, food: Resource<Food>){
-        self.food -= food;
+        if self.food> food{
+            self.food -= food;
+        } else {
+            self.food = 0_u64.into();
+        }
     }
+
 }
 
 
@@ -75,7 +80,7 @@ mod barn_component{
     impl BarnInternalImpl<
         TContractState, +HasComponent<TContractState>, +IWorldProvider<TContractState>
     > of BarnInternalTrait<TContractState> {
-        fn add_food(self: @ComponentState<TContractState>, food: Resource<Food>){
+        fn add_food(self: @ComponentState<TContractState>, player: ContractAddress, food: Resource<Food>){
             let world = self.get_contract().world();
             let player = get_caller_address();
             let mut barn = get!(world, (player), (BarnStorage));
@@ -83,9 +88,8 @@ mod barn_component{
             set!(world, (barn))
         }
 
-        fn remove_food(self: @ComponentState<TContractState>, food: Resource<Food>){
+        fn remove_food(self: @ComponentState<TContractState>, player: ContractAddress, food: Resource<Food>){
             let world = self.get_contract().world();
-            let player = get_caller_address();
             let mut barn = get!(world, (player), (BarnStorage));
             barn.remove_food(food);
             set!(world, (barn))

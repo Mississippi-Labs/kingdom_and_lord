@@ -53,9 +53,21 @@ impl WarehouseStorageExtensionImpl of WarehouseExtension{
     }
 
     fn remove_resource(ref self: WarehouseStorage, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>) {
-        self.wood -= wood;
-        self.bricks -= bricks;
-        self.steel -= steel;
+        if self.wood > wood {
+            self.wood -= wood;
+        } else {
+            self.wood = 0_u64.into();
+        }
+        if self.bricks > bricks {
+            self.bricks -= bricks;
+        } else {
+            self.bricks = 0_u64.into();
+        }
+        if self.steel > steel {
+            self.steel -= steel;
+        } else {
+            self.steel = 0_u64.into();
+        }
     }
 }
 
@@ -90,7 +102,7 @@ mod warehouse_component{
     impl WarehouseInternalImpl<
         TContractState, +HasComponent<TContractState>, +IWorldProvider<TContractState>
     > of WarehouseInternalTrait<TContractState> {
-        fn add_resource(self:@ComponentState<TContractState>, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>){
+        fn add_resource(self:@ComponentState<TContractState>, player: ContractAddress, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>){
             let world = self.get_contract().world();
             let player = get_caller_address();
             let mut warehouse: WarehouseStorage = get!(world, (player), (WarehouseStorage));
@@ -98,9 +110,8 @@ mod warehouse_component{
             set!(world, (warehouse))
         }
 
-        fn remove_resource(self:@ComponentState<TContractState>, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>){
+        fn remove_resource(self:@ComponentState<TContractState>, player: ContractAddress, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>){
             let world = self.get_contract().world();
-            let player = get_caller_address();
             let mut warehouse: WarehouseStorage = get!(world, (player), (WarehouseStorage));
             warehouse.remove_resource(wood, bricks, steel);
             set!(world, (warehouse))
@@ -115,6 +126,7 @@ mod warehouse_component{
             let warehouse = get!(self.get_contract().world(), (player), (WarehouseStorage));
             warehouse.max_storage
         }
+
     }
 }
 
