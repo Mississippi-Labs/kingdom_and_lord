@@ -48,7 +48,7 @@ mod tests {
     // // mod test_pay_upgrade;
     // mod test_growth_rate;
     // mod test_create_city;
-    // mod test_ambush;
+    mod test_ambush;
     mod utils;
     mod upgrade_proof;
     mod upgrade_func;

@@ -82,7 +82,6 @@ mod battle_component {
                 y - target_y
             };
             let distance = distance_x + distance_y;
-            println!("x {} y{} {} {} {} {}", x, y, target_x, target_y, start_time, end_time);
             let available_distance = speed * (end_time - start_time);
             if distance > available_distance {
                 false
