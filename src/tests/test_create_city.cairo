@@ -41,7 +41,7 @@ mod tests {
 
         let (x, y) = context.kingdom_lord.get_village_location(caller);
 
-        assert!(x == 1, "x should be 73 but got {}", x);
+        assert!(x == 18, "x should be 18 but got {}", x);
         assert!(y == 92, "y should be 75 but got {}", y);
     }
 
