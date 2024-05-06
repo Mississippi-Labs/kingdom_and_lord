@@ -150,8 +150,8 @@ mod battle_component {
             let target_enemy_village = get!(world, (target_x, target_y), GlobeLocation);
 
             match target_enemy_village.kind{
-                LocationKind::Village(enemy_player) =>{
-                    let mut enemy_troops = get!(world, (enemy_player), Troops);
+                LocationKind::Village =>{
+                    let mut enemy_troops = get!(world, (target_enemy_village.player), Troops);
                     ambush_info.army.fight(ref enemy_troops.army);
 
                     ambush_info.is_revealed = true;
@@ -194,8 +194,8 @@ mod battle_component {
             let target_enemy_village = get!(world, (target_x, target_y), GlobeLocation);
 
             match target_enemy_village.kind{
-                LocationKind::Village(robbed_player) =>{
-                    let mut enemy_troops = get!(world, (robbed_player), Troops);
+                LocationKind::Village =>{
+                    let mut enemy_troops = get!(world, (target_enemy_village.player), Troops);
                     ambush_info.army.rob(ref enemy_troops.army);
 
                     let load_capacity = ambush_info.army.load_capacity();
@@ -206,7 +206,7 @@ mod battle_component {
                     set!(world, (enemy_troops));
                     set!(world, (self_troops));
                     set!(world, (ambush_info));
-                    return Result::Ok((robbed_player, player, load_capacity));
+                    return Result::Ok((player, player, load_capacity));
                 },
                 _ => {return Result::Err(Error::LocationNotVillage);}
             }

@@ -16,15 +16,25 @@ struct GlobeLocation {
     #[key]
     y: u64,
     kind: LocationKind,
+    // zero if location kind is not village
+    player: ContractAddress 
 }
 
 #[derive(Introspect, Copy, Drop, Serde, PartialEq)]
 enum LocationKind{
-    Nothing: ContractAddress,
-    Village: ContractAddress,
-    Army: ContractAddress,
-    Block: ContractAddress,
+    Nothing,
+    Village,
+    Army,
+    Block,
 }
+
+// #[derive(Introspect, Copy, Drop, Serde, PartialEq)]
+// enum LocationKind{
+//     Nothing: ContractAddress,
+//     Village: ContractAddress,
+//     Army: ContractAddress,
+//     Block: ContractAddress,
+// }
 
 #[derive(Model, Copy, Drop, Serde)]
 struct VillageConfirm {
@@ -116,11 +126,11 @@ mod globe_component {
             let (x, y)  = get_position_temp(confirm.block);
 
             let village_location = get!(world, (x, y), GlobeLocation);
-            if village_location.kind != LocationKind::Nothing(ContractAddressZero::zero()) {
+            if village_location.kind != LocationKind::Nothing{
                 return Result::Err(Error::VillagePositionAlreadyTaken);
             }
             let village = PlayerVillage { player, x, y };
-            let village_location = GlobeLocation { x, y, kind: LocationKind::Village(player) };
+            let village_location = GlobeLocation { x, y, kind: LocationKind::Village, player };
             set!(world, (village_location));
             set!(world, (village));
             Result::Ok(())

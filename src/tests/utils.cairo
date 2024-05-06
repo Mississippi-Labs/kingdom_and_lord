@@ -54,8 +54,8 @@ struct TestContext {
     kingdom_lord: IKingdomLordDispatcher,
     kingdom_lord_test: IKingdomLordTestDispatcher,
     kingdom_lord_admin: IKingdomLordAdminDispatcher,
-    erc20_dispatcher: IERC20Dispatcher,
-    erc20_address: ContractAddress
+    // erc20_dispatcher: IERC20Dispatcher,
+    // erc20_address: ContractAddress
 }
 
 // fn NAME() -> felt252 {
@@ -247,18 +247,19 @@ fn setup_world() -> TestContext {
     symbol.serialize(ref calldata);
     SUPPLY.serialize(ref calldata);
     owner.serialize(ref calldata);
-    let (erc20_contract_address, _) = starknet::deploy_syscall(
-        ERC20::TEST_CLASS_HASH.try_into().expect('erc20 test classs'), 0, calldata.span(), false
-    )
-        .expect('expect deploy erc20');
+    // let (erc20_contract_address, _) = starknet::deploy_syscall(
+    //     ERC20::TEST_CLASS_HASH.try_into().expect('erc20 test classs'), 0, calldata.span(), false
+    // )
+    //     .expect('expect deploy erc20');
 
     let admin_dispatcher = IKingdomLordAdminDispatcher { contract_address: admin_contract_address };
-    let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_contract_address };
+    // let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_contract_address };
     set_caller_address(PLAYER());
     set_contract_address(PLAYER());
     admin_dispatcher
         .set_config(
-            erc20_contract_address,
+            // erc20_contract_address,
+            owner,
             200_u256,
             owner,
             0x608f06197fc3aab41e774567c8e4b7e8fa5dae821240eda6b39f22939315f8c
@@ -269,7 +270,7 @@ fn setup_world() -> TestContext {
         kingdom_lord: IKingdomLordDispatcher { contract_address },
         kingdom_lord_test: IKingdomLordTestDispatcher { contract_address },
         kingdom_lord_admin: admin_dispatcher,
-        erc20_dispatcher,
-        erc20_address: erc20_contract_address
+        // erc20_dispatcher,
+        // erc20_address: erc20_contract_address
     }
 }
