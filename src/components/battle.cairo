@@ -148,8 +148,8 @@ mod battle_component {
             assert!(ambush_info.player == player, "You can only use your own ambush");
 
             let target_enemy_village = get!(world, (target_x, target_y), GlobeLocation);
-
-            match target_enemy_village.kind{
+            let location_kind: LocationKind = target_enemy_village.location_kind.into();
+            match location_kind{
                 LocationKind::Village =>{
                     let mut enemy_troops = get!(world, (target_enemy_village.player), Troops);
                     ambush_info.army.fight(ref enemy_troops.army);
@@ -192,8 +192,8 @@ mod battle_component {
             assert!(ambush_info.player == player, "You can only use your own ambush");
 
             let target_enemy_village = get!(world, (target_x, target_y), GlobeLocation);
-
-            match target_enemy_village.kind{
+            let location_kind: LocationKind = target_enemy_village.location_kind.into();
+            match location_kind{
                 LocationKind::Village =>{
                     let mut enemy_troops = get!(world, (target_enemy_village.player), Troops);
                     ambush_info.army.rob(ref enemy_troops.army);

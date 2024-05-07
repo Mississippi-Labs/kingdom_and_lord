@@ -15,16 +15,37 @@ struct GlobeLocation {
     x: u64,
     #[key]
     y: u64,
-    kind: LocationKind,
+    location_kind: u64,
     // zero if location kind is not village
     player: ContractAddress 
 }
 
-#[derive(Introspect, Copy, Drop, Serde, PartialEq)]
+impl LocationKindIntou64 of Into<LocationKind, u64>{
+    fn into(self: LocationKind) -> u64{
+        match self {
+            LocationKind::Nothing => 0,
+            LocationKind::Village => 1,
+            LocationKind::Block => 2,
+        }
+    }
+
+}
+
+impl LocationKindInto of Into<u64, LocationKind>{
+    fn into(self: u64) -> LocationKind{
+        match self {
+            0 => LocationKind::Nothing,
+            1 => LocationKind::Village,
+            2 => LocationKind::Block,
+            _ => panic!("Invalid location kind")
+        }
+    }
+}
+
+#[derive( Copy, Drop, Serde, PartialEq)]
 enum LocationKind{
     Nothing,
     Village,
-    Army,
     Block,
 }
 
@@ -77,6 +98,7 @@ mod globe_component {
     use kingdom_lord::models::time::get_current_time;
     use kingdom_lord::interface::Error;
     use starknet::contract_address::ContractAddressZero;
+    use super::{LocationKindIntou64, LocationKindInto};
 
     #[storage]
     struct Storage {}
@@ -126,11 +148,11 @@ mod globe_component {
             let (x, y)  = get_position_temp(confirm.block);
 
             let village_location = get!(world, (x, y), GlobeLocation);
-            if village_location.kind != LocationKind::Nothing{
+            if village_location.location_kind != LocationKind::Nothing.into(){
                 return Result::Err(Error::VillagePositionAlreadyTaken);
             }
             let village = PlayerVillage { player, x, y };
-            let village_location = GlobeLocation { x, y, kind: LocationKind::Village, player };
+            let village_location = GlobeLocation { x, y, location_kind: LocationKind::Village.into(), player };
             set!(world, (village_location));
             set!(world, (village));
             Result::Ok(())
