@@ -11,6 +11,11 @@ jobs:
   sozo-test:
     runs-on: ubuntu-latest
     steps:
+      - uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          key: ${{ secrets.WILL }}
+          script: systemctl restart katana.service
       - uses: actions/checkout@v3
       - run: curl -L https://install.dojoengine.org | bash
       - run: /home/runner/.config/.dojo/bin/dojoup
