@@ -1,32 +1,9 @@
 #!/bin/bash
 set -xo pipefail
+
+source "$(dirname "$0")/local_env.sh"
+
 pushd $(dirname "$0")/..
-
-if [[ -z "${DEPLOY_RPC_URL+x}" ]]
-then
-    export RPC_URL="http://localhost:5050"
-else
-    export RPC_URL="$DEPLOY_RPC_URL"
-fi
-
-if [[ -z "${TARGET_NAME+x}" ]]
-then
-    export TARGET_NAME="dev"
-else
-    echo "profile target is $TARGET_NAME"
-fi
-
-export WORLD_ADDRESS=$(cat ./manifests/$TARGET_NAME/manifest.json | jq -r '.world.address')
-
-export ACTIONS_ADDRESS=$(cat ./manifests/$TARGET_NAME/manifest.json| jq -r '.contracts[] | select(.name == "kingdom_lord::actions::kingdom_lord_controller" ).address')
-
-export ADMIN_ADDRESS=$(cat ./manifests/$TARGET_NAME/manifest.json| jq -r '.contracts[] | select(.name == "kingdom_lord::admin::kingdom_lord_admin" ).address')
-
-echo "---------------------------------------------------------------------------"
-echo world : $WORLD_ADDRESS 
-echo " "
-echo actions : $ACTIONS_ADDRESS
-echo "---------------------------------------------------------------------------"
 
 # enable system -> component authorizations
 COMPONENTS=("SpawnStatus" "Barn" "BarnStorage" "Barrack" "Troops" "BarrackUnderTraining" "BarrackWaitingToTrain" "CityBuilding" "UnderUpgrading" "WaitingToUpgrade" "CityHall" "College" "OuterCity" "Stable" "StableUnderTraining" "StableWaitingToTrain" "BuildingAreaInfo" "Warehouse" "WarehouseStorage" "CityWall" "Embassy" "PlayerVillage" "GlobeLocation" "VillageConfirm" "AmbushInfo")

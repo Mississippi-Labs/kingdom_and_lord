@@ -1,20 +1,9 @@
 #!/bin/bash
 set -xo pipefail
+
+source "$(dirname "$0")/local_env.sh"
+
 pushd $(dirname "$0")/..
-
-if [[ -z "${DEPLOY_RPC_URL+x}" ]]
-then
-    export RPC_URL="http://localhost:5050"
-else
-    export RPC_URL="$DEPLOY_RPC_URL"
-fi
-
-if [[ -z "${TARGET_NAME+x}" ]]
-then
-    export TARGET_NAME="dev"
-else
-    echo "profile target is $TARGET_NAME"
-fi
 
 echo "Setting pay address for upgrading"
 
