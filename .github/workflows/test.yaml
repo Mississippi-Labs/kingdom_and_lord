@@ -30,7 +30,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: manifest.json
-          path: target/${{ env.TARGET_NAME }}/manifest.json
+          path: manifest/${{ env.TARGET_NAME }}/manifest.json
       - run: bash scripts/default_auth.sh
       - name: start torii service
         uses: appleboy/ssh-action@v1.0.3
