@@ -41,3 +41,5 @@ jobs:
           script: systemctl start torii.service; systemctl start katana-genblock.service
       - name: set merkle data
         run: bash scripts/set_testnet_merkle.sh
+      - name: try spawn
+        run: bash scripts/test/spawn.sh
