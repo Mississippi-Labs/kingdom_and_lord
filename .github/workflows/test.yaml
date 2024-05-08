@@ -11,12 +11,7 @@ jobs:
   sozo-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          key: ${{ secrets.WILL }}
-          username: ${{ secrets.USER }}
-          script: systemctl restart katana.service
+
       - uses: actions/checkout@v3
       - run: curl -L https://install.dojoengine.org | bash
       - run: /home/runner/.config/.dojo/bin/dojoup
@@ -24,9 +19,25 @@ jobs:
       - run: cp /home/runner/.config/.dojo/bin/sozo /usr/local/bin/sozo
       - run: sozo build
       - run: sozo test
-      # - run: sozo --profile ${{ env.TARGET_NAME }} migrate
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: manifest.json
-      #     path: target/${{ env.TARGET_NAME }}/manifest.json
-      # - run: bash scripts/default_auth.sh
+      - name: stop torii service, restart katana
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          key: ${{ secrets.WILL }}
+          username: ${{ secrets.USER }}
+          script: systemctl stop torii.service; systemctl restart katana.service
+      - run: sozo --profile ${{ env.TARGET_NAME }} migrate apply
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manifest.json
+          path: target/${{ env.TARGET_NAME }}/manifest.json
+      - run: bash scripts/default_auth.sh
+      - name: start torii service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          key: ${{ secrets.WILL }}
+          username: ${{ secrets.USER }}
+          script: systemctl start torii.service
+      - name: set merkle data
+        run: bash scripts/set_testnet_merkle.sh
