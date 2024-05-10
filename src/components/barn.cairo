@@ -82,7 +82,6 @@ mod barn_component{
     > of BarnInternalTrait<TContractState> {
         fn add_food(self: @ComponentState<TContractState>, player: ContractAddress, food: Resource<Food>){
             let world = self.get_contract().world();
-            let player = get_caller_address();
             let mut barn = get!(world, (player), (BarnStorage));
             barn.add_food(food);
             set!(world, (barn))

@@ -19,7 +19,7 @@ use core::result::ResultTrait;
     };
     use kingdom_lord::models::building_kind::BuildingKind;
     use kingdom_lord::tests::upgrade_func::{level1_barrack, level1_stable};
-    use kingdom_lord::tests::utils::{full_level_barrack, full_level_stable, train_millitia, train_scouts, assert_troop};
+    use kingdom_lord::tests::utils::{full_level_barrack, full_level_stable, train_millitia, train_scouts, assert_troop, assert_resource};
 
     #[test]
     #[available_gas(300000000000)]
@@ -109,9 +109,14 @@ use core::result::ResultTrait;
         context.kingdom_lord_test.create_ambush_test(ambush_hash,10, 0,0,10,0,0).expect('create ambush succeed');
         assert_troop(context, player2, 0,0,0,0,0,0);
         increase_time(100000);
-        context.kingdom_lord_test.reveal_attack_test(ambush_hash, 75, 90, 100000, 1, 76,90, false).expect('reveal attack succeed');
+        context.kingdom_lord_test.start_training_test(0).expect('train millitia');
+        assert_resource(context, player2, 880, 900, 850, 970);
+        context.kingdom_lord_test.reveal_attack_test(ambush_hash, 75, 90, 100000, 1, 76,90, true).expect('reveal attack succeed');
 
-        assert_troop(context, player2, 0,0,0,0,0,0);
-        assert_troop(context, player1, 6,0,0,6,0,0);
+        assert_troop(context, player2, 4,0,0,4,0,0);
+        assert_troop(context, player1, 4,0,0,4,0,0);
+
+        assert_resource(context, player1, 960, 960, 960, 960);
+        assert_resource(context, player2, 920, 940, 890, 1000);
     }
 }

@@ -206,7 +206,7 @@ mod battle_component {
                     set!(world, (enemy_troops));
                     set!(world, (self_troops));
                     set!(world, (ambush_info));
-                    return Result::Ok((player, player, load_capacity));
+                    return Result::Ok((target_enemy_village.player, player, load_capacity));
                 },
                 _ => {return Result::Err(Error::LocationNotVillage);}
             }

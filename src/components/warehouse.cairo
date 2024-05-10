@@ -104,7 +104,6 @@ mod warehouse_component{
     > of WarehouseInternalTrait<TContractState> {
         fn add_resource(self:@ComponentState<TContractState>, player: ContractAddress, wood: Resource<Wood>, bricks: Resource<Brick>, steel: Resource<Steel>){
             let world = self.get_contract().world();
-            let player = get_caller_address();
             let mut warehouse: WarehouseStorage = get!(world, (player), (WarehouseStorage));
             warehouse.add_resource(wood, bricks, steel);
             set!(world, (warehouse))
