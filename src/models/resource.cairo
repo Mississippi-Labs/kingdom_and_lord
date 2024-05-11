@@ -1,4 +1,4 @@
-#[derive(Drop, Introspect, Copy, Serde, Default)]
+#[derive(Drop, Introspect, Copy, Serde, Default, Debug)]
 struct Resource<T>{
     amount: u64
 }

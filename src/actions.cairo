@@ -940,7 +940,7 @@ mod kingdom_lord_controller {
                 match self.battle.reveal_rob(hash, x, y, time, nonce, target_x, target_y){
                     Result::Ok((robbed_player, player, load_capacity)) => {
                         self.mine(robbed_player);
-                        let (wood, brick, steel, food) = self._get_resource(get_caller_address());
+                        let (wood, brick, steel, food) = self._get_resource(robbed_player);
                         let total: u64 = wood.into() + brick.into() + steel.into() + food.into();
 
                         let robbed_wood = wood.into() * load_capacity / total;

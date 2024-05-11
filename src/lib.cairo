@@ -37,18 +37,18 @@ mod helpers {
 }
 
 mod tests {
-    // mod test_spawn;
-    // mod test_storage;
-    // mod test_upgrade;
-    // mod test_city_hall;
-    // mod test_city_wall;
-    // mod test_train;
-    // mod test_embassy;
-    // mod test_total_population;
-    // // mod test_pay_upgrade;
-    // mod test_growth_rate;
-    // mod test_create_city;
-    // mod test_ambush;
+    mod test_spawn;
+    mod test_storage;
+    mod test_upgrade;
+    mod test_city_hall;
+    mod test_city_wall;
+    mod test_train;
+    mod test_embassy;
+    mod test_total_population;
+    // mod test_pay_upgrade;
+    mod test_growth_rate;
+    mod test_create_city;
+    mod test_ambush;
     mod utils;
     mod upgrade_proof;
     mod upgrade_func;

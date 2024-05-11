@@ -111,6 +111,7 @@ use core::result::ResultTrait;
         increase_time(100000);
         context.kingdom_lord_test.start_training_test(0).expect('train millitia');
         assert_resource(context, player2, 880, 900, 850, 970);
+        assert_resource(context, player1, 1000, 1000, 1000, 1000);
         context.kingdom_lord_test.reveal_attack_test(ambush_hash, 75, 90, 100000, 1, 76,90, true).expect('reveal attack succeed');
 
         assert_troop(context, player2, 4,0,0,4,0,0);
