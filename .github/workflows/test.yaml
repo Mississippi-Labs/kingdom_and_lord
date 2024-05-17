@@ -25,7 +25,7 @@ jobs:
           host: ${{ secrets.HOST }}
           key: ${{ secrets.WILL }}
           username: ${{ secrets.USER }}
-          script: systemctl stop torii.service; systemctl stop katana-genblock.service; systemctl restart katana.service
+          script: systemctl stop torii.service; systemctl stop katana-genblock.service;rm -rf /var/katana; systemctl restart katana.service
       - run: sozo --profile ${{ env.TARGET_NAME }} migrate apply
       - uses: actions/upload-artifact@v4
         with:
