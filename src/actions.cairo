@@ -223,8 +223,9 @@ mod kingdom_lord_controller {
         fn start_training(
                 self: @ContractState,
                 soldier_kind: u64,
+                amount: u64
             ) -> Result<u64, Error>{
-            panic_on_err(self._start_training(soldier_kind))
+            panic_on_err(self._start_training(soldier_kind, amount))
             }
         fn finish_training(self: @ContractState, is_barrack: bool) -> Result<u64, Error>{
             panic_on_err(self._finish_training(is_barrack))
@@ -341,8 +342,8 @@ mod kingdom_lord_controller {
         fn finish_upgrade_test(self: @ContractState) -> Result<(), Error>{
             self._finish_upgrade()
         }
-        fn start_training_test(self: @ContractState, soldier_kind: u64) -> Result<u64, Error>{
-            self._start_training(soldier_kind)
+        fn start_training_test(self: @ContractState, soldier_kind: u64, amount:u64) -> Result<u64, Error>{
+            self._start_training(soldier_kind, amount)
         }
         fn finish_training_test(self: @ContractState, is_barrack: bool) -> Result<u64, Error>{
             self._finish_training(is_barrack)
@@ -580,7 +581,8 @@ mod kingdom_lord_controller {
                 soldier_kind: 0,
                 start_time: 0,
                 end_time: 0,
-                is_finished: true
+                is_finished: true,
+                amount: 0
             });
 
             index = 0;
@@ -598,7 +600,8 @@ mod kingdom_lord_controller {
                 soldier_kind: 0,
                 start_time: 0,
                 end_time: 0,
-                is_finished: true
+                is_finished: true,
+                amount: 0
             });
 
             set!(world, (SpawnStatus { player, already_spawned: true }));
@@ -814,15 +817,15 @@ mod kingdom_lord_controller {
         // }
 
 
-        fn _start_training(self: @ContractState, soldier_kind: u64) -> Result<u64, Error> {
+        fn _start_training(self: @ContractState, soldier_kind: u64, amount: u64) -> Result<u64, Error> {
             let caller_address = get_caller_address();
             let soldier_kind_num = soldier_kind;
             let soldier_kind: SoldierKind = soldier_kind.into();
             let soldier_info = soldier_info(soldier_kind);
-            let req_wood = soldier_info.req_wood.into();
-            let req_brick = soldier_info.req_brick.into();
-            let req_steel = soldier_info.req_steel.into();
-            let req_food = soldier_info.req_food.into();
+            let req_wood = (soldier_info.req_wood * amount).into();
+            let req_brick = (soldier_info.req_brick * amount).into();
+            let req_steel = (soldier_info.req_steel * amount).into();
+            let req_food = (soldier_info.req_food * amount).into();
             let (wood, brick, steel, food) = self.get_resource(caller_address);
             if wood < req_wood || brick < req_brick || steel < req_steel || food < req_food {
                 return Result::Err(Error::ResourceNotEnough);
@@ -836,9 +839,9 @@ mod kingdom_lord_controller {
             self.barn.remove_food(caller_address, req_food);
 
             let res = if soldier_kind_num < 3{
-                self.barrack.start_training(soldier_kind, soldier_info.required_time)
+                self.barrack.start_training(soldier_kind, soldier_info.required_time, amount)
             }   else {
-                self.stable.start_training(soldier_kind, soldier_info.required_time)
+                self.stable.start_training(soldier_kind, soldier_info.required_time, amount)
             };
             match res {
                 Result::Ok(training_id) => {

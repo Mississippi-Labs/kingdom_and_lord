@@ -28,6 +28,7 @@ struct StableUnderTraining{
     start_time: u64,
     end_time: u64,
     is_finished: bool,
+    amount: u64
 }
 
 #[derive(Model, Copy, Drop, Serde)]
@@ -39,6 +40,7 @@ struct StableWaitingToTrain{
     soldier_kind: u64,
     required_time: u64,
     is_planned: bool,
+    amount: u64
 }
 
 
@@ -48,7 +50,8 @@ fn new_stable_wait_to_train(address: ContractAddress, training_id: u64) -> Stabl
         training_id: training_id,
         soldier_kind: 0,
         required_time: 0,
-        is_planned: false
+        is_planned: false,
+        amount: 0
     }
 }
 
@@ -115,7 +118,8 @@ mod stable_component{
         }
         fn start_training(self: @ComponentState<TContractState>,            
             soldier_kind: SoldierKind,
-            required_time: u64
+            required_time: u64,
+            amount:u64
         )-> Result<u64, Error>{
             let world = self.get_contract().world();
             let current_time = get_current_time();
@@ -123,7 +127,7 @@ mod stable_component{
             let stable: Stable = get!(world, (player), (Stable));
             let mut under_training = get!(world, (player), (StableUnderTraining));
 
-            let required_time = stable.bonus * required_time / 100;
+            let required_time = (stable.bonus * required_time / 100) * amount;
             if stable.population == 0{
                 return Result::Err(Error::NoTargetBuildingConstructed);
             }
@@ -133,6 +137,7 @@ mod stable_component{
                 under_training.is_finished = false;
                 under_training.start_time = current_time;
                 under_training.end_time = current_time + required_time;
+                under_training.amount = amount;
                 under_training.soldier_kind = soldier_kind.into();
                 let mut next_training_id = under_training.current_training_id + 1;
                 if next_training_id == UNDER_TRAINING_COUNT{
@@ -161,6 +166,7 @@ mod stable_component{
                         train.soldier_kind = soldier_kind.into();
                         train.required_time = required_time;
                         train.is_planned = true;
+                        train.amount = amount;
  
                         set!(world, (train));
                         res = Result::Ok(index);
@@ -188,22 +194,22 @@ mod stable_component{
                 let origin_training_id = training.current_training_id;
                 match soldier_kind{
                     SoldierKind::Millitia => {
-                        troops.army.millitia += 1;
+                        troops.army.millitia += training.amount;
                     },
                     SoldierKind::Guard => {
-                        troops.army.guard += 1;
+                        troops.army.guard += training.amount;
                     },
                     SoldierKind::HeavyInfantry => {
-                        troops.army.heavy_infantry += 1;
+                        troops.army.heavy_infantry += training.amount;
                     },
                     SoldierKind::Scouts => {
-                        troops.army.scouts += 1;
+                        troops.army.scouts += training.amount;
                     },
                     SoldierKind::Knights => {
-                        troops.army.knights += 1;
+                        troops.army.knights += training.amount;
                     },
                     SoldierKind::HeavyKnights => {
-                        troops.army.heavy_knights += 1;
+                        troops.army.heavy_knights += training.amount;
                     }
                 }
 
@@ -219,6 +225,7 @@ mod stable_component{
                     training.start_time = current_time;
                     training.end_time = current_time + next_train.required_time;
                     training.is_finished = false;
+                    training.amount = next_train.amount;
                     set!(world, (next_train));
                 }
                 set!(world, (troops));

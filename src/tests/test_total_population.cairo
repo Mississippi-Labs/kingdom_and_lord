@@ -51,16 +51,16 @@ mod tests {
         assert_population(context, caller, 14);
     
 
-        train_millitia(context);
+        train_millitia(context, 1);
         assert_population(context, caller, 15);
 
-        train_millitia(context);
+        train_millitia(context, 1);
         assert_population(context, caller, 16);
 
-        train_scouts(context);
+        train_scouts(context, 1);
         assert_population(context, caller, 18);
 
-        train_scouts(context);
+        train_scouts(context, 1);
         assert_population(context, caller, 20);
     }
 }

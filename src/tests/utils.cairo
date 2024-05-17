@@ -205,15 +205,15 @@ fn full_level_stable(context: TestContext, position: u64, player: ContractAddres
 }
 
 
-fn train_millitia(context: TestContext) {
-    context.kingdom_lord_test.start_training_test(0).expect('train millitia');
-    increase_time(1600);
+fn train_millitia(context: TestContext, amount: u64) {
+    context.kingdom_lord_test.start_training_test(0, amount).expect('train millitia');
+    increase_time(1600 * amount);
     context.kingdom_lord_test.finish_training_test(true).expect('finish training millitia');
 }
 
-fn train_scouts(context: TestContext) {
-    context.kingdom_lord_test.start_training_test(3).expect('train scouts');
-    increase_time(1600);
+fn train_scouts(context: TestContext, amount: u64) {
+    context.kingdom_lord_test.start_training_test(3, amount).expect('train scouts');
+    increase_time(1360 * amount);
     context.kingdom_lord_test.finish_training_test(false).expect('finish training scouts');
 }
 

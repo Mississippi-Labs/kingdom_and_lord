@@ -67,6 +67,7 @@ trait IKingdomLord<ContractState>{
     fn start_training(
             self: @ContractState,
             soldier_kind: u64,
+            amount: u64
         ) -> Result<u64, Error>;
     fn finish_training(self: @ContractState, is_barrack: bool) -> Result<u64, Error>;
     // fn pay_to_finish_upgrade(ref self: ContractState, upgrade_id: u64) -> Result<(), Error>;
@@ -140,6 +141,7 @@ trait IKingdomLordTest<ContractState>{
         fn start_training_test(
             self: @ContractState,
             soldier_kind: u64,
+            amount: u64
         ) -> Result<u64, Error>;
         fn finish_training_test(self: @ContractState, is_barrack: bool) -> Result<u64, Error>;
         
